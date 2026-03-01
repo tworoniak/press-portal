@@ -1,0 +1,12 @@
+{
+  "scripts": {
+    "dev": "concurrently \"pnpm --filter @press/web dev\" \"pnpm --filter @press/api start:dev\"",
+    "dev:web": "pnpm --filter @press/web dev",
+    "dev:api": "pnpm --filter @press/api start:dev",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

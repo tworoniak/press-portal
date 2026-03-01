@@ -1,0 +1,160 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum InteractionType {
+  EMAIL
+  CALL
+  TEXT
+  DM
+  MEETING
+  NOTE
+}
+
+enum OutreachStatus {
+  NOT_CONTACTED
+  CONTACTED
+  RESPONDED
+  CONFIRMED
+  PUBLISHED
+  ARCHIVED
+}
+
+model Contact {
+  id           String   @id @default(cuid())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  firstName    String?
+  lastName     String?
+  displayName  String?  // optional override if you prefer "Jane @ Label"
+  role         String?  // publicist / manager / label / etc.
+  company      String?
+
+  email        String?  @unique
+  phone        String?
+  website      String?
+  timezone     String?  // e.g. "America/Chicago"
+
+  notes        String?
+  doNotContact Boolean  @default(false)
+
+  // Simple tags MVP (we can normalize later)
+  tags         String[] @default([])
+
+  status       OutreachStatus @default(NOT_CONTACTED)
+  lastContactedAt DateTime?
+
+  bands        ContactBand[]
+  festivals     ContactFestival[]
+  interactions  Interaction[]
+
+  @@index([lastName])
+  @@index([company])
+  @@index([status])
+}
+
+model Band {
+  id         String   @id @default(cuid())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  name       String   @unique
+  genre      String?
+  country    String?
+  website    String?
+  spotifyUrl String?
+  instagram  String?
+  notes      String?
+
+  contacts   ContactBand[]
+  interactions Interaction[]
+
+  @@index([name])
+}
+
+model Festival {
+  id           String   @id @default(cuid())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  name         String   @unique
+  location     String?
+  website      String?
+  instagram    String?
+
+  // Optional scheduling fields
+  startDate    DateTime?
+  endDate      DateTime?
+
+  credentialInfo String? // notes about media credentials, deadline, requirements
+  notes          String?
+
+  contacts     ContactFestival[]
+  interactions Interaction[]
+
+  @@index([name])
+}
+
+model ContactBand {
+  contactId String
+  bandId    String
+
+  relationshipRole  String?
+  relationshipNotes String?
+
+  createdAt DateTime @default(now())
+
+  contact Contact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  band    Band    @relation(fields: [bandId], references: [id], onDelete: Cascade)
+
+  @@id([contactId, bandId])
+  @@index([bandId])
+}
+
+model ContactFestival {
+  contactId  String
+  festivalId String
+
+  relationshipRole  String?
+  relationshipNotes String?
+
+  createdAt DateTime @default(now())
+
+  contact  Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  festival Festival @relation(fields: [festivalId], references: [id], onDelete: Cascade)
+
+  @@id([contactId, festivalId])
+  @@index([festivalId])
+}
+
+model Interaction {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  type        InteractionType
+  occurredAt  DateTime @default(now())
+  subject     String?
+  notes       String?
+
+  outcome     String?     // "sent press release", "confirmed interview", etc.
+  nextFollowUpAt DateTime?
+
+  contactId   String
+  bandId      String?
+  festivalId  String?
+
+  contact     Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  band        Band?    @relation(fields: [bandId], references: [id], onDelete: SetNull)
+  festival    Festival? @relation(fields: [festivalId], references: [id], onDelete: SetNull)
+
+  @@index([contactId, occurredAt])
+  @@index([bandId])
+  @@index([festivalId])
+  @@index([nextFollowUpAt])
+}
