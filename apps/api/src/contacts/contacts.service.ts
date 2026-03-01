@@ -10,9 +10,42 @@ export class ContactsService {
     return this.prisma.contact.create({ data });
   }
 
-  async findAll() {
+  async findAll(filters?: {
+    search?: string;
+    status?: string;
+    tag?: string;
+    needsFollowUp?: boolean;
+  }) {
+    const search = filters?.search?.trim();
+    const status = filters?.status?.trim();
+    const tag = filters?.tag?.trim();
+
+    const now = new Date();
+
     return this.prisma.contact.findMany({
-      orderBy: { createdAt: 'desc' },
+      where: {
+        ...(status ? { status: status as any } : {}),
+        ...(tag ? { tags: { has: tag } } : {}),
+        ...(search
+          ? {
+              OR: [
+                { firstName: { contains: search, mode: 'insensitive' } },
+                { lastName: { contains: search, mode: 'insensitive' } },
+                { displayName: { contains: search, mode: 'insensitive' } },
+                { email: { contains: search, mode: 'insensitive' } },
+                { company: { contains: search, mode: 'insensitive' } },
+              ],
+            }
+          : {}),
+        ...(filters?.needsFollowUp
+          ? {
+              interactions: {
+                some: { nextFollowUpAt: { lte: now } },
+              },
+            }
+          : {}),
+      },
+      orderBy: [{ lastContactedAt: 'desc' }, { createdAt: 'desc' }],
     });
   }
 

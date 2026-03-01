@@ -39,8 +39,22 @@ export type CreateContactInput = Partial<
   >
 >;
 
-export async function fetchContacts() {
-  const res = await api.get<Contact[]>('/contacts');
+export type ContactFilters = {
+  search?: string;
+  status?: string;
+  tag?: string;
+  needsFollowUp?: boolean;
+};
+
+export async function fetchContacts(filters?: ContactFilters) {
+  const res = await api.get<Contact[]>('/contacts', {
+    params: {
+      ...(filters?.search ? { search: filters.search } : {}),
+      ...(filters?.status ? { status: filters.status } : {}),
+      ...(filters?.tag ? { tag: filters.tag } : {}),
+      ...(filters?.needsFollowUp ? { needsFollowUp: true } : {}),
+    },
+  });
   return res.data;
 }
 

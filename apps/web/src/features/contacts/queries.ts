@@ -1,10 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { createContact, fetchContacts, type CreateContactInput } from './api';
+import {
+  createContact,
+  fetchContacts,
+  type ContactFilters,
+  type CreateContactInput,
+} from './api';
 
-export function useContacts() {
+export function useContacts(filters?: ContactFilters) {
   return useQuery({
-    queryKey: ['contacts'],
-    queryFn: fetchContacts,
+    queryKey: ['contacts', filters ?? {}],
+    queryFn: () => fetchContacts(filters),
   });
 }
 
@@ -13,8 +18,9 @@ export function useCreateContact() {
 
   return useMutation({
     mutationFn: (input: CreateContactInput) => createContact(input),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['contacts'] });
+    onSuccess: async () => {
+      await qc.invalidateQueries({ queryKey: ['contacts'] });
+      await qc.invalidateQueries({ queryKey: ['dashboard'] });
     },
   });
 }

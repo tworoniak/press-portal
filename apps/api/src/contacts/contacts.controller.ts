@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { ContactsService } from './contacts.service';
 import { Prisma } from '@prisma/client';
@@ -20,8 +21,18 @@ export class ContactsController {
   }
 
   @Get()
-  findAll() {
-    return this.contactsService.findAll();
+  findAll(
+    @Query('search') search?: string,
+    @Query('status') status?: string,
+    @Query('tag') tag?: string,
+    @Query('needsFollowUp') needsFollowUp?: string,
+  ) {
+    return this.contactsService.findAll({
+      search,
+      status,
+      tag,
+      needsFollowUp: needsFollowUp === 'true',
+    });
   }
 
   @Get(':id')
