@@ -9,6 +9,7 @@ import table from '../../components/ui/Table/Table.module.scss';
 import styles from './ContactsPage.module.scss';
 import { Badge, type BadgeTone } from '../../components/ui/Badge/Badge';
 import { TagRow } from '../../components/ui/Tag/TagRow';
+import { Modal } from '../../components/ui/Modal/Modal';
 
 type ContactStatus =
   | ''
@@ -63,6 +64,17 @@ function statusTone(status: string | null | undefined): BadgeTone {
   }
 }
 
+function followUpBadge(nextFollowUpAt: string | null) {
+  if (!nextFollowUpAt) return null;
+
+  const ms = new Date(nextFollowUpAt).getTime() - Date.now();
+  const day = 24 * 60 * 60 * 1000;
+
+  if (ms <= 0) return { tone: 'danger' as const, label: 'Due' };
+  if (ms <= 3 * day) return { tone: 'warn' as const, label: 'Soon' };
+  return { tone: 'default' as const, label: 'Scheduled' };
+}
+
 export default function ContactsPage() {
   // Filters
   const [search, setSearch] = useState('');
@@ -88,8 +100,9 @@ export default function ContactsPage() {
   const [newEmail, setNewEmail] = useState('');
   const [newCompany, setNewCompany] = useState('');
   const [newTags, setNewTags] = useState('Press');
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
 
-  function onAdd() {
+  async function onAdd() {
     const email = newEmail.trim();
     if (!email) return;
 
@@ -102,7 +115,7 @@ export default function ContactsPage() {
       .map((t) => t.trim())
       .filter(Boolean);
 
-    create.mutate({
+    await create.mutateAsync({
       email,
       firstName: firstName || undefined,
       lastName,
@@ -112,19 +125,78 @@ export default function ContactsPage() {
       status: 'NOT_CONTACTED',
     });
 
+    setIsCreateOpen(false);
     setNewName('');
     setNewEmail('');
     setNewCompany('');
-    // keep tags
   }
 
   return (
     <div className={page.page}>
       <div className={page.container}>
+        <Modal
+          title='Create contact'
+          open={isCreateOpen}
+          onClose={() => setIsCreateOpen(false)}
+        >
+          {/* Quick add */}
+          <div className={card.card}>
+            <div className={card.cardTitle}>Quick add</div>
+
+            <div className={styles.quickAddGrid}>
+              <label style={{ display: 'grid', gap: 6 }}>
+                <span style={{ fontSize: 12, opacity: 0.75 }}>Name</span>
+                <input
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  placeholder='Jane Doe'
+                />
+              </label>
+
+              <label style={{ display: 'grid', gap: 6 }}>
+                <span style={{ fontSize: 12, opacity: 0.75 }}>Email *</span>
+                <input
+                  value={newEmail}
+                  onChange={(e) => setNewEmail(e.target.value)}
+                  placeholder='jane@label.com'
+                />
+              </label>
+
+              <label style={{ display: 'grid', gap: 6 }}>
+                <span style={{ fontSize: 12, opacity: 0.75 }}>Company</span>
+                <input
+                  value={newCompany}
+                  onChange={(e) => setNewCompany(e.target.value)}
+                  placeholder='Metal PR Co'
+                />
+              </label>
+
+              <label style={{ display: 'grid', gap: 6 }}>
+                <span style={{ fontSize: 12, opacity: 0.75 }}>
+                  Tags (comma)
+                </span>
+                <input
+                  value={newTags}
+                  onChange={(e) => setNewTags(e.target.value)}
+                  placeholder='Press, Metal, US'
+                />
+              </label>
+
+              <button
+                onClick={onAdd}
+                disabled={create.isPending || !newEmail.trim()}
+              >
+                {create.isPending ? 'Adding…' : 'Add'}
+              </button>
+            </div>
+          </div>
+        </Modal>
+
         <div className={page.headerRow}>
           <h1 className={page.title}>Contacts</h1>
           <div className={page.nav}>
-            <Link to='/dashboard'>Dashboard</Link>
+            <button onClick={() => setIsCreateOpen(true)}>New Contact</button>
+            {/* <Link to='/dashboard'>Dashboard</Link> */}
           </div>
         </div>
 
@@ -171,56 +243,6 @@ export default function ContactsPage() {
 
         <div style={{ height: 14 }} />
 
-        {/* Quick add */}
-        <div className={card.card}>
-          <div className={card.cardTitle}>Quick add</div>
-
-          <div className={styles.quickAddGrid}>
-            <label style={{ display: 'grid', gap: 6 }}>
-              <span style={{ fontSize: 12, opacity: 0.75 }}>Name</span>
-              <input
-                value={newName}
-                onChange={(e) => setNewName(e.target.value)}
-                placeholder='Jane Doe'
-              />
-            </label>
-
-            <label style={{ display: 'grid', gap: 6 }}>
-              <span style={{ fontSize: 12, opacity: 0.75 }}>Email *</span>
-              <input
-                value={newEmail}
-                onChange={(e) => setNewEmail(e.target.value)}
-                placeholder='jane@label.com'
-              />
-            </label>
-
-            <label style={{ display: 'grid', gap: 6 }}>
-              <span style={{ fontSize: 12, opacity: 0.75 }}>Company</span>
-              <input
-                value={newCompany}
-                onChange={(e) => setNewCompany(e.target.value)}
-                placeholder='Metal PR Co'
-              />
-            </label>
-
-            <label style={{ display: 'grid', gap: 6 }}>
-              <span style={{ fontSize: 12, opacity: 0.75 }}>Tags (comma)</span>
-              <input
-                value={newTags}
-                onChange={(e) => setNewTags(e.target.value)}
-                placeholder='Press, Metal, US'
-              />
-            </label>
-
-            <button
-              onClick={onAdd}
-              disabled={create.isPending || !newEmail.trim()}
-            >
-              {create.isPending ? 'Adding…' : 'Add'}
-            </button>
-          </div>
-        </div>
-
         <div style={{ height: 18 }} />
 
         {/* Results */}
@@ -246,6 +268,8 @@ export default function ContactsPage() {
                     <th>Company / Role</th>
                     <th>Status</th>
                     <th>Last contacted</th>
+
+                    <th>Follow-up</th>
                     <th>Tags</th>
                   </tr>
                 </thead>
@@ -254,7 +278,9 @@ export default function ContactsPage() {
                   {data?.map((c) => {
                     const label = c.status?.replaceAll('_', ' ') ?? '—';
                     const tone = statusTone(c.status);
-
+                    const nextFollowUpAt =
+                      c.interactions?.[0]?.nextFollowUpAt ?? null;
+                    const fu = followUpBadge(nextFollowUpAt);
                     return (
                       <tr key={c.id}>
                         <td>
@@ -284,6 +310,22 @@ export default function ContactsPage() {
                         </td>
 
                         <td>
+                          {fu ? (
+                            <>
+                              <Badge tone={fu.tone}>{fu.label}</Badge>
+                              <div
+                                className={table.smallMuted}
+                                style={{ marginTop: 6 }}
+                              >
+                                {fmtDate(nextFollowUpAt!)}
+                              </div>
+                            </>
+                          ) : (
+                            <span style={{ opacity: 0.6 }}>—</span>
+                          )}
+                        </td>
+
+                        <td>
                           <TagRow tags={c.tags ?? []} />
                         </td>
                       </tr>
@@ -292,7 +334,7 @@ export default function ContactsPage() {
 
                   {(data?.length ?? 0) === 0 && (
                     <tr>
-                      <td colSpan={5} style={{ padding: 14, opacity: 0.75 }}>
+                      <td colSpan={6} style={{ padding: 14, opacity: 0.75 }}>
                         No contacts match these filters.
                       </td>
                     </tr>

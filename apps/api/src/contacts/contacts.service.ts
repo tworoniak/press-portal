@@ -24,6 +24,7 @@ export class ContactsService {
 
     return this.prisma.contact.findMany({
       where: {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         ...(status ? { status: status as any } : {}),
         ...(tag ? { tags: { has: tag } } : {}),
         ...(search
@@ -44,6 +45,17 @@ export class ContactsService {
               },
             }
           : {}),
+      },
+      include: {
+        interactions: {
+          where: { nextFollowUpAt: { not: null } },
+          orderBy: { nextFollowUpAt: 'asc' },
+          take: 1,
+          select: {
+            id: true,
+            nextFollowUpAt: true,
+          },
+        },
       },
       orderBy: [{ lastContactedAt: 'desc' }, { createdAt: 'desc' }],
     });

@@ -17,15 +17,15 @@ const INTERACTION_OPTIONS = [
   { value: 'NOTE', label: 'Note' },
 ] as const satisfies readonly { value: InteractionType; label: string }[];
 
-function fmt(dt: string) {
-  return new Date(dt).toLocaleString();
-}
+// function fmt(dt: string) {
+//   return new Date(dt).toLocaleString();
+// }
 
 export default function ContactDetailPage() {
   const { id = '' } = useParams();
   const { data, isLoading, isError } = useContact(id);
   const create = useCreateInteraction(id);
-
+  const [outcome, setOutcome] = useState('');
   const [type, setType] = useState<InteractionType>('EMAIL');
   const [subject, setSubject] = useState('');
   const [notes, setNotes] = useState('');
@@ -107,6 +107,15 @@ export default function ContactDetailPage() {
             </label>
 
             <label style={{ display: 'grid', gap: 6 }}>
+              <span style={{ fontSize: 12, opacity: 0.75 }}>Outcome</span>
+              <input
+                value={outcome}
+                onChange={(e) => setOutcome(e.target.value)}
+                placeholder='e.g. Requested promo, Confirmed coverage, No reply'
+              />
+            </label>
+
+            <label style={{ display: 'grid', gap: 6 }}>
               <span style={{ fontSize: 12, opacity: 0.75 }}>Notes</span>
               <textarea
                 value={notes}
@@ -133,59 +142,24 @@ export default function ContactDetailPage() {
                   type,
                   subject: subject.trim() || undefined,
                   notes: notes.trim() || undefined,
+                  outcome: outcome.trim() || undefined,
                   nextFollowUpAt: nextFollowUpAt
                     ? new Date(nextFollowUpAt).toISOString()
                     : undefined,
                 });
                 setSubject('');
                 setNotes('');
+                setNextFollowUpAt('');
+                setOutcome('');
               }}
               disabled={create.isPending}
             >
               {create.isPending ? 'Saving…' : 'Save interaction'}
-              setNextFollowUpAt('');
             </button>
           </div>
         </div>
 
         <div style={{ height: 14 }} />
-
-        {/* <div className={card.card}>
-          <div className={card.cardTitle}>Timeline</div>
-
-          {data.interactions?.length ? (
-            <ul style={{ margin: 0, paddingLeft: 16 }}>
-              {data.interactions.map((it) => (
-                <li key={it.id} style={{ marginBottom: 14 }}>
-                  <div style={{ fontWeight: 650 }}>
-                    {it.type}{' '}
-                    <span style={{ opacity: 0.65 }}>
-                      • {fmt(it.occurredAt)}
-                    </span>
-                  </div>
-
-                  {it.subject ? (
-                    <div style={{ marginTop: 4 }}>{it.subject}</div>
-                  ) : null}
-
-                  {it.notes ? (
-                    <div
-                      style={{
-                        marginTop: 6,
-                        opacity: 0.85,
-                        whiteSpace: 'pre-wrap',
-                      }}
-                    >
-                      {it.notes}
-                    </div>
-                  ) : null}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <div className={page.subtle}>No interactions yet.</div>
-          )}
-        </div> */}
 
         <Timeline items={data.interactions ?? []} />
 

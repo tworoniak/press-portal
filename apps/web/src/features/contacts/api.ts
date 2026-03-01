@@ -1,5 +1,10 @@
 import { api } from '../../lib/api';
 
+export type ContactFollowUp = {
+  id: string;
+  nextFollowUpAt: string | null;
+};
+
 export type Contact = {
   id: string;
   firstName: string | null;
@@ -18,6 +23,7 @@ export type Contact = {
   lastContactedAt: string | null;
   createdAt: string;
   updatedAt: string;
+  interactions?: ContactFollowUp[];
 };
 
 export type CreateContactInput = Partial<

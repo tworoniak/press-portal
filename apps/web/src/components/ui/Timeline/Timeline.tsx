@@ -6,6 +6,7 @@ export type TimelineItem = {
   occurredAt: string;
   subject: string | null;
   notes: string | null;
+  outcome: string | null;
   nextFollowUpAt: string | null;
 };
 
@@ -32,7 +33,9 @@ export function Timeline({ items }: { items: TimelineItem[] }) {
               ) : null}
             </div>
           </div>
-
+          {it.outcome ? (
+            <div className={styles.meta}>Outcome: {it.outcome}</div>
+          ) : null}
           {it.subject ? (
             <div className={styles.subject}>{it.subject}</div>
           ) : null}
