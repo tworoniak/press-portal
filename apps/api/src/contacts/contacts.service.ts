@@ -64,6 +64,11 @@ export class ContactsService {
   async findOne(id: string) {
     return this.prisma.contact.findUnique({
       where: { id },
+      include: {
+        interactions: {
+          orderBy: { occurredAt: 'desc' },
+        },
+      },
     });
   }
 

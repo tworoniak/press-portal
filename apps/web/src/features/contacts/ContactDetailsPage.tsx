@@ -8,7 +8,9 @@ import page from '../../components/ui/Page/Page.module.scss';
 import card from '../../components/ui/Card/Card.module.scss';
 import { TagRow } from '../../components/ui/Tag/TagRow';
 
-type InteractionType = 'EMAIL' | 'CALL' | 'DM' | 'NOTE';
+import type { Interaction } from './detailApi';
+type InteractionType = Interaction['type'];
+// type InteractionType = 'EMAIL' | 'CALL' | 'DM' | 'NOTE';
 
 const INTERACTION_OPTIONS = [
   { value: 'EMAIL', label: 'Email' },
@@ -136,8 +138,8 @@ export default function ContactDetailPage() {
             </label>
 
             <button
-              onClick={() => {
-                create.mutate({
+              onClick={async () => {
+                await create.mutateAsync({
                   contactId: id,
                   type,
                   subject: subject.trim() || undefined,
@@ -147,12 +149,13 @@ export default function ContactDetailPage() {
                     ? new Date(nextFollowUpAt).toISOString()
                     : undefined,
                 });
+
                 setSubject('');
                 setNotes('');
                 setNextFollowUpAt('');
                 setOutcome('');
               }}
-              disabled={create.isPending}
+              disabled={create.isPending || !id}
             >
               {create.isPending ? 'Saving…' : 'Save interaction'}
             </button>
@@ -161,7 +164,10 @@ export default function ContactDetailPage() {
 
         <div style={{ height: 14 }} />
 
-        <Timeline items={data.interactions ?? []} />
+        <div className={card.card}>
+          <div className={card.cardTitle}>Timeline</div>
+          <Timeline items={data.interactions ?? []} />
+        </div>
 
         <div style={{ height: 10 }} />
         <div className={page.subtle}>

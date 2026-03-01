@@ -25,6 +25,34 @@ export async function fetchContact(id: string) {
   return res.data;
 }
 
+// export async function createInteraction(input: {
+//   contactId: string;
+//   type: Interaction['type'];
+//   occurredAt?: string;
+//   subject?: string;
+//   notes?: string;
+//   outcome?: string;
+//   nextFollowUpAt?: string;
+//   bandId?: string;
+//   festivalId?: string;
+// }) {
+//   const res = await api.post<Interaction>('/interactions', {
+//     type: input.type,
+//     occurredAt: input.occurredAt,
+//     subject: input.subject,
+//     notes: input.notes,
+//     outcome: input.outcome,
+//     nextFollowUpAt: input.nextFollowUpAt,
+//     contact: { connect: { id: input.contactId } },
+//     ...(input.bandId ? { band: { connect: { id: input.bandId } } } : {}),
+//     ...(input.festivalId
+//       ? { festival: { connect: { id: input.festivalId } } }
+//       : {}),
+//   });
+
+//   return res.data;
+// }
+
 export async function createInteraction(input: {
   contactId: string;
   type: Interaction['type'];
@@ -33,22 +61,7 @@ export async function createInteraction(input: {
   notes?: string;
   outcome?: string;
   nextFollowUpAt?: string;
-  bandId?: string;
-  festivalId?: string;
 }) {
-  const res = await api.post<Interaction>('/interactions', {
-    type: input.type,
-    occurredAt: input.occurredAt,
-    subject: input.subject,
-    notes: input.notes,
-    outcome: input.outcome,
-    nextFollowUpAt: input.nextFollowUpAt,
-    contact: { connect: { id: input.contactId } },
-    ...(input.bandId ? { band: { connect: { id: input.bandId } } } : {}),
-    ...(input.festivalId
-      ? { festival: { connect: { id: input.festivalId } } }
-      : {}),
-  });
-
+  const res = await api.post<Interaction>('/interactions', input);
   return res.data;
 }
