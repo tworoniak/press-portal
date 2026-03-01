@@ -1,6 +1,21 @@
 import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useContact, useCreateInteraction } from './detailQueries';
+import { SelectField } from '../../components/SelectField/SelectField';
+import { Timeline } from '../../components/ui/Timeline/Timeline';
+
+import page from '../../components/ui/Page/Page.module.scss';
+import card from '../../components/ui/Card/Card.module.scss';
+import { TagRow } from '../../components/ui/Tag/TagRow';
+
+type InteractionType = 'EMAIL' | 'CALL' | 'DM' | 'NOTE';
+
+const INTERACTION_OPTIONS = [
+  { value: 'EMAIL', label: 'Email' },
+  { value: 'CALL', label: 'Call' },
+  { value: 'DM', label: 'DM' },
+  { value: 'NOTE', label: 'Note' },
+] as const satisfies readonly { value: InteractionType; label: string }[];
 
 function fmt(dt: string) {
   return new Date(dt).toLocaleString();
@@ -11,9 +26,10 @@ export default function ContactDetailPage() {
   const { data, isLoading, isError } = useContact(id);
   const create = useCreateInteraction(id);
 
-  const [type, setType] = useState<'EMAIL' | 'CALL' | 'DM' | 'NOTE'>('EMAIL');
+  const [type, setType] = useState<InteractionType>('EMAIL');
   const [subject, setSubject] = useState('');
   const [notes, setNotes] = useState('');
+  const [nextFollowUpAt, setNextFollowUpAt] = useState<string>('');
 
   const title = useMemo(() => {
     if (!data) return '';
@@ -25,94 +41,159 @@ export default function ContactDetailPage() {
     );
   }, [data]);
 
-  if (isLoading) return <div style={{ padding: 24 }}>Loading…</div>;
-  if (isError || !data) return <div style={{ padding: 24 }}>Not found.</div>;
+  if (isLoading)
+    return (
+      <div className={page.page}>
+        <div className={page.container}>Loading…</div>
+      </div>
+    );
+
+  if (isError || !data)
+    return (
+      <div className={page.page}>
+        <div className={page.container}>Not found.</div>
+      </div>
+    );
 
   return (
-    <div style={{ padding: 24, maxWidth: 900, margin: '0 auto' }}>
-      <Link to='/contacts'>← Back to Contacts</Link>
+    <div className={page.page}>
+      <div className={page.container}>
+        <div className={page.headerRow}>
+          <h1 className={page.title}>{title}</h1>
+          <div className={page.nav}>
+            <Link to='/contacts'>Contacts</Link>
+            <Link to='/dashboard'>Dashboard</Link>
+          </div>
+        </div>
 
-      <h1 style={{ marginTop: 12 }}>{title}</h1>
-      <div style={{ opacity: 0.8 }}>
-        {data.company ? data.company : ''} {data.role ? `• ${data.role}` : ''}
-      </div>
-      <div style={{ marginTop: 6, fontSize: 14 }}>
-        {data.email ? <span>{data.email}</span> : null}
-        {data.tags?.length ? <span> • {data.tags.join(', ')}</span> : null}
-      </div>
+        <div className={page.subtle}>
+          {data.company ? data.company : '—'}
+          {data.role ? ` • ${data.role}` : ''}
+          {data.email ? ` • ${data.email}` : ''}
+        </div>
 
-      <hr style={{ margin: '18px 0' }} />
+        <div style={{ height: 10 }} />
 
-      <h2>Log Interaction</h2>
-      <div style={{ display: 'grid', gap: 10, maxWidth: 520 }}>
-        <label style={{ display: 'grid', gap: 6 }}>
-          <span style={{ fontSize: 12, opacity: 0.75 }}>Type</span>
-          <select
-            value={type}
-            onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-              setType(e.target.value as 'EMAIL' | 'CALL' | 'DM' | 'NOTE')
-            }
+        <div className={card.card}>
+          <div className={card.cardTitle}>Tags</div>
+          <TagRow tags={data.tags ?? []} />
+        </div>
+
+        <div style={{ height: 14 }} />
+
+        <div className={card.card}>
+          <div className={card.cardTitle}>Log Interaction</div>
+
+          <div
+            style={{
+              display: 'grid',
+              gap: 10,
+              maxWidth: 560,
+            }}
           >
-            <option value='EMAIL'>Email</option>
-            <option value='CALL'>Call</option>
-            <option value='DM'>DM</option>
-            <option value='NOTE'>Note</option>
-          </select>
-        </label>
+            <SelectField<InteractionType>
+              label='Type'
+              value={type}
+              options={INTERACTION_OPTIONS}
+              onChange={setType}
+            />
 
-        <label style={{ display: 'grid', gap: 6 }}>
-          <span style={{ fontSize: 12, opacity: 0.75 }}>Subject</span>
-          <input value={subject} onChange={(e) => setSubject(e.target.value)} />
-        </label>
+            <label style={{ display: 'grid', gap: 6 }}>
+              <span style={{ fontSize: 12, opacity: 0.75 }}>Subject</span>
+              <input
+                value={subject}
+                onChange={(e) => setSubject(e.target.value)}
+              />
+            </label>
 
-        <label style={{ display: 'grid', gap: 6 }}>
-          <span style={{ fontSize: 12, opacity: 0.75 }}>Notes</span>
-          <textarea
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            rows={4}
-          />
-        </label>
+            <label style={{ display: 'grid', gap: 6 }}>
+              <span style={{ fontSize: 12, opacity: 0.75 }}>Notes</span>
+              <textarea
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                rows={4}
+              />
+            </label>
 
-        <button
-          onClick={() => {
-            create.mutate({
-              contactId: id,
-              type,
-              subject: subject.trim() || undefined,
-              notes: notes.trim() || undefined,
-            });
-            setSubject('');
-            setNotes('');
-          }}
-          disabled={create.isPending}
-        >
-          {create.isPending ? 'Saving…' : 'Save interaction'}
-        </button>
+            <label style={{ display: 'grid', gap: 6 }}>
+              <span style={{ fontSize: 12, opacity: 0.75 }}>
+                Next follow-up
+              </span>
+              <input
+                type='datetime-local'
+                value={nextFollowUpAt}
+                onChange={(e) => setNextFollowUpAt(e.target.value)}
+              />
+            </label>
+
+            <button
+              onClick={() => {
+                create.mutate({
+                  contactId: id,
+                  type,
+                  subject: subject.trim() || undefined,
+                  notes: notes.trim() || undefined,
+                  nextFollowUpAt: nextFollowUpAt
+                    ? new Date(nextFollowUpAt).toISOString()
+                    : undefined,
+                });
+                setSubject('');
+                setNotes('');
+              }}
+              disabled={create.isPending}
+            >
+              {create.isPending ? 'Saving…' : 'Save interaction'}
+              setNextFollowUpAt('');
+            </button>
+          </div>
+        </div>
+
+        <div style={{ height: 14 }} />
+
+        {/* <div className={card.card}>
+          <div className={card.cardTitle}>Timeline</div>
+
+          {data.interactions?.length ? (
+            <ul style={{ margin: 0, paddingLeft: 16 }}>
+              {data.interactions.map((it) => (
+                <li key={it.id} style={{ marginBottom: 14 }}>
+                  <div style={{ fontWeight: 650 }}>
+                    {it.type}{' '}
+                    <span style={{ opacity: 0.65 }}>
+                      • {fmt(it.occurredAt)}
+                    </span>
+                  </div>
+
+                  {it.subject ? (
+                    <div style={{ marginTop: 4 }}>{it.subject}</div>
+                  ) : null}
+
+                  {it.notes ? (
+                    <div
+                      style={{
+                        marginTop: 6,
+                        opacity: 0.85,
+                        whiteSpace: 'pre-wrap',
+                      }}
+                    >
+                      {it.notes}
+                    </div>
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <div className={page.subtle}>No interactions yet.</div>
+          )}
+        </div> */}
+
+        <Timeline items={data.interactions ?? []} />
+
+        <div style={{ height: 10 }} />
+        <div className={page.subtle}>
+          <Link to='/contacts'>← Back to Contacts</Link>
+        </div>
       </div>
-
-      <hr style={{ margin: '18px 0' }} />
-
-      <h2>Timeline</h2>
-      {data.interactions?.length ? (
-        <ul style={{ paddingLeft: 16 }}>
-          {data.interactions.map((it) => (
-            <li key={it.id} style={{ marginBottom: 12 }}>
-              <div>
-                <strong>{it.type}</strong> • <span>{fmt(it.occurredAt)}</span>
-              </div>
-              {it.subject ? <div>{it.subject}</div> : null}
-              {it.notes ? (
-                <div style={{ opacity: 0.85, whiteSpace: 'pre-wrap' }}>
-                  {it.notes}
-                </div>
-              ) : null}
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p style={{ opacity: 0.75 }}>No interactions yet.</p>
-      )}
     </div>
   );
 }

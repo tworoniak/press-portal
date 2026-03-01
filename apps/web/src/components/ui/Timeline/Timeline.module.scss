@@ -1,0 +1,52 @@
+.timeline {
+  display: grid;
+  gap: 12px;
+}
+
+.item {
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 14px;
+  padding: 12px 12px;
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.left {
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.type {
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.meta {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.subject {
+  margin-top: 8px;
+  font-weight: 600;
+}
+
+.notes {
+  margin-top: 6px;
+  color: rgba(255, 255, 255, 0.86);
+  white-space: pre-wrap;
+  line-height: 1.35;
+}
+
+.empty {
+  color: var(--muted);
+  font-size: 14px;
+}

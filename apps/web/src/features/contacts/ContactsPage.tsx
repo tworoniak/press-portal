@@ -1,20 +1,36 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { SelectField } from '../../components/SelectField/SelectField';
 import { useContacts, useCreateContact } from './queries';
 
-const STATUSES = [
-  '',
-  'NOT_CONTACTED',
-  'CONTACTED',
-  'RESPONDED',
-  'CONFIRMED',
-  'PUBLISHED',
-  'ARCHIVED',
-] as const;
+import page from '../../components/ui/Page/Page.module.scss';
+import card from '../../components/ui/Card/Card.module.scss';
+import table from '../../components/ui/Table/Table.module.scss';
+import styles from './ContactsPage.module.scss';
+import { Badge, type BadgeTone } from '../../components/ui/Badge/Badge';
+import { TagRow } from '../../components/ui/Tag/TagRow';
+
+type ContactStatus =
+  | ''
+  | 'NOT_CONTACTED'
+  | 'CONTACTED'
+  | 'RESPONDED'
+  | 'CONFIRMED'
+  | 'PUBLISHED'
+  | 'ARCHIVED';
+
+const STATUS_OPTIONS = [
+  { value: '', label: 'Any' },
+  { value: 'NOT_CONTACTED', label: 'NOT CONTACTED' },
+  { value: 'CONTACTED', label: 'CONTACTED' },
+  { value: 'RESPONDED', label: 'RESPONDED' },
+  { value: 'CONFIRMED', label: 'CONFIRMED' },
+  { value: 'PUBLISHED', label: 'PUBLISHED' },
+  { value: 'ARCHIVED', label: 'ARCHIVED' },
+] as const satisfies readonly { value: ContactStatus; label: string }[];
 
 function fmtDate(dt: string) {
-  const d = new Date(dt);
-  return d.toLocaleString();
+  return new Date(dt).toLocaleString();
 }
 
 function displayName(c: {
@@ -31,10 +47,26 @@ function displayName(c: {
   );
 }
 
+function statusTone(status: string | null | undefined): BadgeTone {
+  switch (status) {
+    case 'PUBLISHED':
+    case 'CONFIRMED':
+      return 'ok';
+    case 'RESPONDED':
+      return 'warn';
+    case 'ARCHIVED':
+      return 'default';
+    case 'NOT_CONTACTED':
+    case 'CONTACTED':
+    default:
+      return 'default';
+  }
+}
+
 export default function ContactsPage() {
   // Filters
   const [search, setSearch] = useState('');
-  const [status, setStatus] = useState<(typeof STATUSES)[number]>('');
+  const [status, setStatus] = useState<ContactStatus>('');
   const [tag, setTag] = useState('');
   const [needsFollowUp, setNeedsFollowUp] = useState(false);
 
@@ -87,134 +119,113 @@ export default function ContactsPage() {
   }
 
   return (
-    <div style={{ padding: 24, maxWidth: 1100, margin: '0 auto' }}>
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
-        <h1 style={{ margin: 0 }}>Contacts</h1>
-        <span style={{ opacity: 0.7 }}>
-          <Link to='/dashboard'>Dashboard</Link>
-        </span>
-      </div>
-
-      {/* Filters */}
-      <div
-        style={{
-          marginTop: 16,
-          display: 'grid',
-          gridTemplateColumns: '2fr 1fr 1fr auto',
-          gap: 12,
-          alignItems: 'end',
-        }}
-      >
-        <label style={{ display: 'grid', gap: 6 }}>
-          <span style={{ fontSize: 12, opacity: 0.75 }}>Search</span>
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder='Name, email, company...'
-          />
-        </label>
-
-        <label style={{ display: 'grid', gap: 6 }}>
-          <span style={{ fontSize: 12, opacity: 0.75 }}>Status</span>
-          <select
-            value={status}
-            onChange={(e) =>
-              setStatus(e.target.value as (typeof STATUSES)[number])
-            }
-          >
-            {STATUSES.map((s) => (
-              <option key={s} value={s}>
-                {s ? s.replaceAll('_', ' ') : 'Any'}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <label style={{ display: 'grid', gap: 6 }}>
-          <span style={{ fontSize: 12, opacity: 0.75 }}>Tag</span>
-          <input
-            value={tag}
-            onChange={(e) => setTag(e.target.value)}
-            placeholder='Metal, Festival...'
-          />
-        </label>
-
-        <label style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          <input
-            type='checkbox'
-            checked={needsFollowUp}
-            onChange={(e) => setNeedsFollowUp(e.target.checked)}
-          />
-          <span style={{ fontSize: 14 }}>Needs follow-up</span>
-        </label>
-      </div>
-
-      {/* Quick add */}
-      <div
-        style={{
-          marginTop: 16,
-          padding: 12,
-          border: '1px solid rgba(0,0,0,0.12)',
-          borderRadius: 10,
-        }}
-      >
-        <div style={{ fontWeight: 600, marginBottom: 10 }}>Quick add</div>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '1.2fr 1.2fr 1fr 1.2fr auto',
-            gap: 10,
-            alignItems: 'end',
-          }}
-        >
-          <label style={{ display: 'grid', gap: 6 }}>
-            <span style={{ fontSize: 12, opacity: 0.75 }}>Name</span>
-            <input
-              value={newName}
-              onChange={(e) => setNewName(e.target.value)}
-              placeholder='Jane Doe'
-            />
-          </label>
-
-          <label style={{ display: 'grid', gap: 6 }}>
-            <span style={{ fontSize: 12, opacity: 0.75 }}>Email *</span>
-            <input
-              value={newEmail}
-              onChange={(e) => setNewEmail(e.target.value)}
-              placeholder='jane@label.com'
-            />
-          </label>
-
-          <label style={{ display: 'grid', gap: 6 }}>
-            <span style={{ fontSize: 12, opacity: 0.75 }}>Company</span>
-            <input
-              value={newCompany}
-              onChange={(e) => setNewCompany(e.target.value)}
-              placeholder='Metal PR Co'
-            />
-          </label>
-
-          <label style={{ display: 'grid', gap: 6 }}>
-            <span style={{ fontSize: 12, opacity: 0.75 }}>Tags (comma)</span>
-            <input
-              value={newTags}
-              onChange={(e) => setNewTags(e.target.value)}
-              placeholder='Press, Metal, US'
-            />
-          </label>
-
-          <button
-            onClick={onAdd}
-            disabled={create.isPending || !newEmail.trim()}
-          >
-            {create.isPending ? 'Adding…' : 'Add'}
-          </button>
+    <div className={page.page}>
+      <div className={page.container}>
+        <div className={page.headerRow}>
+          <h1 className={page.title}>Contacts</h1>
+          <div className={page.nav}>
+            <Link to='/dashboard'>Dashboard</Link>
+          </div>
         </div>
-      </div>
 
-      {/* Results */}
-      <div style={{ marginTop: 18 }}>
+        {/* Filters */}
+        <div className={card.card}>
+          <div className={card.cardTitle}>Filters</div>
+
+          <div className={styles.filterGrid}>
+            <label style={{ display: 'grid', gap: 6 }}>
+              <span style={{ fontSize: 12, opacity: 0.75 }}>Search</span>
+              <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder='Name, email, company...'
+              />
+            </label>
+
+            <SelectField<ContactStatus>
+              label='Status'
+              value={status}
+              options={STATUS_OPTIONS}
+              onChange={setStatus}
+            />
+
+            <label style={{ display: 'grid', gap: 6 }}>
+              <span style={{ fontSize: 12, opacity: 0.75 }}>Tag</span>
+              <input
+                value={tag}
+                onChange={(e) => setTag(e.target.value)}
+                placeholder='Metal, Festival...'
+              />
+            </label>
+
+            <label style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              <input
+                type='checkbox'
+                checked={needsFollowUp}
+                onChange={(e) => setNeedsFollowUp(e.target.checked)}
+              />
+              <span style={{ fontSize: 14 }}>Needs follow-up</span>
+            </label>
+          </div>
+        </div>
+
+        <div style={{ height: 14 }} />
+
+        {/* Quick add */}
+        <div className={card.card}>
+          <div className={card.cardTitle}>Quick add</div>
+
+          <div className={styles.quickAddGrid}>
+            <label style={{ display: 'grid', gap: 6 }}>
+              <span style={{ fontSize: 12, opacity: 0.75 }}>Name</span>
+              <input
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                placeholder='Jane Doe'
+              />
+            </label>
+
+            <label style={{ display: 'grid', gap: 6 }}>
+              <span style={{ fontSize: 12, opacity: 0.75 }}>Email *</span>
+              <input
+                value={newEmail}
+                onChange={(e) => setNewEmail(e.target.value)}
+                placeholder='jane@label.com'
+              />
+            </label>
+
+            <label style={{ display: 'grid', gap: 6 }}>
+              <span style={{ fontSize: 12, opacity: 0.75 }}>Company</span>
+              <input
+                value={newCompany}
+                onChange={(e) => setNewCompany(e.target.value)}
+                placeholder='Metal PR Co'
+              />
+            </label>
+
+            <label style={{ display: 'grid', gap: 6 }}>
+              <span style={{ fontSize: 12, opacity: 0.75 }}>Tags (comma)</span>
+              <input
+                value={newTags}
+                onChange={(e) => setNewTags(e.target.value)}
+                placeholder='Press, Metal, US'
+              />
+            </label>
+
+            <button
+              onClick={onAdd}
+              disabled={create.isPending || !newEmail.trim()}
+            >
+              {create.isPending ? 'Adding…' : 'Add'}
+            </button>
+          </div>
+        </div>
+
+        <div style={{ height: 18 }} />
+
+        {/* Results */}
         {isLoading && <p>Loading…</p>}
+
         {isError && (
           <p>
             Error:{' '}
@@ -224,68 +235,62 @@ export default function ContactsPage() {
 
         {!isLoading && !isError && (
           <>
-            <div style={{ marginBottom: 10, opacity: 0.75, fontSize: 14 }}>
-              {data?.length ?? 0} contact(s)
-            </div>
+            <div className={page.subtle}>{data?.length ?? 0} contact(s)</div>
+            <div style={{ height: 10 }} />
 
-            <div
-              style={{
-                border: '1px solid rgba(0,0,0,0.12)',
-                borderRadius: 10,
-                overflow: 'hidden',
-              }}
-            >
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <div className={table.tableWrap}>
+              <table className={table.table}>
                 <thead>
-                  <tr
-                    style={{
-                      textAlign: 'left',
-                      background: 'rgba(0,0,0,0.04)',
-                    }}
-                  >
-                    <th style={{ padding: 10 }}>Name</th>
-                    <th style={{ padding: 10 }}>Company / Role</th>
-                    <th style={{ padding: 10 }}>Status</th>
-                    <th style={{ padding: 10 }}>Last contacted</th>
-                    <th style={{ padding: 10 }}>Tags</th>
+                  <tr>
+                    <th>Name</th>
+                    <th>Company / Role</th>
+                    <th>Status</th>
+                    <th>Last contacted</th>
+                    <th>Tags</th>
                   </tr>
                 </thead>
+
                 <tbody>
-                  {data?.map((c) => (
-                    <tr
-                      key={c.id}
-                      style={{ borderTop: '1px solid rgba(0,0,0,0.08)' }}
-                    >
-                      <td style={{ padding: 10 }}>
-                        <div style={{ fontWeight: 600 }}>
-                          <Link to={`/contacts/${c.id}`}>{displayName(c)}</Link>
-                        </div>
-                        <div style={{ fontSize: 12, opacity: 0.75 }}>
-                          {c.email ?? ''}
-                        </div>
-                      </td>
+                  {data?.map((c) => {
+                    const label = c.status?.replaceAll('_', ' ') ?? '—';
+                    const tone = statusTone(c.status);
 
-                      <td style={{ padding: 10 }}>
-                        <div>{c.company ?? '—'}</div>
-                        <div style={{ fontSize: 12, opacity: 0.75 }}>
-                          {c.role ?? '—'}
-                        </div>
-                      </td>
+                    return (
+                      <tr key={c.id}>
+                        <td>
+                          <div className={table.rowTitle}>
+                            <Link to={`/contacts/${c.id}`}>
+                              {displayName(c)}
+                            </Link>
+                          </div>
+                          <div className={table.smallMuted}>
+                            {c.email ?? ''}
+                          </div>
+                        </td>
 
-                      <td style={{ padding: 10 }}>
-                        {c.status?.replaceAll('_', ' ') ?? '—'}
-                      </td>
+                        <td>
+                          <div>{c.company ?? '—'}</div>
+                          <div className={table.smallMuted}>
+                            {c.role ?? '—'}
+                          </div>
+                        </td>
 
-                      <td style={{ padding: 10 }}>
-                        {c.lastContactedAt ? fmtDate(c.lastContactedAt) : '—'}
-                      </td>
+                        <td>
+                          <Badge tone={tone}>{label}</Badge>
+                        </td>
 
-                      <td style={{ padding: 10 }}>
-                        {c.tags?.length ? c.tags.join(', ') : '—'}
-                      </td>
-                    </tr>
-                  ))}
-                  {data?.length === 0 && (
+                        <td>
+                          {c.lastContactedAt ? fmtDate(c.lastContactedAt) : '—'}
+                        </td>
+
+                        <td>
+                          <TagRow tags={c.tags ?? []} />
+                        </td>
+                      </tr>
+                    );
+                  })}
+
+                  {(data?.length ?? 0) === 0 && (
                     <tr>
                       <td colSpan={5} style={{ padding: 14, opacity: 0.75 }}>
                         No contacts match these filters.
