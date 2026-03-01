@@ -1,4 +1,4 @@
-# 🎤 Press Contact Portal 🤘
+# 🎤 Press Contact Portal v1.0 🤘
 
 A full-stack Press Contact Management Portal for tracking publicists, managers, labels, and media contacts for bands and festivals.
 
