@@ -14,18 +14,18 @@ body {
 body {
   margin: 0;
   font-family: var(--font);
-  background:
-    radial-gradient(
-      1200px 800px at 20% -10%,
-      rgba(124, 92, 255, 0.25),
-      transparent 55%
-    ),
-    radial-gradient(
-      1200px 800px at 90% 0%,
-      rgba(91, 219, 255, 0.18),
-      transparent 55%
-    ),
-    var(--bg);
+  background: var(--bg);
+  // radial-gradient(
+  //   1200px 800px at 20% -10%,
+  //   rgba(124, 92, 255, 0.25),
+  //   transparent 55%
+  // ),
+  // radial-gradient(
+  //   1200px 800px at 90% 0%,
+  //   rgba(91, 219, 255, 0.18),
+  //   transparent 55%
+  // ),
+  // var(--bg);
   color: var(--text);
 }
 
