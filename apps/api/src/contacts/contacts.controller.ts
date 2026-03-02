@@ -7,10 +7,16 @@ import {
   Patch,
   Delete,
   Query,
+  UseGuards,
+  CanActivate,
+  Type,
 } from '@nestjs/common';
 import { ContactsService } from './contacts.service';
 import { Prisma } from '@prisma/client';
+import { UpdateContactDto } from './dto/update-contact.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
+@UseGuards(JwtAuthGuard as unknown as Type<CanActivate>)
 @Controller('contacts')
 export class ContactsController {
   constructor(private readonly contactsService: ContactsService) {}
@@ -41,8 +47,8 @@ export class ContactsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() body: Prisma.ContactUpdateInput) {
-    return this.contactsService.update(id, body);
+  update(@Param('id') id: string, @Body() dto: UpdateContactDto) {
+    return this.contactsService.update(id, dto as Prisma.ContactUpdateInput);
   }
 
   @Delete(':id')
