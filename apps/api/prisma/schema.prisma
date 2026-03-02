@@ -158,3 +158,12 @@ model Interaction {
   @@index([festivalId])
   @@index([nextFollowUpAt])
 }
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  role      String   @default("ADMIN")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
