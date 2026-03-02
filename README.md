@@ -89,6 +89,15 @@ press-portal/
 - ✅ Prisma relational schema (Contacts, Bands, Festivals, Interactions)
 - ✅ Dockerized PostgreSQL
 
+- 🔐 JWT authentication
+- 🧠 Prisma + Postgres
+- 🧾 Contacts CRUD
+- 🕒 Interactions + follow-up logic
+- 📊 Dashboard queries
+- ⚛️ React + TanStack Query
+- 🎨 Modular SCSS architecture
+- 🧹 Strict TypeScript + ESLint
+
 ---
 
 ## 🛠 Architecture Notes

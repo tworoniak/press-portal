@@ -1,0 +1,56 @@
+.wrap {
+  min-height: calc(100vh - 40px);
+  display: grid;
+  place-items: center;
+}
+
+.card {
+  width: 100%;
+  max-width: 460px;
+}
+
+.header {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.title {
+  margin: 0;
+}
+
+.subtitle {
+  margin: 0;
+  opacity: 0.75;
+  font-size: 14px;
+}
+
+.form {
+  display: grid;
+  gap: 12px;
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+}
+
+.label {
+  font-size: 12px;
+  opacity: 0.75;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.error {
+  border: 1px solid rgba(255, 90, 90, 0.35);
+  background: rgba(255, 90, 90, 0.08);
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 14px;
+}

@@ -45,6 +45,25 @@ export type CreateContactInput = Partial<
   >
 >;
 
+export type UpdateContactInput = Partial<
+  Pick<
+    Contact,
+    | 'firstName'
+    | 'lastName'
+    | 'displayName'
+    | 'role'
+    | 'company'
+    | 'email'
+    | 'phone'
+    | 'website'
+    | 'timezone'
+    | 'notes'
+    | 'doNotContact'
+    | 'tags'
+    | 'status'
+  >
+>;
+
 export type ContactFilters = {
   search?: string;
   status?: string;
@@ -66,5 +85,18 @@ export async function fetchContacts(filters?: ContactFilters) {
 
 export async function createContact(input: CreateContactInput) {
   const res = await api.post<Contact>('/contacts', input);
+  return res.data;
+}
+
+export async function updateContact(input: {
+  id: string;
+  data: UpdateContactInput;
+}) {
+  const res = await api.patch<Contact>(`/contacts/${input.id}`, input.data);
+  return res.data;
+}
+
+export async function deleteContact(id: string) {
+  const res = await api.delete<Contact>(`/contacts/${id}`);
   return res.data;
 }

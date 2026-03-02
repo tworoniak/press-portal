@@ -1,7 +1,12 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { SelectField } from '../../components/SelectField/SelectField';
-import { useContacts, useCreateContact } from './queries';
+import {
+  useContacts,
+  useCreateContact,
+  useDeleteContact,
+  useUpdateContact,
+} from './queries';
 
 import page from '../../components/ui/Page/Page.module.scss';
 import card from '../../components/ui/Card/Card.module.scss';
@@ -29,6 +34,20 @@ const STATUS_OPTIONS = [
   { value: 'PUBLISHED', label: 'PUBLISHED' },
   { value: 'ARCHIVED', label: 'ARCHIVED' },
 ] as const satisfies readonly { value: ContactStatus; label: string }[];
+
+type ContactRow = {
+  id: string;
+  displayName: string | null;
+  firstName: string | null;
+  lastName: string | null;
+  email: string | null;
+  company: string | null;
+  role: string | null;
+  status: ContactStatus | null;
+  tags: string[] | null;
+  lastContactedAt: string | null;
+  interactions?: { id: string; nextFollowUpAt: string | null }[];
+};
 
 function fmtDate(dt: string) {
   return new Date(dt).toLocaleString();
@@ -75,6 +94,23 @@ function followUpBadge(nextFollowUpAt: string | null) {
   return { tone: 'default' as const, label: 'Scheduled' };
 }
 
+function splitTags(value: string) {
+  return value
+    .split(',')
+    .map((t) => t.trim())
+    .filter(Boolean);
+}
+
+type EditDraft = {
+  id: string;
+  displayName: string;
+  email: string;
+  company: string;
+  role: string;
+  status: Exclude<ContactStatus, ''> | '';
+  tagsText: string;
+};
+
 export default function ContactsPage() {
   // Filters
   const [search, setSearch] = useState('');
@@ -94,13 +130,23 @@ export default function ContactsPage() {
 
   const { data, isLoading, isError, error } = useContacts(filters);
   const create = useCreateContact();
+  const update = useUpdateContact();
+  const del = useDeleteContact();
 
-  // Quick add form
+  // Create modal
   const [newName, setNewName] = useState('');
   const [newEmail, setNewEmail] = useState('');
   const [newCompany, setNewCompany] = useState('');
   const [newTags, setNewTags] = useState('Press');
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+
+  // Edit modal
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [editDraft, setEditDraft] = useState<EditDraft | null>(null);
+
+  // Delete modal
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<ContactRow | null>(null);
 
   async function onAdd() {
     const email = newEmail.trim();
@@ -110,10 +156,7 @@ export default function ContactsPage() {
     const [firstName, ...rest] = name.split(' ');
     const lastName = rest.length ? rest.join(' ') : undefined;
 
-    const tags = newTags
-      .split(',')
-      .map((t) => t.trim())
-      .filter(Boolean);
+    const tags = splitTags(newTags);
 
     await create.mutateAsync({
       email,
@@ -131,15 +174,61 @@ export default function ContactsPage() {
     setNewCompany('');
   }
 
+  function openEdit(c: ContactRow) {
+    setEditDraft({
+      id: c.id,
+      displayName: c.displayName ?? '',
+      email: c.email ?? '',
+      company: c.company ?? '',
+      role: c.role ?? '',
+      status: (c.status ?? '') as EditDraft['status'],
+      tagsText: (c.tags ?? []).join(', '),
+    });
+    setIsEditOpen(true);
+  }
+
+  async function onSaveEdit() {
+    if (!editDraft) return;
+
+    const tags = splitTags(editDraft.tagsText);
+
+    await update.mutateAsync({
+      id: editDraft.id,
+      data: {
+        displayName: editDraft.displayName.trim() || null,
+        email: editDraft.email.trim() || null,
+        company: editDraft.company.trim() || null,
+        role: editDraft.role.trim() || null,
+        status: editDraft.status || undefined,
+        tags,
+      },
+    });
+
+    setIsEditOpen(false);
+    setEditDraft(null);
+  }
+
+  function openDelete(c: ContactRow) {
+    setDeleteTarget(c);
+    setIsDeleteOpen(true);
+  }
+
+  async function onConfirmDelete() {
+    if (!deleteTarget) return;
+    await del.mutateAsync(deleteTarget.id);
+    setIsDeleteOpen(false);
+    setDeleteTarget(null);
+  }
+
   return (
     <div className={page.page}>
       <div className={page.container}>
+        {/* Create */}
         <Modal
           title='Create contact'
           open={isCreateOpen}
           onClose={() => setIsCreateOpen(false)}
         >
-          {/* Quick add */}
           <div className={card.card}>
             <div className={card.cardTitle}>Quick add</div>
 
@@ -192,11 +281,134 @@ export default function ContactsPage() {
           </div>
         </Modal>
 
+        {/* Edit */}
+        <Modal
+          title='Edit contact'
+          open={isEditOpen}
+          onClose={() => setIsEditOpen(false)}
+        >
+          <div className={card.card}>
+            <div className={card.cardTitle}>Details</div>
+
+            <div className={styles.quickAddGrid}>
+              <label style={{ display: 'grid', gap: 6 }}>
+                <span style={{ fontSize: 12, opacity: 0.75 }}>
+                  Display name
+                </span>
+                <input
+                  value={editDraft?.displayName ?? ''}
+                  onChange={(e) =>
+                    setEditDraft((prev) =>
+                      prev ? { ...prev, displayName: e.target.value } : prev,
+                    )
+                  }
+                  placeholder='Jane Doe'
+                />
+              </label>
+
+              <label style={{ display: 'grid', gap: 6 }}>
+                <span style={{ fontSize: 12, opacity: 0.75 }}>Email</span>
+                <input
+                  value={editDraft?.email ?? ''}
+                  onChange={(e) =>
+                    setEditDraft((prev) =>
+                      prev ? { ...prev, email: e.target.value } : prev,
+                    )
+                  }
+                  placeholder='jane@label.com'
+                />
+              </label>
+
+              <label style={{ display: 'grid', gap: 6 }}>
+                <span style={{ fontSize: 12, opacity: 0.75 }}>Company</span>
+                <input
+                  value={editDraft?.company ?? ''}
+                  onChange={(e) =>
+                    setEditDraft((prev) =>
+                      prev ? { ...prev, company: e.target.value } : prev,
+                    )
+                  }
+                  placeholder='Metal PR Co'
+                />
+              </label>
+
+              <label style={{ display: 'grid', gap: 6 }}>
+                <span style={{ fontSize: 12, opacity: 0.75 }}>Role</span>
+                <input
+                  value={editDraft?.role ?? ''}
+                  onChange={(e) =>
+                    setEditDraft((prev) =>
+                      prev ? { ...prev, role: e.target.value } : prev,
+                    )
+                  }
+                  placeholder='Publicist'
+                />
+              </label>
+
+              <SelectField<ContactStatus>
+                label='Status'
+                value={(editDraft?.status ?? '') as ContactStatus}
+                options={STATUS_OPTIONS}
+                onChange={(v) =>
+                  setEditDraft((prev) => (prev ? { ...prev, status: v } : prev))
+                }
+              />
+
+              <label style={{ display: 'grid', gap: 6 }}>
+                <span style={{ fontSize: 12, opacity: 0.75 }}>Tags</span>
+                <input
+                  value={editDraft?.tagsText ?? ''}
+                  onChange={(e) =>
+                    setEditDraft((prev) =>
+                      prev ? { ...prev, tagsText: e.target.value } : prev,
+                    )
+                  }
+                  placeholder='Press, Metal, US'
+                />
+              </label>
+
+              <button onClick={onSaveEdit} disabled={update.isPending}>
+                {update.isPending ? 'Saving…' : 'Save'}
+              </button>
+            </div>
+          </div>
+        </Modal>
+
+        {/* Delete */}
+        <Modal
+          title='Delete contact'
+          open={isDeleteOpen}
+          onClose={() => setIsDeleteOpen(false)}
+        >
+          <div className={card.card}>
+            <div className={page.subtle} style={{ marginBottom: 10 }}>
+              This cannot be undone.
+            </div>
+
+            <div style={{ fontWeight: 700, marginBottom: 6 }}>
+              {deleteTarget ? displayName(deleteTarget) : ''}
+            </div>
+            <div className={page.subtle} style={{ marginBottom: 14 }}>
+              {deleteTarget?.email ?? ''}
+            </div>
+
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button
+                onClick={onConfirmDelete}
+                disabled={del.isPending || !deleteTarget}
+              >
+                {del.isPending ? 'Deleting…' : 'Delete'}
+              </button>
+              <button onClick={() => setIsDeleteOpen(false)}>Cancel</button>
+            </div>
+          </div>
+        </Modal>
+
+        {/* Header */}
         <div className={page.headerRow}>
           <h1 className={page.title}>Contacts</h1>
           <div className={page.nav}>
             <button onClick={() => setIsCreateOpen(true)}>New Contact</button>
-            {/* <Link to='/dashboard'>Dashboard</Link> */}
           </div>
         </div>
 
@@ -241,8 +453,6 @@ export default function ContactsPage() {
           </div>
         </div>
 
-        <div style={{ height: 14 }} />
-
         <div style={{ height: 18 }} />
 
         {/* Results */}
@@ -268,19 +478,20 @@ export default function ContactsPage() {
                     <th>Company / Role</th>
                     <th>Status</th>
                     <th>Last contacted</th>
-
                     <th>Follow-up</th>
                     <th>Tags</th>
+                    <th style={{ width: 160 }}>Actions</th>
                   </tr>
                 </thead>
 
                 <tbody>
-                  {data?.map((c) => {
+                  {((data ?? []) as ContactRow[]).map((c) => {
                     const label = c.status?.replaceAll('_', ' ') ?? '—';
                     const tone = statusTone(c.status);
                     const nextFollowUpAt =
                       c.interactions?.[0]?.nextFollowUpAt ?? null;
                     const fu = followUpBadge(nextFollowUpAt);
+
                     return (
                       <tr key={c.id}>
                         <td>
@@ -328,13 +539,22 @@ export default function ContactsPage() {
                         <td>
                           <TagRow tags={c.tags ?? []} />
                         </td>
+
+                        <td>
+                          <div style={{ display: 'flex', gap: 8 }}>
+                            <button onClick={() => openEdit(c)}>Edit</button>
+                            <button onClick={() => openDelete(c)}>
+                              Delete
+                            </button>
+                          </div>
+                        </td>
                       </tr>
                     );
                   })}
 
                   {(data?.length ?? 0) === 0 && (
                     <tr>
-                      <td colSpan={6} style={{ padding: 14, opacity: 0.75 }}>
+                      <td colSpan={7} style={{ padding: 14, opacity: 0.75 }}>
                         No contacts match these filters.
                       </td>
                     </tr>

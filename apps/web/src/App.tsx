@@ -9,9 +9,28 @@ export default function App() {
   return (
     <BrowserRouter>
       <div style={{ padding: 16 }}>
-        <nav style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
-          <Link to='/dashboard'>Dashboard</Link>
-          <Link to='/contacts'>Contacts</Link>
+        <nav
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 12,
+            marginBottom: 16,
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <Link to='/dashboard'>Dashboard</Link>
+            <Link to='/contacts'>Contacts</Link>
+          </div>
+
+          <button
+            onClick={() => {
+              localStorage.removeItem('pp_token');
+              window.location.href = '/login';
+            }}
+          >
+            Logout
+          </button>
         </nav>
 
         <Routes>
