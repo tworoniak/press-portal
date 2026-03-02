@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Prisma } from '@prisma/client';
+import { OutreachStatus, Prisma } from '@prisma/client';
 
 @Injectable()
 export class ContactsService {
@@ -24,8 +24,10 @@ export class ContactsService {
 
     return this.prisma.contact.findMany({
       where: {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        ...(status ? { status: status as any } : {}),
+        ...(status &&
+        Object.values(OutreachStatus).includes(status as OutreachStatus)
+          ? { status: status as OutreachStatus }
+          : {}),
         ...(tag ? { tags: { has: tag } } : {}),
         ...(search
           ? {
@@ -67,6 +69,14 @@ export class ContactsService {
       include: {
         interactions: {
           orderBy: { occurredAt: 'desc' },
+          include: {
+            band: { select: { id: true, name: true } },
+            festival: { select: { id: true, name: true } },
+          },
+        },
+        bands: { include: { band: { select: { id: true, name: true } } } },
+        festivals: {
+          include: { festival: { select: { id: true, name: true } } },
         },
       },
     });

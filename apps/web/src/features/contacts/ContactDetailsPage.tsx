@@ -8,9 +8,10 @@ import page from '../../components/ui/Page/Page.module.scss';
 import card from '../../components/ui/Card/Card.module.scss';
 import { TagRow } from '../../components/ui/Tag/TagRow';
 
-import type { Interaction } from './detailApi';
-type InteractionType = Interaction['type'];
-// type InteractionType = 'EMAIL' | 'CALL' | 'DM' | 'NOTE';
+import { useBands } from '../bands/queries';
+import { useFestivals } from '../festivals/queries';
+
+type InteractionType = 'EMAIL' | 'CALL' | 'DM' | 'NOTE';
 
 const INTERACTION_OPTIONS = [
   { value: 'EMAIL', label: 'Email' },
@@ -19,19 +20,29 @@ const INTERACTION_OPTIONS = [
   { value: 'NOTE', label: 'Note' },
 ] as const satisfies readonly { value: InteractionType; label: string }[];
 
-// function fmt(dt: string) {
-//   return new Date(dt).toLocaleString();
-// }
+type NamedRef = { id: string; name: string };
 
 export default function ContactDetailPage() {
   const { id = '' } = useParams();
   const { data, isLoading, isError } = useContact(id);
   const create = useCreateInteraction(id);
+
   const [outcome, setOutcome] = useState('');
   const [type, setType] = useState<InteractionType>('EMAIL');
   const [subject, setSubject] = useState('');
   const [notes, setNotes] = useState('');
   const [nextFollowUpAt, setNextFollowUpAt] = useState<string>('');
+
+  // ✅ band/festival search + selection
+  const [bandSearch, setBandSearch] = useState('');
+  const [festivalSearch, setFestivalSearch] = useState('');
+  const [selectedBand, setSelectedBand] = useState<NamedRef | null>(null);
+  const [selectedFestival, setSelectedFestival] = useState<NamedRef | null>(
+    null,
+  );
+
+  const bandsQ = useBands(bandSearch, !selectedBand);
+  const festivalsQ = useFestivals(festivalSearch, !selectedFestival);
 
   const title = useMemo(() => {
     if (!data) return '';
@@ -86,19 +97,176 @@ export default function ContactDetailPage() {
         <div className={card.card}>
           <div className={card.cardTitle}>Log Interaction</div>
 
-          <div
-            style={{
-              display: 'grid',
-              gap: 10,
-              maxWidth: 560,
-            }}
-          >
+          <div style={{ display: 'grid', gap: 10, maxWidth: 620 }}>
             <SelectField<InteractionType>
               label='Type'
               value={type}
               options={INTERACTION_OPTIONS}
               onChange={setType}
             />
+
+            {/* Band search */}
+            <label style={{ display: 'grid', gap: 6 }}>
+              <span style={{ fontSize: 12, opacity: 0.75 }}>
+                Band (optional)
+              </span>
+
+              {selectedBand ? (
+                <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                  <div style={{ fontWeight: 600 }}>{selectedBand.name}</div>
+                  <button
+                    type='button'
+                    onClick={() => {
+                      setSelectedBand(null);
+                      setBandSearch('');
+                    }}
+                  >
+                    Clear
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <input
+                    value={bandSearch}
+                    onChange={(e) => setBandSearch(e.target.value)}
+                    placeholder="Type 2+ chars (e.g. 'RWAKE')"
+                  />
+                  {bandSearch.trim().length >= 2 && (
+                    <div
+                      style={{
+                        border: '1px solid rgba(0,0,0,0.12)',
+                        borderRadius: 10,
+                        padding: 8,
+                      }}
+                    >
+                      {bandsQ.isLoading && (
+                        <div style={{ opacity: 0.75 }}>Searching…</div>
+                      )}
+                      {bandsQ.isError && (
+                        <div style={{ opacity: 0.75 }}>
+                          Failed to load bands.
+                        </div>
+                      )}
+                      {!bandsQ.isLoading && !bandsQ.isError && (
+                        <>
+                          {(bandsQ.data ?? []).slice(0, 8).map((b) => (
+                            <button
+                              key={b.id}
+                              type='button'
+                              onClick={() => {
+                                setSelectedBand({ id: b.id, name: b.name });
+                                setBandSearch('');
+                              }}
+                              style={{
+                                display: 'block',
+                                width: '100%',
+                                textAlign: 'left',
+                                padding: '8px 10px',
+                                borderRadius: 8,
+                              }}
+                            >
+                              {b.name}
+                              {b.genre ? (
+                                <span style={{ opacity: 0.7 }}>
+                                  {' '}
+                                  • {b.genre}
+                                </span>
+                              ) : null}
+                            </button>
+                          ))}
+                          {(bandsQ.data?.length ?? 0) === 0 && (
+                            <div style={{ opacity: 0.75 }}>No matches yet.</div>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  )}
+                </>
+              )}
+            </label>
+
+            {/* Festival search */}
+            <label style={{ display: 'grid', gap: 6 }}>
+              <span style={{ fontSize: 12, opacity: 0.75 }}>
+                Festival (optional)
+              </span>
+
+              {selectedFestival ? (
+                <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                  <div style={{ fontWeight: 600 }}>{selectedFestival.name}</div>
+                  <button
+                    type='button'
+                    onClick={() => {
+                      setSelectedFestival(null);
+                      setFestivalSearch('');
+                    }}
+                  >
+                    Clear
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <input
+                    value={festivalSearch}
+                    onChange={(e) => setFestivalSearch(e.target.value)}
+                    placeholder="Type 2+ chars (e.g. 'Maryland')"
+                  />
+                  {festivalSearch.trim().length >= 2 && (
+                    <div
+                      style={{
+                        border: '1px solid rgba(0,0,0,0.12)',
+                        borderRadius: 10,
+                        padding: 8,
+                      }}
+                    >
+                      {festivalsQ.isLoading && (
+                        <div style={{ opacity: 0.75 }}>Searching…</div>
+                      )}
+                      {festivalsQ.isError && (
+                        <div style={{ opacity: 0.75 }}>
+                          Failed to load festivals.
+                        </div>
+                      )}
+                      {!festivalsQ.isLoading && !festivalsQ.isError && (
+                        <>
+                          {(festivalsQ.data ?? []).slice(0, 8).map((f) => (
+                            <button
+                              key={f.id}
+                              type='button'
+                              onClick={() => {
+                                setSelectedFestival({
+                                  id: f.id,
+                                  name: f.name,
+                                });
+                                setFestivalSearch('');
+                              }}
+                              style={{
+                                display: 'block',
+                                width: '100%',
+                                textAlign: 'left',
+                                padding: '8px 10px',
+                                borderRadius: 8,
+                              }}
+                            >
+                              {f.name}
+                              {f.location ? (
+                                <span style={{ opacity: 0.7 }}>
+                                  {' '}
+                                  • {f.location}
+                                </span>
+                              ) : null}
+                            </button>
+                          ))}
+                          {(festivalsQ.data?.length ?? 0) === 0 && (
+                            <div style={{ opacity: 0.75 }}>No matches yet.</div>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  )}
+                </>
+              )}
+            </label>
 
             <label style={{ display: 'grid', gap: 6 }}>
               <span style={{ fontSize: 12, opacity: 0.75 }}>Subject</span>
@@ -138,8 +306,8 @@ export default function ContactDetailPage() {
             </label>
 
             <button
-              onClick={async () => {
-                await create.mutateAsync({
+              onClick={() => {
+                create.mutate({
                   contactId: id,
                   type,
                   subject: subject.trim() || undefined,
@@ -148,14 +316,20 @@ export default function ContactDetailPage() {
                   nextFollowUpAt: nextFollowUpAt
                     ? new Date(nextFollowUpAt).toISOString()
                     : undefined,
+                  bandId: selectedBand?.id,
+                  festivalId: selectedFestival?.id,
                 });
 
                 setSubject('');
                 setNotes('');
                 setNextFollowUpAt('');
                 setOutcome('');
+                setSelectedBand(null);
+                setSelectedFestival(null);
+                setBandSearch('');
+                setFestivalSearch('');
               }}
-              disabled={create.isPending || !id}
+              disabled={create.isPending}
             >
               {create.isPending ? 'Saving…' : 'Save interaction'}
             </button>
@@ -164,10 +338,9 @@ export default function ContactDetailPage() {
 
         <div style={{ height: 14 }} />
 
-        <div className={card.card}>
-          <div className={card.cardTitle}>Timeline</div>
-          <Timeline items={data.interactions ?? []} />
-        </div>
+        {/* Timeline now shows chips if Timeline component supports it.
+            If your Timeline just renders fields, we’ll update it next. */}
+        <Timeline items={data.interactions ?? []} />
 
         <div style={{ height: 10 }} />
         <div className={page.subtle}>
