@@ -7,6 +7,8 @@ import { AuthModule } from './auth/auth.module';
 import { ContactsModule } from './contacts/contacts.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { InteractionsModule } from './interactions/interactions.module';
+import { BandsModule } from './bands/bands.module';
+import { FestivalsModule } from './festivals/festivals.module';
 
 @Module({
   imports: [
@@ -15,6 +17,8 @@ import { InteractionsModule } from './interactions/interactions.module';
     ContactsModule,
     DashboardModule,
     InteractionsModule,
+    BandsModule,
+    FestivalsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

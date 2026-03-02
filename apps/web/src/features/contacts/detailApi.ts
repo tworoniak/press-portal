@@ -1,6 +1,8 @@
 import { api } from '../../lib/api';
 import type { Contact } from './api';
 
+type NamedRef = { id: string; name: string };
+
 export type Interaction = {
   id: string;
   type: 'EMAIL' | 'CALL' | 'TEXT' | 'DM' | 'MEETING' | 'NOTE';
@@ -12,6 +14,10 @@ export type Interaction = {
   contactId: string;
   bandId: string | null;
   festivalId: string | null;
+
+  band?: NamedRef | null;
+  festival?: NamedRef | null;
+
   createdAt: string;
   updatedAt: string;
 };
@@ -61,6 +67,8 @@ export async function createInteraction(input: {
   notes?: string;
   outcome?: string;
   nextFollowUpAt?: string;
+  bandId?: string;
+  festivalId?: string;
 }) {
   const res = await api.post<Interaction>('/interactions', input);
   return res.data;
