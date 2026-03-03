@@ -23,12 +23,43 @@ export type Interaction = {
   updatedAt: string;
 };
 
+export type ContactBandRef = {
+  band: { id: string; name: string };
+  createdAt: string;
+  relationshipRole: string | null;
+  relationshipNotes: string | null;
+};
+
 export type ContactDetail = Omit<Contact, 'interactions'> & {
   interactions: Interaction[];
+  bands: ContactBandRef[];
 };
 
 export async function fetchContact(id: string) {
   const res = await api.get<ContactDetail>(`/contacts/${id}`);
+  return res.data;
+}
+
+export async function addContactBand(input: {
+  contactId: string;
+  bandId: string;
+}) {
+  const res = await api.post<ContactBandRef>(
+    `/contacts/${input.contactId}/bands`,
+    {
+      bandId: input.bandId,
+    },
+  );
+  return res.data;
+}
+
+export async function removeContactBand(input: {
+  contactId: string;
+  bandId: string;
+}) {
+  const res = await api.delete<{ ok: true } | unknown>(
+    `/contacts/${input.contactId}/bands/${input.bandId}`,
+  );
   return res.data;
 }
 

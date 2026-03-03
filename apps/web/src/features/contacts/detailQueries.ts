@@ -4,6 +4,8 @@ import {
   deleteInteraction,
   fetchContact,
   updateInteraction,
+  addContactBand,
+  removeContactBand,
   type ContactDetail,
   type Interaction,
 } from './detailApi';
@@ -27,6 +29,49 @@ function upsertInteraction(list: Interaction[], updated: Interaction) {
       new Date(b.occurredAt).getTime() - new Date(a.occurredAt).getTime(),
   );
   return copy;
+}
+
+export function useAddContactBand(contactId: string) {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: (bandId: string) => addContactBand({ contactId, bandId }),
+    onSuccess: async (created) => {
+      qc.setQueryData<ContactDetail>(['contact', contactId], (prev) => {
+        if (!prev) return prev;
+
+        const exists = (prev.bands ?? []).some(
+          (x) => x.band.id === created.band.id,
+        );
+        if (exists) return prev;
+
+        return {
+          ...prev,
+          bands: [created, ...(prev.bands ?? [])],
+        };
+      });
+
+      // optional (if other pages depend on it later)
+      await qc.invalidateQueries({ queryKey: ['dashboard'] });
+    },
+  });
+}
+
+export function useRemoveContactBand(contactId: string) {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: (bandId: string) => removeContactBand({ contactId, bandId }),
+    onSuccess: async (_data, bandId) => {
+      qc.setQueryData<ContactDetail>(['contact', contactId], (prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          bands: (prev.bands ?? []).filter((x) => x.band.id !== bandId),
+        };
+      });
+    },
+  });
 }
 
 export function useCreateInteraction(contactId: string) {
