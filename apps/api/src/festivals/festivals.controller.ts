@@ -42,4 +42,26 @@ export class FestivalsController {
   remove(@Param('id') id: string) {
     return this.festivals.remove(id);
   }
+
+  // ✅ Step B: link / unlink contacts
+  @Post(':id/contacts')
+  addContact(
+    @Param('id') festivalId: string,
+    @Body()
+    body: {
+      contactId: string;
+      relationshipRole?: string;
+      relationshipNotes?: string;
+    },
+  ) {
+    return this.festivals.addContact(festivalId, body);
+  }
+
+  @Delete(':id/contacts/:contactId')
+  removeContact(
+    @Param('id') festivalId: string,
+    @Param('contactId') contactId: string,
+  ) {
+    return this.festivals.removeContact(festivalId, contactId);
+  }
 }

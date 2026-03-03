@@ -48,4 +48,40 @@ export class FestivalsService {
   remove(id: string) {
     return this.prisma.festival.delete({ where: { id } });
   }
+
+  async addContact(
+    festivalId: string,
+    body: {
+      contactId: string;
+      relationshipRole?: string;
+      relationshipNotes?: string;
+    },
+  ) {
+    return this.prisma.contactFestival.upsert({
+      where: {
+        contactId_festivalId: {
+          contactId: body.contactId,
+          festivalId,
+        },
+      },
+      update: {
+        relationshipRole: body.relationshipRole ?? null,
+        relationshipNotes: body.relationshipNotes ?? null,
+      },
+      create: {
+        festival: { connect: { id: festivalId } },
+        contact: { connect: { id: body.contactId } },
+        relationshipRole: body.relationshipRole ?? null,
+        relationshipNotes: body.relationshipNotes ?? null,
+      },
+    });
+  }
+
+  async removeContact(festivalId: string, contactId: string) {
+    return this.prisma.contactFestival.delete({
+      where: {
+        contactId_festivalId: { contactId, festivalId },
+      },
+    });
+  }
 }

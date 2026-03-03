@@ -42,6 +42,35 @@ export class BandsService {
     });
   }
 
+  async addContact(
+    bandId: string,
+    input: {
+      contactId: string;
+      relationshipRole?: string;
+      relationshipNotes?: string;
+    },
+  ) {
+    return this.prisma.contactBand.upsert({
+      where: { contactId_bandId: { contactId: input.contactId, bandId } },
+      update: {
+        relationshipRole: input.relationshipRole,
+        relationshipNotes: input.relationshipNotes,
+      },
+      create: {
+        band: { connect: { id: bandId } },
+        contact: { connect: { id: input.contactId } },
+        relationshipRole: input.relationshipRole,
+        relationshipNotes: input.relationshipNotes,
+      },
+    });
+  }
+
+  async removeContact(bandId: string, contactId: string) {
+    return this.prisma.contactBand.delete({
+      where: { contactId_bandId: { contactId, bandId } },
+    });
+  }
+
   update(id: string, data: Prisma.BandUpdateInput) {
     return this.prisma.band.update({ where: { id }, data });
   }
