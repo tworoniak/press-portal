@@ -116,7 +116,10 @@ export default function ContactDetailPage() {
                   <div style={{ fontWeight: 600 }}>{selectedBand.name}</div>
                   <button
                     type='button'
-                    onClick={() => {
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
                       setSelectedBand(null);
                       setBandSearch('');
                     }}
@@ -131,6 +134,7 @@ export default function ContactDetailPage() {
                     onChange={(e) => setBandSearch(e.target.value)}
                     placeholder="Type 2+ chars (e.g. 'RWAKE')"
                   />
+
                   {bandSearch.trim().length >= 2 && (
                     <div
                       style={{
@@ -153,9 +157,12 @@ export default function ContactDetailPage() {
                             <button
                               key={b.id}
                               type='button'
-                              onClick={() => {
+                              onMouseDown={(e) => e.preventDefault()} // prevents input blur weirdness
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
                                 setSelectedBand({ id: b.id, name: b.name });
-                                setBandSearch('');
+                                setBandSearch(b.name); // <-- keep it visible (optional)
                               }}
                               style={{
                                 display: 'block',
@@ -196,7 +203,10 @@ export default function ContactDetailPage() {
                   <div style={{ fontWeight: 600 }}>{selectedFestival.name}</div>
                   <button
                     type='button'
-                    onClick={() => {
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
                       setSelectedFestival(null);
                       setFestivalSearch('');
                     }}
@@ -233,12 +243,15 @@ export default function ContactDetailPage() {
                             <button
                               key={f.id}
                               type='button'
-                              onClick={() => {
+                              onMouseDown={(e) => e.preventDefault()} // prevents input blur weirdness
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
                                 setSelectedFestival({
                                   id: f.id,
                                   name: f.name,
                                 });
-                                setFestivalSearch('');
+                                setFestivalSearch(f.name); // <-- keep it visible (optional)
                               }}
                               style={{
                                 display: 'block',

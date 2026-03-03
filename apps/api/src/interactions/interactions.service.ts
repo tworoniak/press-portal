@@ -23,6 +23,10 @@ export class InteractionsService {
         nextFollowUpAt,
         contact: { connect: { id: dto.contactId } },
       },
+      include: {
+        band: { select: { id: true, name: true } },
+        festival: { select: { id: true, name: true } },
+      },
     });
 
     // Auto-update lastContactedAt when interaction is created
