@@ -20,3 +20,11 @@ export async function fetchFestivals(search?: string) {
   });
   return res.data;
 }
+
+export async function createFestival(input: {
+  name: string;
+  location?: string;
+}) {
+  const res = await api.post<Festival>('/festivals', input);
+  return res.data;
+}

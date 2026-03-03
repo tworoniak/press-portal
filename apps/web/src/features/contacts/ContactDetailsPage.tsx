@@ -11,8 +11,8 @@ import { Modal } from '../../components/ui/Modal/Modal';
 import type { Interaction } from './detailApi';
 import { useUpdateInteraction, useDeleteInteraction } from './detailQueries';
 
-import { useBands } from '../bands/queries';
-import { useFestivals } from '../festivals/queries';
+import { useBands, useCreateBand } from '../bands/queries';
+import { useFestivals, useCreateFestival } from '../festivals/queries';
 
 type InteractionType = 'EMAIL' | 'CALL' | 'DM' | 'NOTE';
 
@@ -47,6 +47,22 @@ export default function ContactDetailPage() {
   const [editNotes, setEditNotes] = useState('');
   const [editOutcome, setEditOutcome] = useState('');
   const [editNextFollowUpAt, setEditNextFollowUpAt] = useState('');
+  // edit modal: band/festival search + selection
+  const [editBandSearch, setEditBandSearch] = useState('');
+  const [editFestivalSearch, setEditFestivalSearch] = useState('');
+  const [editSelectedBand, setEditSelectedBand] = useState<NamedRef | null>(
+    null,
+  );
+  const [editSelectedFestival, setEditSelectedFestival] =
+    useState<NamedRef | null>(null);
+
+  const editBandsQ = useBands(editBandSearch, !editSelectedBand);
+  const editFestivalsQ = useFestivals(
+    editFestivalSearch,
+    !editSelectedFestival,
+  );
+  const createBand = useCreateBand();
+  const createFestival = useCreateFestival();
 
   const [bandSearch, setBandSearch] = useState('');
   const [festivalSearch, setFestivalSearch] = useState('');
@@ -77,6 +93,19 @@ export default function ContactDetailPage() {
     setEditNextFollowUpAt(
       it.nextFollowUpAt ? it.nextFollowUpAt.slice(0, 16) : '',
     );
+
+    // ✅ prefill selected band/festival (prefer included objects)
+    setEditSelectedBand(
+      it.band ? { id: it.band.id, name: it.band.name } : null,
+    );
+    setEditSelectedFestival(
+      it.festival ? { id: it.festival.id, name: it.festival.name } : null,
+    );
+
+    // clear search fields
+    setEditBandSearch('');
+    setEditFestivalSearch('');
+
     setEditOpen(true);
   }
 
@@ -208,9 +237,36 @@ export default function ContactDetailPage() {
                         </button>
                       ))}
 
-                      {(bandsQ.data?.length ?? 0) === 0 && (
-                        <div style={{ opacity: 0.75 }}>No matches yet.</div>
-                      )}
+                      {(bandsQ.data?.length ?? 0) === 0 ? (
+                        <div style={{ display: 'grid', gap: 8 }}>
+                          <div style={{ opacity: 0.75 }}>No matches.</div>
+                          <button
+                            type='button'
+                            onClick={async (e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+
+                              const name = bandSearch.trim();
+                              if (name.length < 2) return;
+
+                              const created = await createBand.mutateAsync({
+                                name,
+                              });
+                              setSelectedBand({
+                                id: created.id,
+                                name: created.name,
+                              });
+                              setBandSearch('');
+                            }}
+                            disabled={createBand.isPending}
+                            style={{ padding: '8px 10px', borderRadius: 8 }}
+                          >
+                            {createBand.isPending
+                              ? 'Creating…'
+                              : `Create "${bandSearch.trim()}"`}
+                          </button>
+                        </div>
+                      ) : null}
                     </>
                   )}
                 </div>
@@ -303,9 +359,36 @@ export default function ContactDetailPage() {
                         </button>
                       ))}
 
-                      {(festivalsQ.data?.length ?? 0) === 0 && (
-                        <div style={{ opacity: 0.75 }}>No matches yet.</div>
-                      )}
+                      {(festivalsQ.data?.length ?? 0) === 0 ? (
+                        <div style={{ display: 'grid', gap: 8 }}>
+                          <div style={{ opacity: 0.75 }}>No matches.</div>
+                          <button
+                            type='button'
+                            onClick={async (e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+
+                              const name = festivalSearch.trim();
+                              if (name.length < 2) return;
+
+                              const created = await createFestival.mutateAsync({
+                                name,
+                              });
+                              setSelectedFestival({
+                                id: created.id,
+                                name: created.name,
+                              });
+                              setFestivalSearch('');
+                            }}
+                            disabled={createFestival.isPending}
+                            style={{ padding: '8px 10px', borderRadius: 8 }}
+                          >
+                            {createFestival.isPending
+                              ? 'Creating…'
+                              : `Create "${festivalSearch.trim()}"`}
+                          </button>
+                        </div>
+                      ) : null}
                     </>
                   )}
                 </div>
@@ -380,6 +463,7 @@ export default function ContactDetailPage() {
           </div>
         </div>
 
+        {/* Edit Modal */}
         <Modal
           title='Edit interaction'
           open={editOpen}
@@ -396,6 +480,238 @@ export default function ContactDetailPage() {
                 options={INTERACTION_OPTIONS}
                 onChange={setEditType}
               />
+
+              <label style={{ display: 'grid', gap: 6 }}>
+                <span style={{ fontSize: 12, opacity: 0.75 }}>Band</span>
+
+                <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                  <input
+                    value={
+                      editSelectedBand ? editSelectedBand.name : editBandSearch
+                    }
+                    onChange={(e) => {
+                      setEditSelectedBand(null);
+                      setEditBandSearch(e.target.value);
+                    }}
+                    placeholder="Type 2+ chars (e.g. 'RWAKE')"
+                    disabled={Boolean(editSelectedBand)}
+                  />
+
+                  {editSelectedBand ? (
+                    <button
+                      type='button'
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setEditSelectedBand(null);
+                        setEditBandSearch('');
+                      }}
+                    >
+                      Clear
+                    </button>
+                  ) : null}
+                </div>
+
+                {!editSelectedBand && editBandSearch.trim().length >= 2 ? (
+                  <div
+                    onMouseDown={(e) => e.preventDefault()}
+                    style={{
+                      border: '1px solid rgba(0,0,0,0.12)',
+                      borderRadius: 10,
+                      padding: 8,
+                    }}
+                  >
+                    {editBandsQ.isLoading && (
+                      <div style={{ opacity: 0.75 }}>Searching…</div>
+                    )}
+                    {editBandsQ.isError && (
+                      <div style={{ opacity: 0.75 }}>Failed to load bands.</div>
+                    )}
+                    {!editBandsQ.isLoading && !editBandsQ.isError && (
+                      <>
+                        {(editBandsQ.data ?? []).slice(0, 8).map((b) => (
+                          <button
+                            key={b.id}
+                            type='button'
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setEditSelectedBand({ id: b.id, name: b.name });
+                              setEditBandSearch('');
+                            }}
+                            style={{
+                              display: 'block',
+                              width: '100%',
+                              textAlign: 'left',
+                              padding: '8px 10px',
+                              borderRadius: 8,
+                            }}
+                          >
+                            {b.name}
+                            {b.genre ? (
+                              <span style={{ opacity: 0.7 }}> • {b.genre}</span>
+                            ) : null}
+                          </button>
+                        ))}
+                        {(editBandsQ.data?.length ?? 0) === 0 ? (
+                          <div style={{ display: 'grid', gap: 8 }}>
+                            <div style={{ opacity: 0.75 }}>No matches.</div>
+                            <button
+                              type='button'
+                              onMouseDown={(e) => e.preventDefault()}
+                              onClick={async (e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+
+                                const name = editBandSearch.trim();
+                                if (name.length < 2) return;
+
+                                const created = await createBand.mutateAsync({
+                                  name,
+                                });
+
+                                setEditSelectedBand({
+                                  id: created.id,
+                                  name: created.name,
+                                });
+                                setEditBandSearch('');
+                              }}
+                              disabled={createBand.isPending}
+                              style={{ padding: '8px 10px', borderRadius: 8 }}
+                            >
+                              {createBand.isPending
+                                ? 'Creating…'
+                                : `Create "${editBandSearch.trim()}"`}
+                            </button>
+                          </div>
+                        ) : null}
+                      </>
+                    )}
+                  </div>
+                ) : null}
+              </label>
+
+              <label style={{ display: 'grid', gap: 6 }}>
+                <span style={{ fontSize: 12, opacity: 0.75 }}>Festival</span>
+
+                <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                  <input
+                    value={
+                      editSelectedFestival
+                        ? editSelectedFestival.name
+                        : editFestivalSearch
+                    }
+                    onChange={(e) => {
+                      setEditSelectedFestival(null);
+                      setEditFestivalSearch(e.target.value);
+                    }}
+                    placeholder="Type 2+ chars (e.g. 'Maryland')"
+                    disabled={Boolean(editSelectedFestival)}
+                  />
+
+                  {editSelectedFestival ? (
+                    <button
+                      type='button'
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setEditSelectedFestival(null);
+                        setEditFestivalSearch('');
+                      }}
+                    >
+                      Clear
+                    </button>
+                  ) : null}
+                </div>
+
+                {!editSelectedFestival &&
+                editFestivalSearch.trim().length >= 2 ? (
+                  <div
+                    onMouseDown={(e) => e.preventDefault()}
+                    style={{
+                      border: '1px solid rgba(0,0,0,0.12)',
+                      borderRadius: 10,
+                      padding: 8,
+                    }}
+                  >
+                    {editFestivalsQ.isLoading && (
+                      <div style={{ opacity: 0.75 }}>Searching…</div>
+                    )}
+                    {editFestivalsQ.isError && (
+                      <div style={{ opacity: 0.75 }}>
+                        Failed to load festivals.
+                      </div>
+                    )}
+                    {!editFestivalsQ.isLoading && !editFestivalsQ.isError && (
+                      <>
+                        {(editFestivalsQ.data ?? []).slice(0, 8).map((f) => (
+                          <button
+                            key={f.id}
+                            type='button'
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setEditSelectedFestival({
+                                id: f.id,
+                                name: f.name,
+                              });
+                              setEditFestivalSearch('');
+                            }}
+                            style={{
+                              display: 'block',
+                              width: '100%',
+                              textAlign: 'left',
+                              padding: '8px 10px',
+                              borderRadius: 8,
+                            }}
+                          >
+                            {f.name}
+                            {f.location ? (
+                              <span style={{ opacity: 0.7 }}>
+                                {' '}
+                                • {f.location}
+                              </span>
+                            ) : null}
+                          </button>
+                        ))}
+                        {(editFestivalsQ.data?.length ?? 0) === 0 ? (
+                          <div style={{ display: 'grid', gap: 8 }}>
+                            <div style={{ opacity: 0.75 }}>No matches.</div>
+                            <button
+                              type='button'
+                              onMouseDown={(e) => e.preventDefault()}
+                              onClick={async (e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+
+                                const name = editFestivalSearch.trim();
+                                if (name.length < 2) return;
+
+                                const created =
+                                  await createFestival.mutateAsync({ name });
+
+                                setEditSelectedFestival({
+                                  id: created.id,
+                                  name: created.name,
+                                });
+                                setEditFestivalSearch('');
+                              }}
+                              disabled={createFestival.isPending}
+                              style={{ padding: '8px 10px', borderRadius: 8 }}
+                            >
+                              {createFestival.isPending
+                                ? 'Creating…'
+                                : `Create "${editFestivalSearch.trim()}"`}
+                            </button>
+                          </div>
+                        ) : null}
+                      </>
+                    )}
+                  </div>
+                ) : null}
+              </label>
 
               <label style={{ display: 'grid', gap: 6 }}>
                 <span style={{ fontSize: 12, opacity: 0.75 }}>Subject</span>
@@ -447,6 +763,10 @@ export default function ContactDetailPage() {
                         outcome: editOutcome.trim() ? editOutcome.trim() : null,
                         nextFollowUpAt: editNextFollowUpAt
                           ? new Date(editNextFollowUpAt).toISOString()
+                          : null,
+                        bandId: editSelectedBand ? editSelectedBand.id : null,
+                        festivalId: editSelectedFestival
+                          ? editSelectedFestival.id
                           : null,
                       },
                     });
