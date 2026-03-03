@@ -4,6 +4,8 @@ import ContactDetailPage from './features/contacts/ContactDetailsPage';
 import DashboardPage from './features/dashboard/DashboardPage';
 import LoginPage from './pages/LoginPage';
 import { RequireAuth } from './components/RequireAuth';
+import BandDetailPage from './features/bands/BandDetailPage';
+import FestivalDetailPage from './features/festivals/FestivalDetailPage';
 
 export default function App() {
   return (
@@ -36,23 +38,14 @@ export default function App() {
         <Routes>
           <Route path='/login' element={<LoginPage />} />
           <Route path='/' element={<Navigate to='/dashboard' replace />} />
-          <Route
-            path='/dashboard'
-            element={
-              <RequireAuth>
-                <DashboardPage />
-              </RequireAuth>
-            }
-          />
-          <Route
-            path='/contacts'
-            element={
-              <RequireAuth>
-                <ContactsPage />
-              </RequireAuth>
-            }
-          />
-          <Route path='/contacts/:id' element={<ContactDetailPage />} />
+
+          <Route element={<RequireAuth />}>
+            <Route path='/contacts/:id' element={<ContactDetailPage />} />
+            <Route path='/bands/:id' element={<BandDetailPage />} />
+            <Route path='/festivals/:id' element={<FestivalDetailPage />} />
+            <Route path='/dashboard' element={<DashboardPage />} />
+            <Route path='/contacts' element={<ContactsPage />} />
+          </Route>
         </Routes>
       </div>
     </BrowserRouter>

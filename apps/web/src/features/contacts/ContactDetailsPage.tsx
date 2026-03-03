@@ -198,10 +198,23 @@ export default function ContactDetailPage() {
                     borderRadius: 999,
                   }}
                 >
-                  <span style={{ fontWeight: 600 }}>{cb.band.name}</span>
+                  <Link
+                    to={`/bands/${cb.band.id}`}
+                    style={{
+                      fontWeight: 600,
+                      textDecoration: 'none',
+                      color: 'inherit',
+                    }}
+                  >
+                    {cb.band.name}
+                  </Link>
+
                   <button
                     type='button'
-                    onClick={() => removeBand.mutate(cb.band.id)}
+                    onClick={(e) => {
+                      e.stopPropagation(); // defensive
+                      removeBand.mutate(cb.band.id);
+                    }}
                     disabled={removeBand.isPending}
                     style={{ opacity: 0.8 }}
                   >
@@ -357,7 +370,16 @@ export default function ContactDetailPage() {
                     borderRadius: 999,
                   }}
                 >
-                  <span style={{ fontWeight: 600 }}>{cf.festival.name}</span>
+                  <Link
+                    to={`/festivals/${cf.festival.id}`}
+                    style={{
+                      fontWeight: 600,
+                      textDecoration: 'none',
+                      color: 'inherit',
+                    }}
+                  >
+                    {cf.festival.name}
+                  </Link>
                   <button
                     type='button'
                     onClick={() => removeFestival.mutate(cf.festival.id)}
