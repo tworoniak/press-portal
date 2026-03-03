@@ -28,8 +28,18 @@ export class BandsService {
     });
   }
 
-  findOne(id: string) {
-    return this.prisma.band.findUnique({ where: { id } });
+  async findOne(id: string) {
+    return this.prisma.band.findUnique({
+      where: { id },
+      include: {
+        contacts: {
+          include: {
+            contact: true,
+          },
+          orderBy: { createdAt: 'desc' },
+        },
+      },
+    });
   }
 
   update(id: string, data: Prisma.BandUpdateInput) {

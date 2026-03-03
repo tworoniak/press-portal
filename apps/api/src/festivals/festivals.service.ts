@@ -27,8 +27,18 @@ export class FestivalsService {
     });
   }
 
-  findOne(id: string) {
-    return this.prisma.festival.findUnique({ where: { id } });
+  async findOne(id: string) {
+    return this.prisma.festival.findUnique({
+      where: { id },
+      include: {
+        contacts: {
+          include: {
+            contact: true,
+          },
+          orderBy: { createdAt: 'desc' },
+        },
+      },
+    });
   }
 
   update(id: string, data: Prisma.FestivalUpdateInput) {
