@@ -111,9 +111,18 @@ export default function ContactDetailPage() {
                 Band (optional)
               </span>
 
-              {selectedBand ? (
-                <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-                  <div style={{ fontWeight: 600 }}>{selectedBand.name}</div>
+              <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                <input
+                  value={selectedBand ? selectedBand.name : bandSearch}
+                  onChange={(e) => {
+                    setSelectedBand(null);
+                    setBandSearch(e.target.value);
+                  }}
+                  placeholder="Type 2+ chars (e.g. 'RWAKE')"
+                  disabled={Boolean(selectedBand)}
+                />
+
+                {selectedBand ? (
                   <button
                     type='button'
                     onMouseDown={(e) => e.preventDefault()}
@@ -126,70 +135,63 @@ export default function ContactDetailPage() {
                   >
                     Clear
                   </button>
-                </div>
-              ) : (
-                <>
-                  <input
-                    value={bandSearch}
-                    onChange={(e) => setBandSearch(e.target.value)}
-                    placeholder="Type 2+ chars (e.g. 'RWAKE')"
-                  />
+                ) : null}
+              </div>
 
-                  {bandSearch.trim().length >= 2 && (
-                    <div
-                      style={{
-                        border: '1px solid rgba(0,0,0,0.12)',
-                        borderRadius: 10,
-                        padding: 8,
-                      }}
-                    >
-                      {bandsQ.isLoading && (
-                        <div style={{ opacity: 0.75 }}>Searching…</div>
-                      )}
-                      {bandsQ.isError && (
-                        <div style={{ opacity: 0.75 }}>
-                          Failed to load bands.
-                        </div>
-                      )}
-                      {!bandsQ.isLoading && !bandsQ.isError && (
-                        <>
-                          {(bandsQ.data ?? []).slice(0, 8).map((b) => (
-                            <button
-                              key={b.id}
-                              type='button'
-                              onMouseDown={(e) => e.preventDefault()} // prevents input blur weirdness
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                setSelectedBand({ id: b.id, name: b.name });
-                                setBandSearch(b.name); // <-- keep it visible (optional)
-                              }}
-                              style={{
-                                display: 'block',
-                                width: '100%',
-                                textAlign: 'left',
-                                padding: '8px 10px',
-                                borderRadius: 8,
-                              }}
-                            >
-                              {b.name}
-                              {b.genre ? (
-                                <span style={{ opacity: 0.7 }}>
-                                  {' '}
-                                  • {b.genre}
-                                </span>
-                              ) : null}
-                            </button>
-                          ))}
-                          {(bandsQ.data?.length ?? 0) === 0 && (
-                            <div style={{ opacity: 0.75 }}>No matches yet.</div>
-                          )}
-                        </>
-                      )}
-                    </div>
+              {/* Dropdown */}
+              {!selectedBand && bandSearch.trim().length >= 2 ? (
+                <div
+                  onMouseDown={(e) => e.preventDefault()} // ✅ keeps input from blurring before click registers
+                  style={{
+                    border: '1px solid rgba(0,0,0,0.12)',
+                    borderRadius: 10,
+                    padding: 8,
+                  }}
+                >
+                  {bandsQ.isLoading && (
+                    <div style={{ opacity: 0.75 }}>Searching…</div>
                   )}
-                </>
-              )}
+                  {bandsQ.isError && (
+                    <div style={{ opacity: 0.75 }}>Failed to load bands.</div>
+                  )}
+
+                  {!bandsQ.isLoading && !bandsQ.isError && (
+                    <>
+                      {(bandsQ.data ?? []).slice(0, 8).map((b) => (
+                        <button
+                          key={b.id}
+                          type='button'
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setSelectedBand({ id: b.id, name: b.name });
+                            setBandSearch(''); // optional now; input shows selectedBand.name
+                          }}
+                          style={{
+                            display: 'block',
+                            width: '100%',
+                            textAlign: 'left',
+                            padding: '8px 10px',
+                            borderRadius: 8,
+                          }}
+                        >
+                          {b.name}
+                          {b.genre ? (
+                            <span style={{ opacity: 0.7 }}> • {b.genre}</span>
+                          ) : null}
+                        </button>
+                      ))}
+
+                      {(bandsQ.data?.length ?? 0) === 0 && (
+                        <div style={{ opacity: 0.75 }}>No matches yet.</div>
+                      )}
+                    </>
+                  )}
+                </div>
+              ) : null}
+
+              {/* tiny debug (optional) */}
+              {/* <div style={{ fontSize: 12, opacity: 0.7 }}>selectedBandId: {selectedBand?.id ?? '(none)'}</div> */}
             </label>
 
             {/* Festival search */}
@@ -198,9 +200,20 @@ export default function ContactDetailPage() {
                 Festival (optional)
               </span>
 
-              {selectedFestival ? (
-                <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-                  <div style={{ fontWeight: 600 }}>{selectedFestival.name}</div>
+              <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                <input
+                  value={
+                    selectedFestival ? selectedFestival.name : festivalSearch
+                  }
+                  onChange={(e) => {
+                    setSelectedFestival(null);
+                    setFestivalSearch(e.target.value);
+                  }}
+                  placeholder="Type 2+ chars (e.g. 'Maryland')"
+                  disabled={Boolean(selectedFestival)}
+                />
+
+                {selectedFestival ? (
                   <button
                     type='button'
                     onMouseDown={(e) => e.preventDefault()}
@@ -213,72 +226,64 @@ export default function ContactDetailPage() {
                   >
                     Clear
                   </button>
-                </div>
-              ) : (
-                <>
-                  <input
-                    value={festivalSearch}
-                    onChange={(e) => setFestivalSearch(e.target.value)}
-                    placeholder="Type 2+ chars (e.g. 'Maryland')"
-                  />
-                  {festivalSearch.trim().length >= 2 && (
-                    <div
-                      style={{
-                        border: '1px solid rgba(0,0,0,0.12)',
-                        borderRadius: 10,
-                        padding: 8,
-                      }}
-                    >
-                      {festivalsQ.isLoading && (
-                        <div style={{ opacity: 0.75 }}>Searching…</div>
-                      )}
-                      {festivalsQ.isError && (
-                        <div style={{ opacity: 0.75 }}>
-                          Failed to load festivals.
-                        </div>
-                      )}
-                      {!festivalsQ.isLoading && !festivalsQ.isError && (
-                        <>
-                          {(festivalsQ.data ?? []).slice(0, 8).map((f) => (
-                            <button
-                              key={f.id}
-                              type='button'
-                              onMouseDown={(e) => e.preventDefault()} // prevents input blur weirdness
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                setSelectedFestival({
-                                  id: f.id,
-                                  name: f.name,
-                                });
-                                setFestivalSearch(f.name); // <-- keep it visible (optional)
-                              }}
-                              style={{
-                                display: 'block',
-                                width: '100%',
-                                textAlign: 'left',
-                                padding: '8px 10px',
-                                borderRadius: 8,
-                              }}
-                            >
-                              {f.name}
-                              {f.location ? (
-                                <span style={{ opacity: 0.7 }}>
-                                  {' '}
-                                  • {f.location}
-                                </span>
-                              ) : null}
-                            </button>
-                          ))}
-                          {(festivalsQ.data?.length ?? 0) === 0 && (
-                            <div style={{ opacity: 0.75 }}>No matches yet.</div>
-                          )}
-                        </>
-                      )}
+                ) : null}
+              </div>
+
+              {!selectedFestival && festivalSearch.trim().length >= 2 ? (
+                <div
+                  onMouseDown={(e) => e.preventDefault()}
+                  style={{
+                    border: '1px solid rgba(0,0,0,0.12)',
+                    borderRadius: 10,
+                    padding: 8,
+                  }}
+                >
+                  {festivalsQ.isLoading && (
+                    <div style={{ opacity: 0.75 }}>Searching…</div>
+                  )}
+                  {festivalsQ.isError && (
+                    <div style={{ opacity: 0.75 }}>
+                      Failed to load festivals.
                     </div>
                   )}
-                </>
-              )}
+
+                  {!festivalsQ.isLoading && !festivalsQ.isError && (
+                    <>
+                      {(festivalsQ.data ?? []).slice(0, 8).map((f) => (
+                        <button
+                          key={f.id}
+                          type='button'
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setSelectedFestival({ id: f.id, name: f.name });
+                            setFestivalSearch('');
+                          }}
+                          style={{
+                            display: 'block',
+                            width: '100%',
+                            textAlign: 'left',
+                            padding: '8px 10px',
+                            borderRadius: 8,
+                          }}
+                        >
+                          {f.name}
+                          {f.location ? (
+                            <span style={{ opacity: 0.7 }}>
+                              {' '}
+                              • {f.location}
+                            </span>
+                          ) : null}
+                        </button>
+                      ))}
+
+                      {(festivalsQ.data?.length ?? 0) === 0 && (
+                        <div style={{ opacity: 0.75 }}>No matches yet.</div>
+                      )}
+                    </>
+                  )}
+                </div>
+              ) : null}
             </label>
 
             <label style={{ display: 'grid', gap: 6 }}>

@@ -1,12 +1,12 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-import { IsIn, IsISO8601, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsISO8601, IsOptional, IsString } from 'class-validator';
+import { InteractionType } from '@prisma/client';
 
 export class CreateInteractionDto {
   @IsString()
   contactId!: string;
 
-  @IsIn(['EMAIL', 'CALL', 'DM', 'NOTE', 'TEXT', 'MEETING'])
-  type!: string;
+  @IsEnum(InteractionType)
+  type!: InteractionType;
 
   @IsOptional()
   @IsISO8601()
@@ -27,4 +27,12 @@ export class CreateInteractionDto {
   @IsOptional()
   @IsISO8601()
   nextFollowUpAt?: string;
+
+  @IsOptional()
+  @IsString()
+  bandId?: string;
+
+  @IsOptional()
+  @IsString()
+  festivalId?: string;
 }
