@@ -36,6 +36,7 @@ export function useCreateInteraction(contactId: string) {
       // refresh other pages
       await qc.invalidateQueries({ queryKey: ['contacts'] });
       await qc.invalidateQueries({ queryKey: ['dashboard'] });
+      await qc.invalidateQueries({ queryKey: ['contact', contactId] });
     },
   });
 }

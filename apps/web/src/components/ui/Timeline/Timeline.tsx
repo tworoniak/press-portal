@@ -1,5 +1,7 @@
 import styles from './Timeline.module.scss';
 
+type NamedRef = { id: string; name: string };
+
 export type TimelineItem = {
   id: string;
   type: string;
@@ -8,6 +10,10 @@ export type TimelineItem = {
   notes: string | null;
   outcome: string | null;
   nextFollowUpAt: string | null;
+
+  // ✅ optional relation labels
+  band?: NamedRef | null;
+  festival?: NamedRef | null;
 };
 
 function fmt(dt: string) {
@@ -26,6 +32,17 @@ export function Timeline({ items }: { items: TimelineItem[] }) {
             <div className={styles.left}>
               <div className={styles.type}>{it.type}</div>
               <div className={styles.meta}>• {fmt(it.occurredAt)}</div>
+
+              {it.band?.name ? (
+                <span className={styles.chip}>Band: {it.band.name}</span>
+              ) : null}
+
+              {it.festival?.name ? (
+                <span className={styles.chip}>
+                  Festival: {it.festival.name}
+                </span>
+              ) : null}
+
               {it.nextFollowUpAt ? (
                 <div className={styles.meta}>
                   • Follow-up: {fmt(it.nextFollowUpAt)}
@@ -33,6 +50,7 @@ export function Timeline({ items }: { items: TimelineItem[] }) {
               ) : null}
             </div>
           </div>
+
           {it.outcome ? (
             <div className={styles.meta}>Outcome: {it.outcome}</div>
           ) : null}
