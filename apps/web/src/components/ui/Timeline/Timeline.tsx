@@ -1,7 +1,5 @@
 import styles from './Timeline.module.scss';
 
-type NamedRef = { id: string; name: string };
-
 export type TimelineItem = {
   id: string;
   type: string;
@@ -10,17 +8,23 @@ export type TimelineItem = {
   notes: string | null;
   outcome: string | null;
   nextFollowUpAt: string | null;
-
-  // ✅ optional relation labels
-  band?: NamedRef | null;
-  festival?: NamedRef | null;
+  band?: { id: string; name: string } | null;
+  festival?: { id: string; name: string } | null;
 };
 
 function fmt(dt: string) {
   return new Date(dt).toLocaleString();
 }
 
-export function Timeline({ items }: { items: TimelineItem[] }) {
+export function Timeline({
+  items,
+  onEdit,
+  onDelete,
+}: {
+  items: TimelineItem[];
+  onEdit?: (item: TimelineItem) => void;
+  onDelete?: (id: string) => void;
+}) {
   if (!items?.length)
     return <div className={styles.empty}>No interactions yet.</div>;
 
@@ -36,7 +40,6 @@ export function Timeline({ items }: { items: TimelineItem[] }) {
               {it.band?.name ? (
                 <span className={styles.chip}>Band: {it.band.name}</span>
               ) : null}
-
               {it.festival?.name ? (
                 <span className={styles.chip}>
                   Festival: {it.festival.name}
@@ -49,6 +52,25 @@ export function Timeline({ items }: { items: TimelineItem[] }) {
                 </div>
               ) : null}
             </div>
+
+            {onEdit || onDelete ? (
+              <div className={styles.actions}>
+                {onEdit ? (
+                  <button type='button' onClick={() => onEdit(it)}>
+                    Edit
+                  </button>
+                ) : null}
+                {onDelete ? (
+                  <button
+                    type='button'
+                    onClick={() => onDelete(it.id)}
+                    className={styles.danger}
+                  >
+                    Delete
+                  </button>
+                ) : null}
+              </div>
+            ) : null}
           </div>
 
           {it.outcome ? (

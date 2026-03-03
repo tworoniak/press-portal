@@ -7,6 +7,9 @@ import { Timeline } from '../../components/ui/Timeline/Timeline';
 import page from '../../components/ui/Page/Page.module.scss';
 import card from '../../components/ui/Card/Card.module.scss';
 import { TagRow } from '../../components/ui/Tag/TagRow';
+import { Modal } from '../../components/ui/Modal/Modal';
+import type { Interaction } from './detailApi';
+import { useUpdateInteraction, useDeleteInteraction } from './detailQueries';
 
 import { useBands } from '../bands/queries';
 import { useFestivals } from '../festivals/queries';
@@ -33,7 +36,18 @@ export default function ContactDetailPage() {
   const [notes, setNotes] = useState('');
   const [nextFollowUpAt, setNextFollowUpAt] = useState<string>('');
 
-  // ✅ band/festival search + selection
+  const updateIt = useUpdateInteraction(id);
+  const delIt = useDeleteInteraction(id);
+
+  const [editOpen, setEditOpen] = useState(false);
+  const [editing, setEditing] = useState<Interaction | null>(null);
+
+  const [editType, setEditType] = useState<InteractionType>('EMAIL');
+  const [editSubject, setEditSubject] = useState('');
+  const [editNotes, setEditNotes] = useState('');
+  const [editOutcome, setEditOutcome] = useState('');
+  const [editNextFollowUpAt, setEditNextFollowUpAt] = useState('');
+
   const [bandSearch, setBandSearch] = useState('');
   const [festivalSearch, setFestivalSearch] = useState('');
   const [selectedBand, setSelectedBand] = useState<NamedRef | null>(null);
@@ -53,6 +67,18 @@ export default function ContactDetailPage() {
       '(no name)'
     );
   }, [data]);
+
+  function openEdit(it: Interaction) {
+    setEditing(it);
+    setEditType(it.type as InteractionType);
+    setEditSubject(it.subject ?? '');
+    setEditNotes(it.notes ?? '');
+    setEditOutcome(it.outcome ?? '');
+    setEditNextFollowUpAt(
+      it.nextFollowUpAt ? it.nextFollowUpAt.slice(0, 16) : '',
+    );
+    setEditOpen(true);
+  }
 
   if (isLoading)
     return (
@@ -354,11 +380,109 @@ export default function ContactDetailPage() {
           </div>
         </div>
 
+        <Modal
+          title='Edit interaction'
+          open={editOpen}
+          onClose={() => {
+            setEditOpen(false);
+            setEditing(null);
+          }}
+        >
+          {editing ? (
+            <div style={{ display: 'grid', gap: 10, maxWidth: 560 }}>
+              <SelectField<InteractionType>
+                label='Type'
+                value={editType}
+                options={INTERACTION_OPTIONS}
+                onChange={setEditType}
+              />
+
+              <label style={{ display: 'grid', gap: 6 }}>
+                <span style={{ fontSize: 12, opacity: 0.75 }}>Subject</span>
+                <input
+                  value={editSubject}
+                  onChange={(e) => setEditSubject(e.target.value)}
+                />
+              </label>
+
+              <label style={{ display: 'grid', gap: 6 }}>
+                <span style={{ fontSize: 12, opacity: 0.75 }}>Outcome</span>
+                <input
+                  value={editOutcome}
+                  onChange={(e) => setEditOutcome(e.target.value)}
+                />
+              </label>
+
+              <label style={{ display: 'grid', gap: 6 }}>
+                <span style={{ fontSize: 12, opacity: 0.75 }}>Notes</span>
+                <textarea
+                  value={editNotes}
+                  onChange={(e) => setEditNotes(e.target.value)}
+                  rows={4}
+                />
+              </label>
+
+              <label style={{ display: 'grid', gap: 6 }}>
+                <span style={{ fontSize: 12, opacity: 0.75 }}>
+                  Next follow-up
+                </span>
+                <input
+                  type='datetime-local'
+                  value={editNextFollowUpAt}
+                  onChange={(e) => setEditNextFollowUpAt(e.target.value)}
+                />
+              </label>
+
+              <div style={{ display: 'flex', gap: 10 }}>
+                <button
+                  type='button'
+                  disabled={updateIt.isPending}
+                  onClick={async () => {
+                    await updateIt.mutateAsync({
+                      id: editing.id,
+                      data: {
+                        type: editType,
+                        subject: editSubject.trim() ? editSubject.trim() : null,
+                        notes: editNotes.trim() ? editNotes.trim() : null,
+                        outcome: editOutcome.trim() ? editOutcome.trim() : null,
+                        nextFollowUpAt: editNextFollowUpAt
+                          ? new Date(editNextFollowUpAt).toISOString()
+                          : null,
+                      },
+                    });
+
+                    setEditOpen(false);
+                    setEditing(null);
+                  }}
+                >
+                  {updateIt.isPending ? 'Saving…' : 'Save'}
+                </button>
+
+                <button
+                  type='button'
+                  onClick={() => {
+                    setEditOpen(false);
+                    setEditing(null);
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : null}
+        </Modal>
+
         <div style={{ height: 14 }} />
 
-        {/* Timeline now shows chips if Timeline component supports it.
-            If your Timeline just renders fields, we’ll update it next. */}
-        <Timeline items={data.interactions ?? []} />
+        <Timeline
+          items={data.interactions ?? []}
+          onEdit={(it) => openEdit(it as Interaction)}
+          onDelete={async (interactionId) => {
+            const ok = confirm('Delete this interaction?');
+            if (!ok) return;
+            await delIt.mutateAsync(interactionId);
+          }}
+        />
 
         <div style={{ height: 10 }} />
         <div className={page.subtle}>
