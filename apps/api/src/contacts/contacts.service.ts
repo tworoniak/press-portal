@@ -116,4 +116,21 @@ export class ContactsService {
       where: { contactId_bandId: { contactId, bandId } },
     });
   }
+
+  async addFestival(contactId: string, festivalId: string) {
+    return this.prisma.contactFestival.upsert({
+      where: { contactId_festivalId: { contactId, festivalId } },
+      update: {},
+      create: { contactId, festivalId },
+      include: {
+        festival: { select: { id: true, name: true } },
+      },
+    });
+  }
+
+  async removeFestival(contactId: string, festivalId: string) {
+    return this.prisma.contactFestival.delete({
+      where: { contactId_festivalId: { contactId, festivalId } },
+    });
+  }
 }

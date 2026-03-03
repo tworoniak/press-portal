@@ -6,6 +6,8 @@ import {
   updateInteraction,
   addContactBand,
   removeContactBand,
+  addContactFestival,
+  removeContactFestival,
   type ContactDetail,
   type Interaction,
 } from './detailApi';
@@ -70,6 +72,34 @@ export function useRemoveContactBand(contactId: string) {
           bands: (prev.bands ?? []).filter((x) => x.band.id !== bandId),
         };
       });
+    },
+  });
+}
+
+export function useAddContactFestival(contactId: string) {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: (festivalId: string) =>
+      addContactFestival({ contactId, festivalId }),
+    onSuccess: async () => {
+      await qc.invalidateQueries({ queryKey: ['contact', contactId] });
+      await qc.invalidateQueries({ queryKey: ['contacts'] });
+      await qc.invalidateQueries({ queryKey: ['dashboard'] });
+    },
+  });
+}
+
+export function useRemoveContactFestival(contactId: string) {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: (festivalId: string) =>
+      removeContactFestival({ contactId, festivalId }),
+    onSuccess: async () => {
+      await qc.invalidateQueries({ queryKey: ['contact', contactId] });
+      await qc.invalidateQueries({ queryKey: ['contacts'] });
+      await qc.invalidateQueries({ queryKey: ['dashboard'] });
     },
   });
 }

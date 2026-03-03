@@ -65,4 +65,17 @@ export class ContactsController {
   removeBand(@Param('id') id: string, @Param('bandId') bandId: string) {
     return this.contactsService.removeBand(id, bandId);
   }
+
+  @Post(':id/festivals')
+  addFestival(@Param('id') id: string, @Body() body: { festivalId: string }) {
+    return this.contactsService.addFestival(id, body.festivalId);
+  }
+
+  @Delete(':id/festivals/:festivalId')
+  removeFestival(
+    @Param('id') id: string,
+    @Param('festivalId') festivalId: string,
+  ) {
+    return this.contactsService.removeFestival(id, festivalId);
+  }
 }

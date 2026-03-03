@@ -3,11 +3,12 @@ import { Link, useParams } from 'react-router-dom';
 
 import { SelectField } from '../../components/SelectField/SelectField';
 import { Timeline } from '../../components/ui/Timeline/Timeline';
+import { TagRow } from '../../components/ui/Tag/TagRow';
+import { Modal } from '../../components/ui/Modal/Modal';
 
 import page from '../../components/ui/Page/Page.module.scss';
 import card from '../../components/ui/Card/Card.module.scss';
-import { TagRow } from '../../components/ui/Tag/TagRow';
-import { Modal } from '../../components/ui/Modal/Modal';
+
 import type { Interaction } from './detailApi';
 import {
   useContact,
@@ -16,14 +17,14 @@ import {
   useDeleteInteraction,
   useAddContactBand,
   useRemoveContactBand,
+  useAddContactFestival,
+  useRemoveContactFestival,
 } from './detailQueries';
 
 import { useBands, useCreateBand } from '../bands/queries';
 import { useFestivals, useCreateFestival } from '../festivals/queries';
 
 type InteractionType = 'EMAIL' | 'CALL' | 'DM' | 'NOTE';
-
-type NamedRef = { id: string; name: string };
 
 const INTERACTION_OPTIONS = [
   { value: 'EMAIL', label: 'Email' },
@@ -32,20 +33,48 @@ const INTERACTION_OPTIONS = [
   { value: 'NOTE', label: 'Note' },
 ] as const satisfies readonly { value: InteractionType; label: string }[];
 
+type NamedRef = { id: string; name: string };
+
 export default function ContactDetailPage() {
   const { id = '' } = useParams();
+
   const { data, isLoading, isError } = useContact(id);
   const create = useCreateInteraction(id);
 
+  const updateIt = useUpdateInteraction(id);
+  const delIt = useDeleteInteraction(id);
+
+  const createBand = useCreateBand();
+  const createFestival = useCreateFestival();
+
+  // ---- create interaction form state
   const [outcome, setOutcome] = useState('');
   const [type, setType] = useState<InteractionType>('EMAIL');
   const [subject, setSubject] = useState('');
   const [notes, setNotes] = useState('');
   const [nextFollowUpAt, setNextFollowUpAt] = useState<string>('');
 
-  const updateIt = useUpdateInteraction(id);
-  const delIt = useDeleteInteraction(id);
+  // create interaction: band/festival picker
+  const [bandSearch, setBandSearch] = useState('');
+  const [festivalSearch, setFestivalSearch] = useState('');
+  const [selectedBand, setSelectedBand] = useState<NamedRef | null>(null);
+  const [selectedFestival, setSelectedFestival] = useState<NamedRef | null>(
+    null,
+  );
 
+  const addFestival = useAddContactFestival(id);
+  const removeFestival = useRemoveContactFestival(id);
+
+  const [repFestivalSearch, setRepFestivalSearch] = useState('');
+  const [repSelectedFestival, setRepSelectedFestival] =
+    useState<NamedRef | null>(null);
+
+  const repFestivalsQ = useFestivals(repFestivalSearch, !repSelectedFestival);
+
+  const bandsQ = useBands(bandSearch, !selectedBand);
+  const festivalsQ = useFestivals(festivalSearch, !selectedFestival);
+
+  // ---- edit modal state
   const [editOpen, setEditOpen] = useState(false);
   const [editing, setEditing] = useState<Interaction | null>(null);
 
@@ -54,7 +83,7 @@ export default function ContactDetailPage() {
   const [editNotes, setEditNotes] = useState('');
   const [editOutcome, setEditOutcome] = useState('');
   const [editNextFollowUpAt, setEditNextFollowUpAt] = useState('');
-  // edit modal: band/festival search + selection
+
   const [editBandSearch, setEditBandSearch] = useState('');
   const [editFestivalSearch, setEditFestivalSearch] = useState('');
   const [editSelectedBand, setEditSelectedBand] = useState<NamedRef | null>(
@@ -69,26 +98,13 @@ export default function ContactDetailPage() {
     !editSelectedFestival,
   );
 
+  // ---- contact ↔ band associations
   const addBand = useAddContactBand(id);
   const removeBand = useRemoveContactBand(id);
 
   const [repBandSearch, setRepBandSearch] = useState('');
   const [repSelectedBand, setRepSelectedBand] = useState<NamedRef | null>(null);
-
   const repBandsQ = useBands(repBandSearch, !repSelectedBand);
-
-  const createBand = useCreateBand();
-  const createFestival = useCreateFestival();
-
-  const [bandSearch, setBandSearch] = useState('');
-  const [festivalSearch, setFestivalSearch] = useState('');
-  const [selectedBand, setSelectedBand] = useState<NamedRef | null>(null);
-  const [selectedFestival, setSelectedFestival] = useState<NamedRef | null>(
-    null,
-  );
-
-  const bandsQ = useBands(bandSearch, !selectedBand);
-  const festivalsQ = useFestivals(festivalSearch, !selectedFestival);
 
   const title = useMemo(() => {
     if (!data) return '';
@@ -102,6 +118,7 @@ export default function ContactDetailPage() {
 
   function openEdit(it: Interaction) {
     setEditing(it);
+
     setEditType(it.type as InteractionType);
     setEditSubject(it.subject ?? '');
     setEditNotes(it.notes ?? '');
@@ -110,7 +127,6 @@ export default function ContactDetailPage() {
       it.nextFollowUpAt ? it.nextFollowUpAt.slice(0, 16) : '',
     );
 
-    // ✅ prefill selected band/festival (prefer included objects)
     setEditSelectedBand(
       it.band ? { id: it.band.id, name: it.band.name } : null,
     );
@@ -118,7 +134,6 @@ export default function ContactDetailPage() {
       it.festival ? { id: it.festival.id, name: it.festival.name } : null,
     );
 
-    // clear search fields
     setEditBandSearch('');
     setEditFestivalSearch('');
 
@@ -169,7 +184,6 @@ export default function ContactDetailPage() {
         <div className={card.card}>
           <div className={card.cardTitle}>Represents bands</div>
 
-          {/* existing associations */}
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
             {(data.bands ?? []).length ? (
               data.bands.map((cb) => (
@@ -202,13 +216,13 @@ export default function ContactDetailPage() {
 
           <div style={{ height: 12 }} />
 
-          {/* add association */}
           <label style={{ display: 'grid', gap: 6, maxWidth: 520 }}>
             <span style={{ fontSize: 12, opacity: 0.75 }}>Add band</span>
 
             {repSelectedBand ? (
               <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
                 <div style={{ fontWeight: 600 }}>{repSelectedBand.name}</div>
+
                 <button
                   type='button'
                   onMouseDown={(e) => e.preventDefault()}
@@ -297,6 +311,7 @@ export default function ContactDetailPage() {
                                 const created = await createBand.mutateAsync({
                                   name,
                                 });
+
                                 setRepSelectedBand({
                                   id: created.id,
                                   name: created.name,
@@ -323,6 +338,179 @@ export default function ContactDetailPage() {
 
         <div style={{ height: 14 }} />
 
+        {/* Represents Festivals */}
+        <div className={card.card}>
+          <div className={card.cardTitle}>Represents festivals</div>
+
+          {/* existing associations */}
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+            {(data.festivals ?? []).length ? (
+              data.festivals.map((cf) => (
+                <div
+                  key={cf.festival.id}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    padding: '6px 10px',
+                    border: '1px solid rgba(0,0,0,0.12)',
+                    borderRadius: 999,
+                  }}
+                >
+                  <span style={{ fontWeight: 600 }}>{cf.festival.name}</span>
+                  <button
+                    type='button'
+                    onClick={() => removeFestival.mutate(cf.festival.id)}
+                    disabled={removeFestival.isPending}
+                    style={{ opacity: 0.8 }}
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))
+            ) : (
+              <div style={{ opacity: 0.75 }}>No festivals linked yet.</div>
+            )}
+          </div>
+
+          <div style={{ height: 12 }} />
+
+          {/* add association */}
+          <label style={{ display: 'grid', gap: 6, maxWidth: 520 }}>
+            <span style={{ fontSize: 12, opacity: 0.75 }}>Add festival</span>
+
+            {repSelectedFestival ? (
+              <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                <div style={{ fontWeight: 600 }}>
+                  {repSelectedFestival.name}
+                </div>
+
+                <button
+                  type='button'
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setRepSelectedFestival(null);
+                    setRepFestivalSearch('');
+                  }}
+                >
+                  Clear
+                </button>
+
+                <button
+                  type='button'
+                  disabled={addFestival.isPending}
+                  onClick={async () => {
+                    await addFestival.mutateAsync(repSelectedFestival.id);
+                    setRepSelectedFestival(null);
+                    setRepFestivalSearch('');
+                  }}
+                >
+                  {addFestival.isPending ? 'Adding…' : 'Add'}
+                </button>
+              </div>
+            ) : (
+              <>
+                <input
+                  value={repFestivalSearch}
+                  onChange={(e) => setRepFestivalSearch(e.target.value)}
+                  placeholder="Type 2+ chars (e.g. 'Maryland')"
+                />
+
+                {repFestivalSearch.trim().length >= 2 ? (
+                  <div
+                    onMouseDown={(e) => e.preventDefault()}
+                    style={{
+                      border: '1px solid rgba(0,0,0,0.12)',
+                      borderRadius: 10,
+                      padding: 8,
+                    }}
+                  >
+                    {repFestivalsQ.isLoading && (
+                      <div style={{ opacity: 0.75 }}>Searching…</div>
+                    )}
+                    {repFestivalsQ.isError && (
+                      <div style={{ opacity: 0.75 }}>
+                        Failed to load festivals.
+                      </div>
+                    )}
+
+                    {!repFestivalsQ.isLoading && !repFestivalsQ.isError ? (
+                      <>
+                        {(repFestivalsQ.data ?? []).slice(0, 8).map((f) => (
+                          <button
+                            key={f.id}
+                            type='button'
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setRepSelectedFestival({
+                                id: f.id,
+                                name: f.name,
+                              });
+                              setRepFestivalSearch('');
+                            }}
+                            style={{
+                              display: 'block',
+                              width: '100%',
+                              textAlign: 'left',
+                              padding: '8px 10px',
+                              borderRadius: 8,
+                            }}
+                          >
+                            {f.name}
+                            {f.location ? (
+                              <span style={{ opacity: 0.7 }}>
+                                {' '}
+                                • {f.location}
+                              </span>
+                            ) : null}
+                          </button>
+                        ))}
+
+                        {(repFestivalsQ.data?.length ?? 0) === 0 ? (
+                          <div style={{ display: 'grid', gap: 8 }}>
+                            <div style={{ opacity: 0.75 }}>No matches.</div>
+                            <button
+                              type='button'
+                              onMouseDown={(e) => e.preventDefault()}
+                              onClick={async (e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+
+                                const name = repFestivalSearch.trim();
+                                if (name.length < 2) return;
+
+                                const created =
+                                  await createFestival.mutateAsync({ name });
+
+                                setRepSelectedFestival({
+                                  id: created.id,
+                                  name: created.name,
+                                });
+                                setRepFestivalSearch('');
+                              }}
+                              disabled={createFestival.isPending}
+                              style={{ padding: '8px 10px', borderRadius: 8 }}
+                            >
+                              {createFestival.isPending
+                                ? 'Creating…'
+                                : `Create "${repFestivalSearch.trim()}"`}
+                            </button>
+                          </div>
+                        ) : null}
+                      </>
+                    ) : null}
+                  </div>
+                ) : null}
+              </>
+            )}
+          </label>
+        </div>
+
+        <div style={{ height: 14 }} />
+
+        {/* Log Interaction */}
         <div className={card.card}>
           <div className={card.cardTitle}>Log Interaction</div>
 
@@ -367,10 +555,9 @@ export default function ContactDetailPage() {
                 ) : null}
               </div>
 
-              {/* Dropdown */}
               {!selectedBand && bandSearch.trim().length >= 2 ? (
                 <div
-                  onMouseDown={(e) => e.preventDefault()} // ✅ keeps input from blurring before click registers
+                  onMouseDown={(e) => e.preventDefault()}
                   style={{
                     border: '1px solid rgba(0,0,0,0.12)',
                     borderRadius: 10,
@@ -394,7 +581,7 @@ export default function ContactDetailPage() {
                             e.preventDefault();
                             e.stopPropagation();
                             setSelectedBand({ id: b.id, name: b.name });
-                            setBandSearch(''); // optional now; input shows selectedBand.name
+                            setBandSearch('');
                           }}
                           style={{
                             display: 'block',
@@ -445,9 +632,6 @@ export default function ContactDetailPage() {
                   )}
                 </div>
               ) : null}
-
-              {/* tiny debug (optional) */}
-              {/* <div style={{ fontSize: 12, opacity: 0.7 }}>selectedBandId: {selectedBand?.id ?? '(none)'}</div> */}
             </label>
 
             {/* Festival search */}
@@ -607,6 +791,7 @@ export default function ContactDetailPage() {
             </label>
 
             <button
+              type='button'
               onClick={() => {
                 create.mutate({
                   contactId: id,
@@ -655,6 +840,7 @@ export default function ContactDetailPage() {
                 onChange={setEditType}
               />
 
+              {/* Band */}
               <label style={{ display: 'grid', gap: 6 }}>
                 <span style={{ fontSize: 12, opacity: 0.75 }}>Band</span>
 
@@ -723,11 +909,9 @@ export default function ContactDetailPage() {
                             }}
                           >
                             {b.name}
-                            {b.genre ? (
-                              <span style={{ opacity: 0.7 }}> • {b.genre}</span>
-                            ) : null}
                           </button>
                         ))}
+
                         {(editBandsQ.data?.length ?? 0) === 0 ? (
                           <div style={{ display: 'grid', gap: 8 }}>
                             <div style={{ opacity: 0.75 }}>No matches.</div>
@@ -766,6 +950,7 @@ export default function ContactDetailPage() {
                 ) : null}
               </label>
 
+              {/* Festival */}
               <label style={{ display: 'grid', gap: 6 }}>
                 <span style={{ fontSize: 12, opacity: 0.75 }}>Festival</span>
 
@@ -842,14 +1027,9 @@ export default function ContactDetailPage() {
                             }}
                           >
                             {f.name}
-                            {f.location ? (
-                              <span style={{ opacity: 0.7 }}>
-                                {' '}
-                                • {f.location}
-                              </span>
-                            ) : null}
                           </button>
                         ))}
+
                         {(editFestivalsQ.data?.length ?? 0) === 0 ? (
                           <div style={{ display: 'grid', gap: 8 }}>
                             <div style={{ opacity: 0.75 }}>No matches.</div>
