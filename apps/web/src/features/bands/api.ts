@@ -19,3 +19,8 @@ export async function fetchBands(search?: string) {
   });
   return res.data;
 }
+
+export async function createBand(input: { name: string }) {
+  const res = await api.post<Band>('/bands', input);
+  return res.data;
+}
