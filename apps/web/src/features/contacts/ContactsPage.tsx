@@ -506,7 +506,9 @@ export default function ContactsPage() {
                         </td>
 
                         <td>
-                          <div>{c.company ?? '—'}</div>
+                          <div className={table.rowCompany}>
+                            {c.company ?? '—'}
+                          </div>
                           <div className={table.smallMuted}>
                             {c.role ?? '—'}
                           </div>
@@ -516,7 +518,7 @@ export default function ContactsPage() {
                           <Badge tone={tone}>{label}</Badge>
                         </td>
 
-                        <td>
+                        <td className={table.smallMuted}>
                           {c.lastContactedAt ? fmtDate(c.lastContactedAt) : '—'}
                         </td>
 

@@ -30,9 +30,17 @@ export type ContactBandRef = {
   relationshipNotes: string | null;
 };
 
+export type ContactFestivalRef = {
+  festival: { id: string; name: string };
+  createdAt: string;
+  relationshipRole: string | null;
+  relationshipNotes: string | null;
+};
+
 export type ContactDetail = Omit<Contact, 'interactions'> & {
   interactions: Interaction[];
   bands: ContactBandRef[];
+  festivals: ContactFestivalRef[];
 };
 
 export async function fetchContact(id: string) {
@@ -59,6 +67,29 @@ export async function removeContactBand(input: {
 }) {
   const res = await api.delete<{ ok: true } | unknown>(
     `/contacts/${input.contactId}/bands/${input.bandId}`,
+  );
+  return res.data;
+}
+
+export async function addContactFestival(input: {
+  contactId: string;
+  festivalId: string;
+}) {
+  const res = await api.post<{ id: string; name: string }>(
+    `/contacts/${input.contactId}/festivals`,
+    {
+      festivalId: input.festivalId,
+    },
+  );
+  return res.data;
+}
+
+export async function removeContactFestival(input: {
+  contactId: string;
+  festivalId: string;
+}) {
+  const res = await api.delete<{ ok: true } | unknown>(
+    `/contacts/${input.contactId}/festivals/${input.festivalId}`,
   );
   return res.data;
 }
