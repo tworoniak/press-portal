@@ -63,3 +63,22 @@
   margin-left: 8px;
   white-space: nowrap;
 }
+
+.actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+
+  button {
+    font-size: 13px;
+  }
+}
+
+.danger {
+  background: var(--danger);
+  color: var(--text);
+
+  &:hover {
+    background: #ea244c;
+  }
+}
