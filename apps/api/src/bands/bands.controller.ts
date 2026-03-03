@@ -42,4 +42,25 @@ export class BandsController {
   remove(@Param('id') id: string) {
     return this.bands.remove(id);
   }
+
+  @Post(':id/contacts')
+  addContact(
+    @Param('id') bandId: string,
+    @Body()
+    body: {
+      contactId: string;
+      relationshipRole?: string;
+      relationshipNotes?: string;
+    },
+  ) {
+    return this.bands.addContact(bandId, body);
+  }
+
+  @Delete(':id/contacts/:contactId')
+  removeContact(
+    @Param('id') bandId: string,
+    @Param('contactId') contactId: string,
+  ) {
+    return this.bands.removeContact(bandId, contactId);
+  }
 }
