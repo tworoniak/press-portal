@@ -74,7 +74,12 @@ export class ContactsService {
             festival: { select: { id: true, name: true } },
           },
         },
-        bands: { include: { band: { select: { id: true, name: true } } } },
+        bands: {
+          include: {
+            band: { select: { id: true, name: true } },
+          },
+          orderBy: { createdAt: 'desc' },
+        },
         festivals: {
           include: { festival: { select: { id: true, name: true } } },
         },
@@ -92,6 +97,23 @@ export class ContactsService {
   async remove(id: string) {
     return this.prisma.contact.delete({
       where: { id },
+    });
+  }
+
+  async addBand(contactId: string, bandId: string) {
+    return this.prisma.contactBand.upsert({
+      where: { contactId_bandId: { contactId, bandId } },
+      update: {},
+      create: { contactId, bandId },
+      include: {
+        band: { select: { id: true, name: true } },
+      },
+    });
+  }
+
+  async removeBand(contactId: string, bandId: string) {
+    return this.prisma.contactBand.delete({
+      where: { contactId_bandId: { contactId, bandId } },
     });
   }
 }

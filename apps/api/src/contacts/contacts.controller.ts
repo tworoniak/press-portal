@@ -55,4 +55,14 @@ export class ContactsController {
   remove(@Param('id') id: string) {
     return this.contactsService.remove(id);
   }
+
+  @Post(':id/bands')
+  addBand(@Param('id') id: string, @Body() body: { bandId: string }) {
+    return this.contactsService.addBand(id, body.bandId);
+  }
+
+  @Delete(':id/bands/:bandId')
+  removeBand(@Param('id') id: string, @Param('bandId') bandId: string) {
+    return this.contactsService.removeBand(id, bandId);
+  }
 }

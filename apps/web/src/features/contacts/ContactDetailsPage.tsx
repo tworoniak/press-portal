@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { useContact, useCreateInteraction } from './detailQueries';
+
 import { SelectField } from '../../components/SelectField/SelectField';
 import { Timeline } from '../../components/ui/Timeline/Timeline';
 
@@ -9,12 +9,21 @@ import card from '../../components/ui/Card/Card.module.scss';
 import { TagRow } from '../../components/ui/Tag/TagRow';
 import { Modal } from '../../components/ui/Modal/Modal';
 import type { Interaction } from './detailApi';
-import { useUpdateInteraction, useDeleteInteraction } from './detailQueries';
+import {
+  useContact,
+  useCreateInteraction,
+  useUpdateInteraction,
+  useDeleteInteraction,
+  useAddContactBand,
+  useRemoveContactBand,
+} from './detailQueries';
 
 import { useBands, useCreateBand } from '../bands/queries';
 import { useFestivals, useCreateFestival } from '../festivals/queries';
 
 type InteractionType = 'EMAIL' | 'CALL' | 'DM' | 'NOTE';
+
+type NamedRef = { id: string; name: string };
 
 const INTERACTION_OPTIONS = [
   { value: 'EMAIL', label: 'Email' },
@@ -22,8 +31,6 @@ const INTERACTION_OPTIONS = [
   { value: 'DM', label: 'DM' },
   { value: 'NOTE', label: 'Note' },
 ] as const satisfies readonly { value: InteractionType; label: string }[];
-
-type NamedRef = { id: string; name: string };
 
 export default function ContactDetailPage() {
   const { id = '' } = useParams();
@@ -61,6 +68,15 @@ export default function ContactDetailPage() {
     editFestivalSearch,
     !editSelectedFestival,
   );
+
+  const addBand = useAddContactBand(id);
+  const removeBand = useRemoveContactBand(id);
+
+  const [repBandSearch, setRepBandSearch] = useState('');
+  const [repSelectedBand, setRepSelectedBand] = useState<NamedRef | null>(null);
+
+  const repBandsQ = useBands(repBandSearch, !repSelectedBand);
+
   const createBand = useCreateBand();
   const createFestival = useCreateFestival();
 
@@ -145,6 +161,164 @@ export default function ContactDetailPage() {
         <div className={card.card}>
           <div className={card.cardTitle}>Tags</div>
           <TagRow tags={data.tags ?? []} />
+        </div>
+
+        <div style={{ height: 14 }} />
+
+        {/* Represents Bands */}
+        <div className={card.card}>
+          <div className={card.cardTitle}>Represents bands</div>
+
+          {/* existing associations */}
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+            {(data.bands ?? []).length ? (
+              data.bands.map((cb) => (
+                <div
+                  key={cb.band.id}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    padding: '6px 10px',
+                    border: '1px solid rgba(0,0,0,0.12)',
+                    borderRadius: 999,
+                  }}
+                >
+                  <span style={{ fontWeight: 600 }}>{cb.band.name}</span>
+                  <button
+                    type='button'
+                    onClick={() => removeBand.mutate(cb.band.id)}
+                    disabled={removeBand.isPending}
+                    style={{ opacity: 0.8 }}
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))
+            ) : (
+              <div style={{ opacity: 0.75 }}>No bands linked yet.</div>
+            )}
+          </div>
+
+          <div style={{ height: 12 }} />
+
+          {/* add association */}
+          <label style={{ display: 'grid', gap: 6, maxWidth: 520 }}>
+            <span style={{ fontSize: 12, opacity: 0.75 }}>Add band</span>
+
+            {repSelectedBand ? (
+              <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                <div style={{ fontWeight: 600 }}>{repSelectedBand.name}</div>
+                <button
+                  type='button'
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setRepSelectedBand(null);
+                    setRepBandSearch('');
+                  }}
+                >
+                  Clear
+                </button>
+
+                <button
+                  type='button'
+                  disabled={addBand.isPending}
+                  onClick={async () => {
+                    await addBand.mutateAsync(repSelectedBand.id);
+                    setRepSelectedBand(null);
+                    setRepBandSearch('');
+                  }}
+                >
+                  {addBand.isPending ? 'Adding…' : 'Add'}
+                </button>
+              </div>
+            ) : (
+              <>
+                <input
+                  value={repBandSearch}
+                  onChange={(e) => setRepBandSearch(e.target.value)}
+                  placeholder="Type 2+ chars (e.g. 'RWAKE')"
+                />
+
+                {repBandSearch.trim().length >= 2 ? (
+                  <div
+                    onMouseDown={(e) => e.preventDefault()}
+                    style={{
+                      border: '1px solid rgba(0,0,0,0.12)',
+                      borderRadius: 10,
+                      padding: 8,
+                    }}
+                  >
+                    {repBandsQ.isLoading && (
+                      <div style={{ opacity: 0.75 }}>Searching…</div>
+                    )}
+                    {repBandsQ.isError && (
+                      <div style={{ opacity: 0.75 }}>Failed to load bands.</div>
+                    )}
+
+                    {!repBandsQ.isLoading && !repBandsQ.isError ? (
+                      <>
+                        {(repBandsQ.data ?? []).slice(0, 8).map((b) => (
+                          <button
+                            key={b.id}
+                            type='button'
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setRepSelectedBand({ id: b.id, name: b.name });
+                              setRepBandSearch('');
+                            }}
+                            style={{
+                              display: 'block',
+                              width: '100%',
+                              textAlign: 'left',
+                              padding: '8px 10px',
+                              borderRadius: 8,
+                            }}
+                          >
+                            {b.name}
+                          </button>
+                        ))}
+
+                        {(repBandsQ.data?.length ?? 0) === 0 ? (
+                          <div style={{ display: 'grid', gap: 8 }}>
+                            <div style={{ opacity: 0.75 }}>No matches.</div>
+                            <button
+                              type='button'
+                              onMouseDown={(e) => e.preventDefault()}
+                              onClick={async (e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+
+                                const name = repBandSearch.trim();
+                                if (name.length < 2) return;
+
+                                const created = await createBand.mutateAsync({
+                                  name,
+                                });
+                                setRepSelectedBand({
+                                  id: created.id,
+                                  name: created.name,
+                                });
+                                setRepBandSearch('');
+                              }}
+                              disabled={createBand.isPending}
+                              style={{ padding: '8px 10px', borderRadius: 8 }}
+                            >
+                              {createBand.isPending
+                                ? 'Creating…'
+                                : `Create "${repBandSearch.trim()}"`}
+                            </button>
+                          </div>
+                        ) : null}
+                      </>
+                    ) : null}
+                  </div>
+                ) : null}
+              </>
+            )}
+          </label>
         </div>
 
         <div style={{ height: 14 }} />
