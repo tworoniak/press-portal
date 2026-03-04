@@ -5,6 +5,7 @@ import { SelectField } from '../../components/SelectField/SelectField';
 import { Timeline } from '../../components/ui/Timeline/Timeline';
 import { TagRow } from '../../components/ui/Tag/TagRow';
 import { Modal } from '../../components/ui/Modal/Modal';
+import { SearchPicker } from '../../components/ui/SearchPicker/SearchPicker';
 
 import page from '../../components/ui/Page/Page.module.scss';
 import card from '../../components/ui/Card/Card.module.scss';
@@ -168,7 +169,19 @@ export default function ContactDetailPage() {
         <div className={page.subtle}>
           {data.company ? data.company : '—'}
           {data.role ? ` • ${data.role}` : ''}
-          {data.email ? ` • ${data.email}` : ''}
+          {data.email ? (
+            <>
+              {' '}
+              •{' '}
+              <a
+                href={`mailto:${data.email}`}
+                className='contact-email-link'
+                onClick={(e) => e.stopPropagation()}
+              >
+                {data.email}
+              </a>
+            </>
+          ) : null}
         </div>
 
         <div style={{ height: 10 }} />
@@ -398,6 +411,7 @@ export default function ContactDetailPage() {
           <div style={{ height: 12 }} />
 
           {/* add association */}
+
           <label style={{ display: 'grid', gap: 6, maxWidth: 520 }}>
             <span style={{ fontSize: 12, opacity: 0.75 }}>Add festival</span>
 
@@ -545,235 +559,48 @@ export default function ContactDetailPage() {
             />
 
             {/* Band search */}
-            <label style={{ display: 'grid', gap: 6 }}>
-              <span style={{ fontSize: 12, opacity: 0.75 }}>
-                Band (optional)
-              </span>
-
-              <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-                <input
-                  value={selectedBand ? selectedBand.name : bandSearch}
-                  onChange={(e) => {
-                    setSelectedBand(null);
-                    setBandSearch(e.target.value);
-                  }}
-                  placeholder="Type 2+ chars (e.g. 'RWAKE')"
-                  disabled={Boolean(selectedBand)}
-                />
-
-                {selectedBand ? (
-                  <button
-                    type='button'
-                    onMouseDown={(e) => e.preventDefault()}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setSelectedBand(null);
-                      setBandSearch('');
-                    }}
-                  >
-                    Clear
-                  </button>
-                ) : null}
-              </div>
-
-              {!selectedBand && bandSearch.trim().length >= 2 ? (
-                <div
-                  onMouseDown={(e) => e.preventDefault()}
-                  style={{
-                    border: '1px solid rgba(0,0,0,0.12)',
-                    borderRadius: 10,
-                    padding: 8,
-                  }}
-                >
-                  {bandsQ.isLoading && (
-                    <div style={{ opacity: 0.75 }}>Searching…</div>
-                  )}
-                  {bandsQ.isError && (
-                    <div style={{ opacity: 0.75 }}>Failed to load bands.</div>
-                  )}
-
-                  {!bandsQ.isLoading && !bandsQ.isError && (
-                    <>
-                      {(bandsQ.data ?? []).slice(0, 8).map((b) => (
-                        <button
-                          key={b.id}
-                          type='button'
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            setSelectedBand({ id: b.id, name: b.name });
-                            setBandSearch('');
-                          }}
-                          style={{
-                            display: 'block',
-                            width: '100%',
-                            textAlign: 'left',
-                            padding: '8px 10px',
-                            borderRadius: 8,
-                          }}
-                        >
-                          {b.name}
-                          {b.genre ? (
-                            <span style={{ opacity: 0.7 }}> • {b.genre}</span>
-                          ) : null}
-                        </button>
-                      ))}
-
-                      {(bandsQ.data?.length ?? 0) === 0 ? (
-                        <div style={{ display: 'grid', gap: 8 }}>
-                          <div style={{ opacity: 0.75 }}>No matches.</div>
-                          <button
-                            type='button'
-                            onClick={async (e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-
-                              const name = bandSearch.trim();
-                              if (name.length < 2) return;
-
-                              const created = await createBand.mutateAsync({
-                                name,
-                              });
-                              setSelectedBand({
-                                id: created.id,
-                                name: created.name,
-                              });
-                              setBandSearch('');
-                            }}
-                            disabled={createBand.isPending}
-                            style={{ padding: '8px 10px', borderRadius: 8 }}
-                          >
-                            {createBand.isPending
-                              ? 'Creating…'
-                              : `Create "${bandSearch.trim()}"`}
-                          </button>
-                        </div>
-                      ) : null}
-                    </>
-                  )}
-                </div>
-              ) : null}
-            </label>
+            <SearchPicker
+              label='Band (optional)'
+              placeholder="Type 2+ chars (e.g. 'RWAKE')"
+              query={bandSearch}
+              onQueryChange={setBandSearch}
+              selected={selectedBand}
+              onSelectedChange={setSelectedBand}
+              items={bandsQ.data}
+              isLoading={bandsQ.isLoading}
+              isError={bandsQ.isError}
+              getKey={(b) => b.id}
+              getName={(b) => b.name}
+              renderMeta={(b) => (b.genre ? <>• {b.genre}</> : null)}
+              onCreate={async (name) => {
+                const created = await createBand.mutateAsync({ name });
+                return { id: created.id, name: created.name };
+              }}
+              isCreating={createBand.isPending}
+              autoFocus
+            />
 
             {/* Festival search */}
-            <label style={{ display: 'grid', gap: 6 }}>
-              <span style={{ fontSize: 12, opacity: 0.75 }}>
-                Festival (optional)
-              </span>
-
-              <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-                <input
-                  value={
-                    selectedFestival ? selectedFestival.name : festivalSearch
-                  }
-                  onChange={(e) => {
-                    setSelectedFestival(null);
-                    setFestivalSearch(e.target.value);
-                  }}
-                  placeholder="Type 2+ chars (e.g. 'Maryland')"
-                  disabled={Boolean(selectedFestival)}
-                />
-
-                {selectedFestival ? (
-                  <button
-                    type='button'
-                    onMouseDown={(e) => e.preventDefault()}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setSelectedFestival(null);
-                      setFestivalSearch('');
-                    }}
-                  >
-                    Clear
-                  </button>
-                ) : null}
-              </div>
-
-              {!selectedFestival && festivalSearch.trim().length >= 2 ? (
-                <div
-                  onMouseDown={(e) => e.preventDefault()}
-                  style={{
-                    border: '1px solid rgba(0,0,0,0.12)',
-                    borderRadius: 10,
-                    padding: 8,
-                  }}
-                >
-                  {festivalsQ.isLoading && (
-                    <div style={{ opacity: 0.75 }}>Searching…</div>
-                  )}
-                  {festivalsQ.isError && (
-                    <div style={{ opacity: 0.75 }}>
-                      Failed to load festivals.
-                    </div>
-                  )}
-
-                  {!festivalsQ.isLoading && !festivalsQ.isError && (
-                    <>
-                      {(festivalsQ.data ?? []).slice(0, 8).map((f) => (
-                        <button
-                          key={f.id}
-                          type='button'
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            setSelectedFestival({ id: f.id, name: f.name });
-                            setFestivalSearch('');
-                          }}
-                          style={{
-                            display: 'block',
-                            width: '100%',
-                            textAlign: 'left',
-                            padding: '8px 10px',
-                            borderRadius: 8,
-                          }}
-                        >
-                          {f.name}
-                          {f.location ? (
-                            <span style={{ opacity: 0.7 }}>
-                              {' '}
-                              • {f.location}
-                            </span>
-                          ) : null}
-                        </button>
-                      ))}
-
-                      {(festivalsQ.data?.length ?? 0) === 0 ? (
-                        <div style={{ display: 'grid', gap: 8 }}>
-                          <div style={{ opacity: 0.75 }}>No matches.</div>
-                          <button
-                            type='button'
-                            onClick={async (e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-
-                              const name = festivalSearch.trim();
-                              if (name.length < 2) return;
-
-                              const created = await createFestival.mutateAsync({
-                                name,
-                              });
-                              setSelectedFestival({
-                                id: created.id,
-                                name: created.name,
-                              });
-                              setFestivalSearch('');
-                            }}
-                            disabled={createFestival.isPending}
-                            style={{ padding: '8px 10px', borderRadius: 8 }}
-                          >
-                            {createFestival.isPending
-                              ? 'Creating…'
-                              : `Create "${festivalSearch.trim()}"`}
-                          </button>
-                        </div>
-                      ) : null}
-                    </>
-                  )}
-                </div>
-              ) : null}
-            </label>
+            <SearchPicker
+              label='Festival (optional)'
+              placeholder="Type 2+ chars (e.g. 'Maryland')"
+              query={festivalSearch}
+              onQueryChange={setFestivalSearch}
+              selected={selectedFestival}
+              onSelectedChange={setSelectedFestival}
+              items={festivalsQ.data}
+              isLoading={festivalsQ.isLoading}
+              isError={festivalsQ.isError}
+              getKey={(f) => f.id}
+              getName={(f) => f.name}
+              renderMeta={(f) => (f.location ? <>• {f.location}</> : null)}
+              onCreate={async (name) => {
+                const created = await createFestival.mutateAsync({ name });
+                return { id: created.id, name: created.name };
+              }}
+              isCreating={createFestival.isPending}
+              autoFocus
+            />
 
             <label style={{ display: 'grid', gap: 6 }}>
               <span style={{ fontSize: 12, opacity: 0.75 }}>Subject</span>
@@ -815,6 +642,8 @@ export default function ContactDetailPage() {
             <button
               type='button'
               onClick={() => {
+                console.log('selectedBand', selectedBand);
+                console.log('selectedFestival', selectedFestival);
                 create.mutate({
                   contactId: id,
                   type,

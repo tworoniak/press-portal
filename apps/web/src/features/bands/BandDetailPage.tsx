@@ -11,6 +11,10 @@ import { useContactSearch } from '../contacts/searchQueries';
 
 type NamedRef = { id: string; label: string };
 
+function fmt(dt: string) {
+  return new Date(dt).toLocaleString();
+}
+
 function contactLabel(c: {
   displayName: string | null;
   firstName: string | null;
@@ -24,6 +28,20 @@ function contactLabel(c: {
     '(no name)'
   );
 }
+
+// function contactLabel(c: {
+//   displayName: string | null;
+//   firstName: string | null;
+//   lastName: string | null;
+//   email: string | null;
+// }) {
+//   return (
+//     c.displayName ||
+//     [c.firstName, c.lastName].filter(Boolean).join(' ') ||
+//     c.email ||
+//     '(no name)'
+//   );
+// }
 
 export default function BandDetailPage() {
   const { id = '' } = useParams();
@@ -236,6 +254,89 @@ export default function BandDetailPage() {
               </>
             )}
           </label>
+
+          {/* Recent interactions */}
+          <div style={{ height: 14 }} />
+
+          <div className={card.card}>
+            <div className={card.cardTitle}>Recent interactions</div>
+
+            {(band.interactions?.length ?? 0) > 0 ? (
+              <div style={{ display: 'grid', gap: 12 }}>
+                {band.interactions.slice(0, 10).map((it) => (
+                  <div
+                    key={it.id}
+                    style={{
+                      border: '1px solid rgba(0,0,0,0.10)',
+                      borderRadius: 12,
+                      padding: 12,
+                    }}
+                  >
+                    <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                      <div style={{ fontWeight: 700 }}>{it.type}</div>
+                      <div style={{ opacity: 0.75 }}>
+                        • {fmt(it.occurredAt)}
+                      </div>
+
+                      {it.nextFollowUpAt ? (
+                        <div style={{ opacity: 0.75 }}>
+                          • Follow-up: {fmt(it.nextFollowUpAt)}
+                        </div>
+                      ) : null}
+
+                      {it.festival ? (
+                        <div style={{ opacity: 0.75 }}>
+                          • Festival: {it.festival.name}
+                        </div>
+                      ) : null}
+                    </div>
+
+                    <div style={{ marginTop: 6, fontSize: 14 }}>
+                      <span style={{ opacity: 0.75 }}>Contact:</span>{' '}
+                      <Link to={`/contacts/${it.contact.id}`}>
+                        {contactLabel(it.contact)}
+                      </Link>
+                      {it.contact.company ? (
+                        <span style={{ opacity: 0.75 }}>
+                          {' '}
+                          • {it.contact.company}
+                        </span>
+                      ) : null}
+                    </div>
+
+                    {it.subject ? (
+                      <div style={{ marginTop: 8, fontWeight: 600 }}>
+                        {it.subject}
+                      </div>
+                    ) : null}
+
+                    {it.outcome ? (
+                      <div style={{ marginTop: 6, opacity: 0.85 }}>
+                        <span style={{ fontWeight: 600 }}>Outcome:</span>{' '}
+                        {it.outcome}
+                      </div>
+                    ) : null}
+
+                    {it.notes ? (
+                      <div
+                        style={{
+                          marginTop: 6,
+                          opacity: 0.9,
+                          whiteSpace: 'pre-wrap',
+                        }}
+                      >
+                        {it.notes}
+                      </div>
+                    ) : null}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div style={{ opacity: 0.75 }}>
+                No interactions for this band yet.
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

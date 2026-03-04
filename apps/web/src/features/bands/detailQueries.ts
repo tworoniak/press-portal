@@ -1,11 +1,63 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { fetchBand, removeBandContact } from './detailApi';
+import { removeBandContact } from './detailApi';
 import { api } from '../../lib/api';
+
+export type BandContactLink = {
+  contactId: string;
+  bandId: string;
+  relationshipRole: string | null;
+  relationshipNotes: string | null;
+  createdAt: string;
+  contact: {
+    id: string;
+    displayName: string | null;
+    firstName: string | null;
+    lastName: string | null;
+    email: string | null;
+    company: string | null;
+    role: string | null;
+  };
+};
+
+export type BandInteraction = {
+  id: string;
+  type: string;
+  occurredAt: string;
+  subject: string | null;
+  notes: string | null;
+  outcome: string | null;
+  nextFollowUpAt: string | null;
+
+  contact: {
+    id: string;
+    displayName: string | null;
+    firstName: string | null;
+    lastName: string | null;
+    email: string | null;
+    company: string | null;
+    role: string | null;
+  };
+
+  festival: { id: string; name: string } | null;
+};
+
+export type BandDetail = {
+  id: string;
+  name: string;
+  genre: string | null;
+  country: string | null;
+  website: string | null;
+  contacts: BandContactLink[];
+  interactions: BandInteraction[];
+};
 
 export function useBand(id: string) {
   return useQuery({
     queryKey: ['band', id],
-    queryFn: () => fetchBand(id),
+    queryFn: async () => {
+      const res = await api.get<BandDetail>(`/bands/${id}`);
+      return res.data;
+    },
     enabled: Boolean(id),
   });
 }
