@@ -84,3 +84,12 @@ hr {
   border-top: 1px solid var(--border);
   margin: var(--space-4) 0;
 }
+
+.contact-email-link {
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 500;
+}
+.contact-email-link:hover {
+  text-decoration: underline;
+}

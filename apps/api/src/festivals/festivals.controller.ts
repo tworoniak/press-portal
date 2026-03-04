@@ -43,7 +43,6 @@ export class FestivalsController {
     return this.festivals.remove(id);
   }
 
-  // ✅ Step B: link / unlink contacts
   @Post(':id/contacts')
   addContact(
     @Param('id') festivalId: string,

@@ -38,6 +38,24 @@ export class BandsService {
           },
           orderBy: { createdAt: 'desc' },
         },
+        interactions: {
+          orderBy: { occurredAt: 'desc' },
+          take: 15,
+          include: {
+            contact: {
+              select: {
+                id: true,
+                displayName: true,
+                firstName: true,
+                lastName: true,
+                email: true,
+                company: true,
+                role: true,
+              },
+            },
+            festival: { select: { id: true, name: true } },
+          },
+        },
       },
     });
   }
