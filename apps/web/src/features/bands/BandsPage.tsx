@@ -1,7 +1,12 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import { useBands, useCreateBand } from './queries';
+import {
+  useBands,
+  useCreateBand,
+  useDeleteBand,
+  useUpdateBand,
+} from './queries';
 
 import page from '../../components/ui/Page/Page.module.scss';
 import card from '../../components/ui/Card/Card.module.scss';
@@ -14,8 +19,22 @@ type BandRow = {
   genre: string | null;
   country: string | null;
   website: string | null;
+  spotifyUrl: string | null;
+  instagram: string | null;
+  notes: string | null;
   createdAt?: string;
   updatedAt?: string;
+};
+
+type EditDraft = {
+  id: string;
+  name: string;
+  genre: string;
+  country: string;
+  website: string;
+  spotifyUrl: string;
+  instagram: string;
+  notes: string;
 };
 
 export default function BandsPage() {
@@ -26,9 +45,20 @@ export default function BandsPage() {
   const [newGenre, setNewGenre] = useState('');
   const [newCountry, setNewCountry] = useState('');
   const [newWebsite, setNewWebsite] = useState('');
+  const [newSpotifyUrl, setNewSpotifyUrl] = useState('');
+  const [newInstagram, setNewInstagram] = useState('');
+  const [newNotes, setNewNotes] = useState('');
 
-  const bandsQ = useBands(search || '', true);
+  const bandsQ = useBands(search, true);
   const create = useCreateBand();
+  const update = useUpdateBand();
+  const del = useDeleteBand();
+
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [editDraft, setEditDraft] = useState<EditDraft | null>(null);
+
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<BandRow | null>(null);
 
   async function onAdd() {
     const name = newName.trim();
@@ -39,6 +69,9 @@ export default function BandsPage() {
       genre: newGenre.trim() || undefined,
       country: newCountry.trim() || undefined,
       website: newWebsite.trim() || undefined,
+      spotifyUrl: newSpotifyUrl.trim() || undefined,
+      instagram: newInstagram.trim() || undefined,
+      notes: newNotes.trim() || undefined,
     });
 
     setIsCreateOpen(false);
@@ -46,6 +79,55 @@ export default function BandsPage() {
     setNewGenre('');
     setNewCountry('');
     setNewWebsite('');
+    setNewSpotifyUrl('');
+    setNewInstagram('');
+    setNewNotes('');
+  }
+
+  function openEdit(b: BandRow) {
+    setEditDraft({
+      id: b.id,
+      name: b.name ?? '',
+      genre: b.genre ?? '',
+      country: b.country ?? '',
+      website: b.website ?? '',
+      spotifyUrl: b.spotifyUrl ?? '',
+      instagram: b.instagram ?? '',
+      notes: b.notes ?? '',
+    });
+    setIsEditOpen(true);
+  }
+
+  async function onSaveEdit() {
+    if (!editDraft) return;
+
+    await update.mutateAsync({
+      id: editDraft.id,
+      data: {
+        name: editDraft.name.trim() || null,
+        genre: editDraft.genre.trim() || null,
+        country: editDraft.country.trim() || null,
+        website: editDraft.website.trim() || null,
+        spotifyUrl: editDraft.spotifyUrl.trim() || null,
+        instagram: editDraft.instagram.trim() || null,
+        notes: editDraft.notes.trim() || null,
+      },
+    });
+
+    setIsEditOpen(false);
+    setEditDraft(null);
+  }
+
+  function openDelete(b: BandRow) {
+    setDeleteTarget(b);
+    setIsDeleteOpen(true);
+  }
+
+  async function onConfirmDelete() {
+    if (!deleteTarget) return;
+    await del.mutateAsync(deleteTarget.id);
+    setIsDeleteOpen(false);
+    setDeleteTarget(null);
   }
 
   const rows = (bandsQ.data ?? []) as BandRow[];
@@ -53,6 +135,7 @@ export default function BandsPage() {
   return (
     <div className={page.page}>
       <div className={page.container}>
+        {/* Create */}
         <Modal
           title='Create band'
           open={isCreateOpen}
@@ -98,6 +181,34 @@ export default function BandsPage() {
                 />
               </label>
 
+              <label style={{ display: 'grid', gap: 6 }}>
+                <span style={{ fontSize: 12, opacity: 0.75 }}>Spotify URL</span>
+                <input
+                  value={newSpotifyUrl}
+                  onChange={(e) => setNewSpotifyUrl(e.target.value)}
+                  placeholder='https://open.spotify.com/...'
+                />
+              </label>
+
+              <label style={{ display: 'grid', gap: 6 }}>
+                <span style={{ fontSize: 12, opacity: 0.75 }}>Instagram</span>
+                <input
+                  value={newInstagram}
+                  onChange={(e) => setNewInstagram(e.target.value)}
+                  placeholder='https://instagram.com/...'
+                />
+              </label>
+
+              <label style={{ display: 'grid', gap: 6 }}>
+                <span style={{ fontSize: 12, opacity: 0.75 }}>Notes</span>
+                <textarea
+                  value={newNotes}
+                  onChange={(e) => setNewNotes(e.target.value)}
+                  rows={4}
+                  placeholder='Any notes about the band...'
+                />
+              </label>
+
               <button
                 type='button'
                 onClick={() => void onAdd()}
@@ -109,6 +220,153 @@ export default function BandsPage() {
           </div>
         </Modal>
 
+        {/* Edit */}
+        <Modal
+          title='Edit band'
+          open={isEditOpen}
+          onClose={() => setIsEditOpen(false)}
+        >
+          <div className={card.card}>
+            <div className={card.cardTitle}>Details</div>
+
+            <div style={{ display: 'grid', gap: 10 }}>
+              <label style={{ display: 'grid', gap: 6 }}>
+                <span style={{ fontSize: 12, opacity: 0.75 }}>Name</span>
+                <input
+                  value={editDraft?.name ?? ''}
+                  onChange={(e) =>
+                    setEditDraft((prev) =>
+                      prev ? { ...prev, name: e.target.value } : prev,
+                    )
+                  }
+                  placeholder='RWAKE'
+                />
+              </label>
+
+              <label style={{ display: 'grid', gap: 6 }}>
+                <span style={{ fontSize: 12, opacity: 0.75 }}>Genre</span>
+                <input
+                  value={editDraft?.genre ?? ''}
+                  onChange={(e) =>
+                    setEditDraft((prev) =>
+                      prev ? { ...prev, genre: e.target.value } : prev,
+                    )
+                  }
+                  placeholder='Sludge / Doom'
+                />
+              </label>
+
+              <label style={{ display: 'grid', gap: 6 }}>
+                <span style={{ fontSize: 12, opacity: 0.75 }}>Country</span>
+                <input
+                  value={editDraft?.country ?? ''}
+                  onChange={(e) =>
+                    setEditDraft((prev) =>
+                      prev ? { ...prev, country: e.target.value } : prev,
+                    )
+                  }
+                  placeholder='US'
+                />
+              </label>
+
+              <label style={{ display: 'grid', gap: 6 }}>
+                <span style={{ fontSize: 12, opacity: 0.75 }}>Website</span>
+                <input
+                  value={editDraft?.website ?? ''}
+                  onChange={(e) =>
+                    setEditDraft((prev) =>
+                      prev ? { ...prev, website: e.target.value } : prev,
+                    )
+                  }
+                  placeholder='https://...'
+                />
+              </label>
+
+              <label style={{ display: 'grid', gap: 6 }}>
+                <span style={{ fontSize: 12, opacity: 0.75 }}>Spotify URL</span>
+                <input
+                  value={editDraft?.spotifyUrl ?? ''}
+                  onChange={(e) =>
+                    setEditDraft((prev) =>
+                      prev ? { ...prev, spotifyUrl: e.target.value } : prev,
+                    )
+                  }
+                  placeholder='https://open.spotify.com/...'
+                />
+              </label>
+
+              <label style={{ display: 'grid', gap: 6 }}>
+                <span style={{ fontSize: 12, opacity: 0.75 }}>Instagram</span>
+                <input
+                  value={editDraft?.instagram ?? ''}
+                  onChange={(e) =>
+                    setEditDraft((prev) =>
+                      prev ? { ...prev, instagram: e.target.value } : prev,
+                    )
+                  }
+                  placeholder='https://instagram.com/...'
+                />
+              </label>
+
+              <label style={{ display: 'grid', gap: 6 }}>
+                <span style={{ fontSize: 12, opacity: 0.75 }}>Notes</span>
+                <textarea
+                  value={editDraft?.notes ?? ''}
+                  onChange={(e) =>
+                    setEditDraft((prev) =>
+                      prev ? { ...prev, notes: e.target.value } : prev,
+                    )
+                  }
+                  rows={4}
+                  placeholder='Any notes about the band...'
+                />
+              </label>
+
+              <button
+                type='button'
+                onClick={() => void onSaveEdit()}
+                disabled={update.isPending}
+              >
+                {update.isPending ? 'Saving…' : 'Save'}
+              </button>
+            </div>
+          </div>
+        </Modal>
+
+        {/* Delete */}
+        <Modal
+          title='Delete band'
+          open={isDeleteOpen}
+          onClose={() => setIsDeleteOpen(false)}
+        >
+          <div className={card.card}>
+            <div className={page.subtle} style={{ marginBottom: 10 }}>
+              This cannot be undone.
+            </div>
+
+            <div style={{ fontWeight: 700, marginBottom: 6 }}>
+              {deleteTarget?.name ?? ''}
+            </div>
+            <div className={page.subtle} style={{ marginBottom: 14 }}>
+              {deleteTarget?.genre ?? ''}
+            </div>
+
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button
+                type='button'
+                onClick={() => void onConfirmDelete()}
+                disabled={del.isPending || !deleteTarget}
+              >
+                {del.isPending ? 'Deleting…' : 'Delete'}
+              </button>
+              <button type='button' onClick={() => setIsDeleteOpen(false)}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </Modal>
+
+        {/* Header */}
         <div className={page.headerRow}>
           <h1 className={page.title}>Bands</h1>
           <div className={page.nav}>
@@ -150,6 +408,7 @@ export default function BandsPage() {
                     <th>Genre</th>
                     <th>Country</th>
                     <th>Website</th>
+                    <th style={{ width: 160 }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -171,12 +430,22 @@ export default function BandsPage() {
                           '—'
                         )}
                       </td>
+                      <td>
+                        <div style={{ display: 'flex', gap: 8 }}>
+                          <button type='button' onClick={() => openEdit(b)}>
+                            Edit
+                          </button>
+                          <button type='button' onClick={() => openDelete(b)}>
+                            Delete
+                          </button>
+                        </div>
+                      </td>
                     </tr>
                   ))}
 
                   {rows.length === 0 && (
                     <tr>
-                      <td colSpan={4} style={{ padding: 14, opacity: 0.75 }}>
+                      <td colSpan={5} style={{ padding: 14, opacity: 0.75 }}>
                         No bands found.
                       </td>
                     </tr>
