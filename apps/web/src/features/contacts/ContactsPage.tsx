@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { SelectField } from '../../components/SelectField/SelectField';
 import {
   useContacts,
@@ -112,6 +112,9 @@ type EditDraft = {
 };
 
 export default function ContactsPage() {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
   // Filters
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState<ContactStatus>('');
@@ -139,6 +142,9 @@ export default function ContactsPage() {
   const [newCompany, setNewCompany] = useState('');
   const [newTags, setNewTags] = useState('Press');
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+
+  const shouldOpenFromRoute = searchParams.get('create') === '1';
+  const createModalOpen = isCreateOpen || shouldOpenFromRoute;
 
   // Edit modal
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -172,6 +178,11 @@ export default function ContactsPage() {
     setNewName('');
     setNewEmail('');
     setNewCompany('');
+    setNewTags('Press');
+
+    if (shouldOpenFromRoute) {
+      navigate('/contacts', { replace: true });
+    }
   }
 
   function openEdit(c: ContactRow) {
@@ -226,8 +237,14 @@ export default function ContactsPage() {
         {/* Create */}
         <Modal
           title='Create contact'
-          open={isCreateOpen}
-          onClose={() => setIsCreateOpen(false)}
+          open={createModalOpen}
+          onClose={() => {
+            setIsCreateOpen(false);
+
+            if (shouldOpenFromRoute) {
+              navigate('/contacts', { replace: true });
+            }
+          }}
         >
           <div className={card.card}>
             <div className={card.cardTitle}>Quick add</div>
@@ -272,7 +289,8 @@ export default function ContactsPage() {
               </label>
 
               <button
-                onClick={onAdd}
+                type='button'
+                onClick={() => void onAdd()}
                 disabled={create.isPending || !newEmail.trim()}
               >
                 {create.isPending ? 'Adding…' : 'Add'}
@@ -367,7 +385,11 @@ export default function ContactsPage() {
                 />
               </label>
 
-              <button onClick={onSaveEdit} disabled={update.isPending}>
+              <button
+                type='button'
+                onClick={() => void onSaveEdit()}
+                disabled={update.isPending}
+              >
                 {update.isPending ? 'Saving…' : 'Save'}
               </button>
             </div>
@@ -394,12 +416,15 @@ export default function ContactsPage() {
 
             <div style={{ display: 'flex', gap: 10 }}>
               <button
-                onClick={onConfirmDelete}
+                type='button'
+                onClick={() => void onConfirmDelete()}
                 disabled={del.isPending || !deleteTarget}
               >
                 {del.isPending ? 'Deleting…' : 'Delete'}
               </button>
-              <button onClick={() => setIsDeleteOpen(false)}>Cancel</button>
+              <button type='button' onClick={() => setIsDeleteOpen(false)}>
+                Cancel
+              </button>
             </div>
           </div>
         </Modal>
@@ -408,7 +433,9 @@ export default function ContactsPage() {
         <div className={page.headerRow}>
           <h1 className={page.title}>Contacts</h1>
           <div className={page.nav}>
-            <button onClick={() => setIsCreateOpen(true)}>New Contact</button>
+            <button type='button' onClick={() => setIsCreateOpen(true)}>
+              New Contact
+            </button>
           </div>
         </div>
 
@@ -442,7 +469,14 @@ export default function ContactsPage() {
               />
             </label>
 
-            <label style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <label
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'auto 1fr',
+                gap: 8,
+                alignItems: 'center',
+              }}
+            >
               <input
                 type='checkbox'
                 checked={needsFollowUp}
@@ -544,8 +578,10 @@ export default function ContactsPage() {
 
                         <td>
                           <div style={{ display: 'flex', gap: 8 }}>
-                            <button onClick={() => openEdit(c)}>Edit</button>
-                            <button onClick={() => openDelete(c)}>
+                            <button type='button' onClick={() => openEdit(c)}>
+                              Edit
+                            </button>
+                            <button type='button' onClick={() => openDelete(c)}>
                               Delete
                             </button>
                           </div>

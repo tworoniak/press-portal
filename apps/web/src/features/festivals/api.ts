@@ -24,7 +24,10 @@ export async function fetchFestivals(search?: string) {
 export async function createFestival(input: {
   name: string;
   location?: string;
+  website?: string;
+  startDate?: string;
+  endDate?: string;
 }) {
-  const res = await api.post<Festival>('/festivals', input);
+  const res = await api.post('/festivals', input);
   return res.data;
 }
