@@ -1,11 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createFestival, fetchFestivals } from './api';
 
-export function useFestivals(search: string, enabled = true) {
+export function useFestivals(search = '', enabled = true) {
   return useQuery({
     queryKey: ['festivals', { search }],
-    queryFn: () => fetchFestivals(search),
-    enabled: enabled && search.trim().length >= 2,
+    queryFn: () => fetchFestivals(search || undefined),
+    enabled,
     staleTime: 30_000,
   });
 }

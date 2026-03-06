@@ -1,11 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createBand, fetchBands } from './api';
 
-export function useBands(search: string, enabled = true) {
+export function useBands(search = '', enabled = true) {
   return useQuery({
     queryKey: ['bands', { search }],
-    queryFn: () => fetchBands(search),
-    enabled: enabled && search.trim().length >= 2,
+    queryFn: () => fetchBands(search || undefined),
+    enabled,
     staleTime: 30_000,
   });
 }

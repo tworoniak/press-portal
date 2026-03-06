@@ -7,6 +7,8 @@ import { RequireAuth } from './components/RequireAuth';
 import BandDetailPage from './features/bands/BandDetailPage';
 import FestivalDetailPage from './features/festivals/FestivalDetailPage';
 import { CommandPalette } from './components/ui/CommandPalette/CommandPalette';
+import FestivalsPage from './features/festivals/FestivalsPage';
+import BandsPage from './features/bands/BandsPage';
 
 export default function App() {
   return (
@@ -42,11 +44,13 @@ export default function App() {
             <Route path='/' element={<Navigate to='/dashboard' replace />} />
 
             <Route element={<RequireAuth />}>
-              <Route path='/contacts/:id' element={<ContactDetailPage />} />
-              <Route path='/bands/:id' element={<BandDetailPage />} />
-              <Route path='/festivals/:id' element={<FestivalDetailPage />} />
               <Route path='/dashboard' element={<DashboardPage />} />
               <Route path='/contacts' element={<ContactsPage />} />
+              <Route path='/contacts/:id' element={<ContactDetailPage />} />
+              <Route path='/bands' element={<BandsPage />} />
+              <Route path='/bands/:id' element={<BandDetailPage />} />
+              <Route path='/festivals' element={<FestivalsPage />} />
+              <Route path='/festivals/:id' element={<FestivalDetailPage />} />
             </Route>
           </Routes>
         </div>

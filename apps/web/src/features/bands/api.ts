@@ -14,13 +14,19 @@ export type Band = {
 };
 
 export async function fetchBands(search?: string) {
-  const res = await api.get<Band[]>('/bands', {
-    params: search?.trim() ? { search: search.trim() } : {},
+  const res = await api.get('/bands', {
+    params: search ? { search } : undefined,
   });
+
   return res.data;
 }
 
-export async function createBand(input: { name: string }) {
-  const res = await api.post<Band>('/bands', input);
+export async function createBand(input: {
+  name: string;
+  genre?: string;
+  country?: string;
+  website?: string;
+}) {
+  const res = await api.post('/bands', input);
   return res.data;
 }
