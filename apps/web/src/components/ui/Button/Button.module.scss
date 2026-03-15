@@ -1,0 +1,139 @@
+.button {
+  font-family: inherit;
+  border-radius: var(--radius);
+  font-weight: 600;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+  // padding: 8px 14px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+
+  transition:
+    transform 0.15s ease,
+    background 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+
+  &:active {
+    transform: translateY(1px);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+/* sizes */
+
+.sm {
+  padding: 0.35rem 0.7rem;
+  font-size: 0.85rem;
+}
+
+.md {
+  padding: 0.55rem 1rem;
+  font-size: 0.95rem;
+}
+
+.lg {
+  padding: 0.8rem 1.2rem;
+  font-size: 1.05rem;
+}
+
+.xl {
+  padding: 1rem 1.4rem;
+  font-size: 1.2rem;
+}
+
+/* variants */
+
+.contained {
+  border: none;
+}
+
+.outline {
+  background: transparent;
+  border: 1px solid;
+}
+
+/* primary */
+
+.primary.contained {
+  background: var(--primary);
+  color: white;
+
+  &:hover {
+    background: #6a4df0;
+  }
+}
+
+.primary.outline {
+  border-color: var(--primary);
+  color: var(--primary);
+
+  &:hover {
+    background: rgba(124, 92, 255, 0.1);
+  }
+}
+
+/* danger */
+
+.danger.contained {
+  background: #ef4444;
+  color: white;
+
+  &:hover {
+    background: #dc2626;
+  }
+}
+
+.danger.outline {
+  border-color: #ef4444;
+  color: #ef4444;
+
+  &:hover {
+    background: rgba(239, 68, 68, 0.1);
+  }
+}
+
+/* neutral */
+
+.neutral.contained {
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.12);
+  }
+}
+
+.neutral.outline {
+  border-color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.85);
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.06);
+  }
+}
+
+// Icon support
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.iconOnly {
+  padding: 0.55rem;
+}

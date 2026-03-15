@@ -12,6 +12,9 @@ import page from '../../components/ui/Page/Page.module.scss';
 import card from '../../components/ui/Card/Card.module.scss';
 import table from '../../components/ui/Table/Table.module.scss';
 import { Modal } from '../../components/ui/Modal/Modal';
+import Button from '../../components/ui/Button/Button';
+
+import { Trash2 } from 'lucide-react';
 
 type BandRow = {
   id: string;
@@ -209,13 +212,23 @@ export default function BandsPage() {
                 />
               </label>
 
-              <button
+              <Button
+                variant='contained'
+                color='primary'
+                size='lg'
+                onClick={() => void onAdd()}
+                disabled={create.isPending || !newName.trim()}
+              >
+                {create.isPending ? 'Adding…' : 'Add'}
+              </Button>
+
+              {/* <button
                 type='button'
                 onClick={() => void onAdd()}
                 disabled={create.isPending || !newName.trim()}
               >
                 {create.isPending ? 'Adding…' : 'Add'}
-              </button>
+              </button> */}
             </div>
           </div>
         </Modal>
@@ -321,14 +334,22 @@ export default function BandsPage() {
                   placeholder='Any notes about the band...'
                 />
               </label>
-
-              <button
+              <Button
+                variant='contained'
+                color='primary'
+                size='lg'
+                onClick={() => void onSaveEdit()}
+                disabled={update.isPending}
+              >
+                {update.isPending ? 'Saving…' : 'Save'}
+              </Button>
+              {/* <button
                 type='button'
                 onClick={() => void onSaveEdit()}
                 disabled={update.isPending}
               >
                 {update.isPending ? 'Saving…' : 'Save'}
-              </button>
+              </button> */}
             </div>
           </div>
         </Modal>
@@ -352,16 +373,33 @@ export default function BandsPage() {
             </div>
 
             <div style={{ display: 'flex', gap: 10 }}>
-              <button
+              <Button
+                variant='contained'
+                color='danger'
+                size='lg'
+                onClick={() => void onConfirmDelete()}
+                disabled={del.isPending || !deleteTarget}
+              >
+                {del.isPending ? 'Deleting…' : 'Delete'}
+              </Button>
+              {/* <button
                 type='button'
                 onClick={() => void onConfirmDelete()}
                 disabled={del.isPending || !deleteTarget}
               >
                 {del.isPending ? 'Deleting…' : 'Delete'}
-              </button>
-              <button type='button' onClick={() => setIsDeleteOpen(false)}>
+              </button> */}
+              <Button
+                variant='outline'
+                color='neutral'
+                size='lg'
+                onClick={() => setIsDeleteOpen(false)}
+              >
                 Cancel
-              </button>
+              </Button>
+              {/* <button type='button' onClick={() => setIsDeleteOpen(false)}>
+                Cancel
+              </button> */}
             </div>
           </div>
         </Modal>
@@ -370,9 +408,17 @@ export default function BandsPage() {
         <div className={page.headerRow}>
           <h1 className={page.title}>Bands</h1>
           <div className={page.nav}>
-            <button type='button' onClick={() => setIsCreateOpen(true)}>
+            <Button
+              variant='contained'
+              color='primary'
+              size='lg'
+              onClick={() => setIsCreateOpen(true)}
+            >
               New Band
-            </button>
+            </Button>
+            {/* <button type='button' onClick={() => setIsCreateOpen(true)}>
+              New Band
+            </button> */}
           </div>
         </div>
 
@@ -432,12 +478,24 @@ export default function BandsPage() {
                       </td>
                       <td>
                         <div style={{ display: 'flex', gap: 8 }}>
-                          <button type='button' onClick={() => openEdit(b)}>
+                          <Button
+                            variant='contained'
+                            color='primary'
+                            size='lg'
+                            onClick={() => openEdit(b)}
+                          >
                             Edit
-                          </button>
-                          <button type='button' onClick={() => openDelete(b)}>
-                            Delete
-                          </button>
+                          </Button>
+
+                          <Button
+                            variant='outline'
+                            color='danger'
+                            size='lg'
+                            onClick={() => openDelete(b)}
+                          >
+                            {/* Delete */}
+                            <Trash2 size={14} />
+                          </Button>
                         </div>
                       </td>
                     </tr>

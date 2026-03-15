@@ -7,7 +7,7 @@ import {
   useDeleteContact,
   useUpdateContact,
 } from './queries';
-
+import { Trash2 } from 'lucide-react';
 import page from '../../components/ui/Page/Page.module.scss';
 import card from '../../components/ui/Card/Card.module.scss';
 import table from '../../components/ui/Table/Table.module.scss';
@@ -15,6 +15,7 @@ import styles from './ContactsPage.module.scss';
 import { Badge, type BadgeTone } from '../../components/ui/Badge/Badge';
 import { TagRow } from '../../components/ui/Tag/TagRow';
 import { Modal } from '../../components/ui/Modal/Modal';
+import Button from '../../components/ui/Button/Button';
 
 type ContactStatus =
   | ''
@@ -288,13 +289,15 @@ export default function ContactsPage() {
                 />
               </label>
 
-              <button
-                type='button'
+              <Button
+                variant='contained'
+                color='primary'
+                size='lg'
                 onClick={() => void onAdd()}
                 disabled={create.isPending || !newEmail.trim()}
               >
                 {create.isPending ? 'Adding…' : 'Add'}
-              </button>
+              </Button>
             </div>
           </div>
         </Modal>
@@ -385,13 +388,15 @@ export default function ContactsPage() {
                 />
               </label>
 
-              <button
-                type='button'
+              <Button
+                variant='contained'
+                color='primary'
+                size='xl'
                 onClick={() => void onSaveEdit()}
                 disabled={update.isPending}
               >
                 {update.isPending ? 'Saving…' : 'Save'}
-              </button>
+              </Button>
             </div>
           </div>
         </Modal>
@@ -403,7 +408,14 @@ export default function ContactsPage() {
           onClose={() => setIsDeleteOpen(false)}
         >
           <div className={card.card}>
-            <div className={page.subtle} style={{ marginBottom: 10 }}>
+            <div
+              className={page.subtle}
+              style={{
+                marginBottom: 10,
+                fontSize: 14,
+                fontWeight: 700,
+              }}
+            >
               This cannot be undone.
             </div>
 
@@ -415,16 +427,24 @@ export default function ContactsPage() {
             </div>
 
             <div style={{ display: 'flex', gap: 10 }}>
-              <button
-                type='button'
+              <Button
+                variant='contained'
+                color='danger'
+                size='lg'
                 onClick={() => void onConfirmDelete()}
                 disabled={del.isPending || !deleteTarget}
               >
                 {del.isPending ? 'Deleting…' : 'Delete'}
-              </button>
-              <button type='button' onClick={() => setIsDeleteOpen(false)}>
+              </Button>
+
+              <Button
+                variant='outline'
+                color='neutral'
+                size='lg'
+                onClick={() => setIsDeleteOpen(false)}
+              >
                 Cancel
-              </button>
+              </Button>
             </div>
           </div>
         </Modal>
@@ -433,9 +453,14 @@ export default function ContactsPage() {
         <div className={page.headerRow}>
           <h1 className={page.title}>Contacts</h1>
           <div className={page.nav}>
-            <button type='button' onClick={() => setIsCreateOpen(true)}>
+            <Button
+              variant='contained'
+              color='primary'
+              size='lg'
+              onClick={() => setIsCreateOpen(true)}
+            >
               New Contact
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -578,12 +603,25 @@ export default function ContactsPage() {
 
                         <td>
                           <div style={{ display: 'flex', gap: 8 }}>
-                            <button type='button' onClick={() => openEdit(c)}>
+                            <Button
+                              variant='contained'
+                              color='primary'
+                              size='lg'
+                              onClick={() => openEdit(c)}
+                            >
                               Edit
-                            </button>
-                            <button type='button' onClick={() => openDelete(c)}>
-                              Delete
-                            </button>
+                            </Button>
+
+                            <Button
+                              variant='outline'
+                              color='danger'
+                              size='lg'
+                              onClick={() => openDelete(c)}
+                            >
+                              {/* Delete */}
+
+                              <Trash2 size={14} />
+                            </Button>
                           </div>
                         </td>
                       </tr>
