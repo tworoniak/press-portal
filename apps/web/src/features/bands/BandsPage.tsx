@@ -221,14 +221,6 @@ export default function BandsPage() {
               >
                 {create.isPending ? 'Adding…' : 'Add'}
               </Button>
-
-              {/* <button
-                type='button'
-                onClick={() => void onAdd()}
-                disabled={create.isPending || !newName.trim()}
-              >
-                {create.isPending ? 'Adding…' : 'Add'}
-              </button> */}
             </div>
           </div>
         </Modal>
@@ -343,13 +335,6 @@ export default function BandsPage() {
               >
                 {update.isPending ? 'Saving…' : 'Save'}
               </Button>
-              {/* <button
-                type='button'
-                onClick={() => void onSaveEdit()}
-                disabled={update.isPending}
-              >
-                {update.isPending ? 'Saving…' : 'Save'}
-              </button> */}
             </div>
           </div>
         </Modal>
@@ -361,11 +346,14 @@ export default function BandsPage() {
           onClose={() => setIsDeleteOpen(false)}
         >
           <div className={card.card}>
-            <div className={page.subtle} style={{ marginBottom: 10 }}>
+            <div
+              className={page.subtle}
+              style={{ marginBottom: 10, fontSize: 14, fontWeight: 700 }}
+            >
               This cannot be undone.
             </div>
 
-            <div style={{ fontWeight: 700, marginBottom: 6 }}>
+            <div style={{ fontWeight: 700, marginBottom: 6, fontSize: 14 }}>
               {deleteTarget?.name ?? ''}
             </div>
             <div className={page.subtle} style={{ marginBottom: 14 }}>
@@ -382,13 +370,7 @@ export default function BandsPage() {
               >
                 {del.isPending ? 'Deleting…' : 'Delete'}
               </Button>
-              {/* <button
-                type='button'
-                onClick={() => void onConfirmDelete()}
-                disabled={del.isPending || !deleteTarget}
-              >
-                {del.isPending ? 'Deleting…' : 'Delete'}
-              </button> */}
+
               <Button
                 variant='outline'
                 color='neutral'
@@ -397,9 +379,6 @@ export default function BandsPage() {
               >
                 Cancel
               </Button>
-              {/* <button type='button' onClick={() => setIsDeleteOpen(false)}>
-                Cancel
-              </button> */}
             </div>
           </div>
         </Modal>
@@ -416,9 +395,6 @@ export default function BandsPage() {
             >
               New Band
             </Button>
-            {/* <button type='button' onClick={() => setIsCreateOpen(true)}>
-              New Band
-            </button> */}
           </div>
         </div>
 
@@ -485,6 +461,8 @@ export default function BandsPage() {
                             onClick={() => openEdit(b)}
                           >
                             Edit
+                            {/* <span className='mobile-hidden'>Edit</span> */}
+                            {/* <Pencil size={14} /> */}
                           </Button>
 
                           <Button
@@ -493,7 +471,7 @@ export default function BandsPage() {
                             size='lg'
                             onClick={() => openDelete(b)}
                           >
-                            {/* Delete */}
+                            <span className='mobile-hidden'>Delete</span>
                             <Trash2 size={14} />
                           </Button>
                         </div>

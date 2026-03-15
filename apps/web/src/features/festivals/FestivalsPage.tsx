@@ -398,11 +398,14 @@ export default function FestivalsPage() {
           onClose={() => setIsDeleteOpen(false)}
         >
           <div className={card.card}>
-            <div className={page.subtle} style={{ marginBottom: 10 }}>
+            <div
+              className={page.subtle}
+              style={{ marginBottom: 10, fontSize: 14, fontWeight: 700 }}
+            >
               This cannot be undone.
             </div>
 
-            <div style={{ fontWeight: 700, marginBottom: 6 }}>
+            <div style={{ fontWeight: 700, marginBottom: 6, fontSize: 14 }}>
               {deleteTarget?.name ?? ''}
             </div>
             <div className={page.subtle} style={{ marginBottom: 14 }}>
@@ -521,7 +524,7 @@ export default function FestivalsPage() {
                             size='lg'
                             onClick={() => openDelete(f)}
                           >
-                            {/* Delete */}
+                            <span className='mobile-hidden'>Delete</span>
                             <Trash2 size={14} />
                           </Button>
                         </div>

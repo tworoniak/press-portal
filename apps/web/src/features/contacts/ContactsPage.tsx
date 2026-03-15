@@ -618,8 +618,7 @@ export default function ContactsPage() {
                               size='lg'
                               onClick={() => openDelete(c)}
                             >
-                              {/* Delete */}
-
+                              <span className='mobile-hidden'>Delete</span>
                               <Trash2 size={14} />
                             </Button>
                           </div>

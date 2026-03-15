@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 
 import page from '../components/ui/Page/Page.module.scss';
 import card from '../components/ui/Card/Card.module.scss';
+import Button from '../components/ui/Button/Button';
+
 import styles from './LoginPage.module.scss';
 
 import { api } from '../lib/api';
@@ -73,9 +75,16 @@ export default function LoginPage() {
               </label>
 
               <div className={styles.actions}>
-                <button type='submit' disabled={isLoading}>
+                <Button
+                  variant='contained'
+                  color='primary'
+                  size='lg'
+                  type='submit'
+                  disabled={isLoading}
+                >
                   {isLoading ? 'Signing in…' : 'Sign in'}
-                </button>
+                </Button>
+
                 <span className={page.subtle}>
                   Tip: change defaults when ready
                 </span>

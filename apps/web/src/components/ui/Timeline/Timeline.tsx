@@ -1,3 +1,5 @@
+import { Trash2 } from 'lucide-react';
+import Button from '../Button/Button';
 import styles from './Timeline.module.scss';
 
 export type TimelineItem = {
@@ -56,18 +58,25 @@ export function Timeline({
             {onEdit || onDelete ? (
               <div className={styles.actions}>
                 {onEdit ? (
-                  <button type='button' onClick={() => onEdit(it)}>
+                  <Button
+                    variant='contained'
+                    color='primary'
+                    size='lg'
+                    onClick={() => onEdit(it)}
+                  >
                     Edit
-                  </button>
+                  </Button>
                 ) : null}
                 {onDelete ? (
-                  <button
-                    type='button'
+                  <Button
+                    variant='outline'
+                    color='danger'
+                    size='lg'
                     onClick={() => onDelete(it.id)}
-                    className={styles.danger}
                   >
                     Delete
-                  </button>
+                    <Trash2 size={14} />
+                  </Button>
                 ) : null}
               </div>
             ) : null}

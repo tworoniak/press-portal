@@ -66,9 +66,9 @@ export default function DashboardPage() {
       <div className={page.container}>
         <div className={page.headerRow}>
           <h1 className={page.title}>Dashboard</h1>
-          <div className={page.nav}>
+          {/* <div className={page.nav}>
             <Link to='/contacts'>Contacts</Link>
-          </div>
+          </div> */}
         </div>
 
         {/* Summary row */}
