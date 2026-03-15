@@ -8,20 +8,27 @@
 
   --primary: #7c5cff;
   --primary-hover: #422c9b;
+  --primary-dark: #191233;
   --primary-2: #5bdbff;
 
   --danger: #ff5c7c;
   --warn: #ffcc66;
   --ok: #3ee08f;
 
-  --radius: 14px;
+  --radius: 0.4rem;
   --shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
 
-  --space-1: 6px;
-  --space-2: 10px;
-  --space-3: 14px;
-  --space-4: 18px;
-  --space-5: 24px;
+  --space-1: 0.6rem;
+  --space-2: 1rem;
+  --space-3: 1.4rem;
+  --space-4: 1.8rem;
+  --space-5: 2.4rem;
+
+  --gradient-primary: linear-gradient(
+    180deg,
+    var(--primary-dark) 0%,
+    #000 100%
+  );
 
   --font:
     ui-sans-serif, system-ui, -apple-system, Segoe UI, Rubik, Helvetica, Arial,

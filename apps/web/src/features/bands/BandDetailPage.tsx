@@ -2,6 +2,8 @@ import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import page from '../../components/ui/Page/Page.module.scss';
 import card from '../../components/ui/Card/Card.module.scss';
+import Button from '../../components/ui/Button/Button';
+import { X } from 'lucide-react';
 import {
   useBand,
   useAddBandContact,
@@ -79,10 +81,10 @@ export default function BandDetailPage() {
       <div className={page.container}>
         <div className={page.headerRow}>
           <h1 className={page.title}>{title}</h1>
-          <div className={page.nav}>
+          {/* <div className={page.nav}>
             <Link to='/contacts'>Contacts</Link>
             <Link to='/dashboard'>Dashboard</Link>
-          </div>
+          </div> */}
         </div>
 
         <div className={page.subtle}>
@@ -118,15 +120,16 @@ export default function BandDetailPage() {
                     {contactLabel(link.contact)}
                   </Link>
 
-                  <button
-                    type='button'
+                  <Button
+                    variant='outline'
+                    color='danger'
+                    size='sm'
                     onClick={() => remove.mutate(link.contactId)}
                     disabled={remove.isPending}
-                    style={{ opacity: 0.8 }}
                     title='Remove'
                   >
-                    ✕
-                  </button>
+                    <X size={14} />
+                  </Button>
                 </div>
               ))
             ) : (
@@ -143,9 +146,13 @@ export default function BandDetailPage() {
             {selected ? (
               <div style={{ display: 'grid', gap: 10 }}>
                 <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-                  <div style={{ fontWeight: 600 }}>{selected.label}</div>
-                  <button
-                    type='button'
+                  <div style={{ fontWeight: 600, fontSize: 12 }}>
+                    {selected.label}
+                  </div>
+                  <Button
+                    variant='contained'
+                    color='primary'
+                    size='lg'
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => {
                       setSelected(null);
@@ -153,7 +160,7 @@ export default function BandDetailPage() {
                     }}
                   >
                     Clear
-                  </button>
+                  </Button>
                 </div>
 
                 <input
@@ -169,8 +176,10 @@ export default function BandDetailPage() {
                   placeholder='Relationship notes (optional)'
                 />
 
-                <button
-                  type='button'
+                <Button
+                  variant='contained'
+                  color='primary'
+                  size='xl'
                   disabled={add.isPending}
                   onClick={async () => {
                     await add.mutateAsync({
@@ -186,7 +195,7 @@ export default function BandDetailPage() {
                   }}
                 >
                   {add.isPending ? 'Adding…' : 'Add'}
-                </button>
+                </Button>
               </div>
             ) : (
               <>
@@ -217,21 +226,21 @@ export default function BandDetailPage() {
                     {!searchQ.isLoading && !searchQ.isError && (
                       <>
                         {(searchQ.data ?? []).slice(0, 8).map((c) => (
-                          <button
+                          <Button
                             key={c.id}
+                            variant='contained'
+                            color='primary'
+                            size='xl'
                             type='button'
+                            style={{
+                              width: '100%',
+                              marginBottom: '8px',
+                            }}
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
                               setSelected({ id: c.id, label: contactLabel(c) });
                               setSearch('');
-                            }}
-                            style={{
-                              display: 'block',
-                              width: '100%',
-                              textAlign: 'left',
-                              padding: '8px 10px',
-                              borderRadius: 8,
                             }}
                           >
                             {contactLabel(c)}
@@ -241,7 +250,7 @@ export default function BandDetailPage() {
                                 • {c.company}
                               </span>
                             ) : null}
-                          </button>
+                          </Button>
                         ))}
 
                         {(searchQ.data?.length ?? 0) === 0 ? (

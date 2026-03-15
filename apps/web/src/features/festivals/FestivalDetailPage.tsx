@@ -3,6 +3,9 @@ import { Link, useParams } from 'react-router-dom';
 
 import page from '../../components/ui/Page/Page.module.scss';
 import card from '../../components/ui/Card/Card.module.scss';
+import Button from '../../components/ui/Button/Button';
+
+import { X } from 'lucide-react';
 
 import {
   useFestival,
@@ -67,10 +70,10 @@ export default function FestivalDetailPage() {
       <div className={page.container}>
         <div className={page.headerRow}>
           <h1 className={page.title}>{title}</h1>
-          <div className={page.nav}>
+          {/* <div className={page.nav}>
             <Link to='/contacts'>Contacts</Link>
             <Link to='/dashboard'>Dashboard</Link>
-          </div>
+          </div> */}
         </div>
 
         <div className={page.subtle}>
@@ -106,20 +109,24 @@ export default function FestivalDetailPage() {
                 >
                   <Link
                     to={`/contacts/${link.contactId}`}
-                    style={{ fontWeight: 600, textDecoration: 'none' }}
+                    style={{
+                      fontWeight: 600,
+                      fontSize: 12,
+                      textDecoration: 'none',
+                    }}
                   >
                     {contactLabel(link.contact)}
                   </Link>
 
-                  <button
-                    type='button'
+                  <Button
+                    variant='outline'
+                    color='danger'
+                    size='sm'
                     onClick={() => remove.mutate(link.contactId)}
                     disabled={remove.isPending}
-                    style={{ opacity: 0.8 }}
-                    title='Remove'
                   >
-                    ✕
-                  </button>
+                    <X size={14} />
+                  </Button>
                 </div>
               ))
             ) : (
@@ -136,9 +143,13 @@ export default function FestivalDetailPage() {
             {selected ? (
               <div style={{ display: 'grid', gap: 10 }}>
                 <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-                  <div style={{ fontWeight: 600 }}>{selected.label}</div>
-                  <button
-                    type='button'
+                  <div style={{ fontWeight: 600, fontSize: 12 }}>
+                    {selected.label}
+                  </div>
+                  <Button
+                    variant='contained'
+                    color='primary'
+                    size='lg'
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => {
                       setSelected(null);
@@ -146,7 +157,7 @@ export default function FestivalDetailPage() {
                     }}
                   >
                     Clear
-                  </button>
+                  </Button>
                 </div>
 
                 <input
@@ -162,8 +173,10 @@ export default function FestivalDetailPage() {
                   placeholder='Relationship notes (optional)'
                 />
 
-                <button
-                  type='button'
+                <Button
+                  variant='contained'
+                  color='primary'
+                  size='xl'
                   disabled={add.isPending}
                   onClick={async () => {
                     await add.mutateAsync({
@@ -179,7 +192,7 @@ export default function FestivalDetailPage() {
                   }}
                 >
                   {add.isPending ? 'Adding…' : 'Add'}
-                </button>
+                </Button>
               </div>
             ) : (
               <>
@@ -210,21 +223,21 @@ export default function FestivalDetailPage() {
                     {!searchQ.isLoading && !searchQ.isError && (
                       <>
                         {(searchQ.data ?? []).slice(0, 8).map((c) => (
-                          <button
+                          <Button
+                            variant='contained'
+                            color='primary'
+                            size='xl'
                             key={c.id}
                             type='button'
+                            style={{
+                              width: '100%',
+                              marginBottom: '8px',
+                            }}
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
                               setSelected({ id: c.id, label: contactLabel(c) });
                               setSearch('');
-                            }}
-                            style={{
-                              display: 'block',
-                              width: '100%',
-                              textAlign: 'left',
-                              padding: '8px 10px',
-                              borderRadius: 8,
                             }}
                           >
                             {contactLabel(c)}
@@ -234,7 +247,7 @@ export default function FestivalDetailPage() {
                                 • {c.company}
                               </span>
                             ) : null}
-                          </button>
+                          </Button>
                         ))}
 
                         {(searchQ.data?.length ?? 0) === 0 ? (

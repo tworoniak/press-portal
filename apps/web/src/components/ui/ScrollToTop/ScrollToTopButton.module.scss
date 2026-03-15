@@ -1,0 +1,36 @@
+/* Scroll to top */
+
+.scroll-to-top {
+  position: fixed;
+  bottom: 8rem;
+  right: 2rem;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  background-color: #007bff;
+  color: white;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px) scale(0.95);
+
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+}
+
+.scroll-to-top.show {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-to-top {
+    transition: none;
+  }
+}

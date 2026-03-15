@@ -1,0 +1,32 @@
+@mixin gradient-text($from, $to) {
+  background: linear-gradient(to right, $from, $to);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@mixin animated-gradient-text($colors...) {
+  background: linear-gradient(90deg, $colors);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: gradient-shift 8s ease infinite;
+}
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% center;
+  }
+
+  100% {
+    background-position: 200% center;
+  }
+}
+
+// Media Query Mixin
+@mixin respond($breakpoint) {
+  @media (min-width: $breakpoint) {
+    @content;
+  }
+}

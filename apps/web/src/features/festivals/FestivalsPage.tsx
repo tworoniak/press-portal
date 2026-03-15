@@ -12,6 +12,9 @@ import page from '../../components/ui/Page/Page.module.scss';
 import card from '../../components/ui/Card/Card.module.scss';
 import table from '../../components/ui/Table/Table.module.scss';
 import { Modal } from '../../components/ui/Modal/Modal';
+import Button from '../../components/ui/Button/Button';
+
+import { Trash2 } from 'lucide-react';
 
 type FestivalRow = {
   id: string;
@@ -244,13 +247,15 @@ export default function FestivalsPage() {
                 />
               </label>
 
-              <button
-                type='button'
+              <Button
+                variant='contained'
+                color='primary'
+                size='lg'
                 onClick={() => void onAdd()}
                 disabled={create.isPending || !newName.trim()}
               >
                 {create.isPending ? 'Adding…' : 'Add'}
-              </button>
+              </Button>
             </div>
           </div>
         </Modal>
@@ -373,13 +378,15 @@ export default function FestivalsPage() {
                 />
               </label>
 
-              <button
-                type='button'
+              <Button
+                variant='contained'
+                color='primary'
+                size='xl'
                 onClick={() => void onSaveEdit()}
                 disabled={update.isPending}
               >
                 {update.isPending ? 'Saving…' : 'Save'}
-              </button>
+              </Button>
             </div>
           </div>
         </Modal>
@@ -403,16 +410,24 @@ export default function FestivalsPage() {
             </div>
 
             <div style={{ display: 'flex', gap: 10 }}>
-              <button
-                type='button'
+              <Button
+                variant='contained'
+                color='danger'
+                size='lg'
                 onClick={() => void onConfirmDelete()}
                 disabled={del.isPending || !deleteTarget}
               >
                 {del.isPending ? 'Deleting…' : 'Delete'}
-              </button>
-              <button type='button' onClick={() => setIsDeleteOpen(false)}>
+              </Button>
+
+              <Button
+                variant='outline'
+                color='neutral'
+                size='lg'
+                onClick={() => setIsDeleteOpen(false)}
+              >
                 Cancel
-              </button>
+              </Button>
             </div>
           </div>
         </Modal>
@@ -421,9 +436,14 @@ export default function FestivalsPage() {
         <div className={page.headerRow}>
           <h1 className={page.title}>Festivals</h1>
           <div className={page.nav}>
-            <button type='button' onClick={() => setIsCreateOpen(true)}>
+            <Button
+              variant='contained'
+              color='primary'
+              size='lg'
+              onClick={() => setIsCreateOpen(true)}
+            >
               New Festival
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -486,12 +506,24 @@ export default function FestivalsPage() {
                       </td>
                       <td>
                         <div style={{ display: 'flex', gap: 8 }}>
-                          <button type='button' onClick={() => openEdit(f)}>
+                          <Button
+                            variant='contained'
+                            color='primary'
+                            size='lg'
+                            onClick={() => openEdit(f)}
+                          >
                             Edit
-                          </button>
-                          <button type='button' onClick={() => openDelete(f)}>
-                            Delete
-                          </button>
+                          </Button>
+
+                          <Button
+                            variant='outline'
+                            color='danger'
+                            size='lg'
+                            onClick={() => openDelete(f)}
+                          >
+                            {/* Delete */}
+                            <Trash2 size={14} />
+                          </Button>
                         </div>
                       </td>
                     </tr>

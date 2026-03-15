@@ -1,21 +1,26 @@
-@use './tokens.scss';
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
+html,
+body,
+#root {
+  min-height: 100%;
 }
 
-html,
-body {
-  height: 100%;
+html {
+  font-size: 62.5%;
 }
 
 body {
   margin: 0;
   font-family: var(--font);
-  background: var(--bg);
+  background: var(--gradient-primary);
+  background-repeat: no-repeat;
+  background-color: #000;
   color: var(--text);
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 a {
@@ -51,9 +56,9 @@ textarea::placeholder {
 }
 
 button {
-  font-size: 12px;
-  padding: 10px 14px;
-  border-radius: 12px;
+  font-size: 1.2rem;
+  padding: 8px 14px;
+  border-radius: var(--radius);
   border: 1px solid var(--border);
   background: linear-gradient(
     180deg,
@@ -79,6 +84,12 @@ button:disabled {
   box-shadow: none;
 }
 
+input,
+select,
+textarea {
+  border-radius: var(--radius);
+}
+
 hr {
   border: 0;
   border-top: 1px solid var(--border);
@@ -93,3 +104,36 @@ hr {
 .contact-email-link:hover {
   text-decoration: underline;
 }
+
+// Firefox (still limited, but we can make it subtle)
+// scrollbar-width: thin;
+// scrollbar-color: transparent transparent;
+
+// Chrome / Edge / Safari
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 999px;
+  transition: background 0.25s ease;
+}
+
+// Reveal scrollbar only on hover/focus
+// &:hover,
+// &:focus-within {
+//   scrollbar-color: var(--color-scrollbar-thumb) transparent;
+
+//   &::-webkit-scrollbar-thumb {
+//     background: var(--color-scrollbar-thumb);
+//   }
+
+//   &::-webkit-scrollbar-thumb:hover {
+//     background: var(--color-scrollbar-thumb-hover);
+//   }
+// }
