@@ -14,6 +14,11 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 export class DashboardController {
   constructor(private readonly dashboard: DashboardService) {}
 
+  @Get()
+  overview() {
+    return this.dashboard.getOverview();
+  }
+
   @Get('followups')
   followUpsDue(@Query('limit') limit?: string) {
     return this.dashboard.followUpsDue(limit ? Number(limit) : 20);
