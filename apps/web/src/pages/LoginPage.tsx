@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import page from '../components/ui/Page/Page.module.scss';
 import card from '../components/ui/Card/Card.module.scss';
 import Button from '../components/ui/Button/Button';
+import Footer from '../components/layout/Footer/Footer';
 
 import styles from './LoginPage.module.scss';
 
@@ -41,58 +42,70 @@ export default function LoginPage() {
   }
 
   return (
-    <div className={page.page}>
-      <div className={page.container}>
-        <div className={styles.wrap}>
-          <div className={`${card.card} ${styles.card}`}>
-            <div className={styles.header}>
-              <h1 className={styles.title}>Press Portal</h1>
-              <p className={styles.subtitle}>
-                Sign in to manage contacts, follow-ups, and interactions.
-              </p>
+    <>
+      <main className={page.page}>
+        <div className={page.container}>
+          <div className={styles.wrap}>
+            <div className={styles.hero}>
+              <h1>
+                Welcome to <span>PressPilot</span>
+              </h1>
+              <h2>
+                Organize your press contacts.
+                <br className='mobile-only' /> Simplify your outreach.
+              </h2>
             </div>
-
-            {error ? <div className={styles.error}>{error}</div> : null}
-
-            <form className={styles.form} onSubmit={onSubmit}>
-              <label className={styles.field}>
-                <span className={styles.label}>Email</span>
-                <input
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  autoComplete='email'
-                />
-              </label>
-
-              <label className={styles.field}>
-                <span className={styles.label}>Password</span>
-                <input
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  type='password'
-                  autoComplete='current-password'
-                />
-              </label>
-
-              <div className={styles.actions}>
-                <Button
-                  variant='contained'
-                  color='primary'
-                  size='lg'
-                  type='submit'
-                  disabled={isLoading}
-                >
-                  {isLoading ? 'Signing in…' : 'Sign in'}
-                </Button>
-
-                <span className={page.subtle}>
-                  Tip: change defaults when ready
-                </span>
+            <div className={`${card.card} ${styles.card}`}>
+              <div className={styles.header}>
+                <h1 className={styles.title}>Press Portal</h1>
+                <p className={styles.subtitle}>
+                  Sign in to manage contacts, follow-ups, and interactions.
+                </p>
               </div>
-            </form>
+
+              {error ? <div className={styles.error}>{error}</div> : null}
+
+              <form className={styles.form} onSubmit={onSubmit}>
+                <label className={styles.field}>
+                  <span className={styles.label}>Email</span>
+                  <input
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    autoComplete='email'
+                  />
+                </label>
+
+                <label className={styles.field}>
+                  <span className={styles.label}>Password</span>
+                  <input
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    type='password'
+                    autoComplete='current-password'
+                  />
+                </label>
+
+                <div className={styles.actions}>
+                  <Button
+                    variant='contained'
+                    color='primary'
+                    size='lg'
+                    type='submit'
+                    disabled={isLoading}
+                  >
+                    {isLoading ? 'Signing in…' : 'Sign in'}
+                  </Button>
+
+                  <span className={page.subtle}>
+                    Tip: change defaults when ready
+                  </span>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
+      </main>
+      <Footer />
+    </>
   );
 }
