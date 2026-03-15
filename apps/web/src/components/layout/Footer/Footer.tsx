@@ -1,8 +1,9 @@
+import { forwardRef } from 'react';
 import styles from './Footer.module.scss';
 
-const Footer = () => {
+const Footer = forwardRef<HTMLElement>((_, ref) => {
   return (
-    <footer className={styles.footer}>
+    <footer ref={ref} className={styles.footer}>
       <div className={styles.footerInner}>
         <p>
           PressPilot{' '}
@@ -14,6 +15,8 @@ const Footer = () => {
       </div>
     </footer>
   );
-};
+});
+
+Footer.displayName = 'Footer';
 
 export default Footer;

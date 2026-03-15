@@ -1,8 +1,8 @@
 /* Scroll to top */
 
-.scroll-to-top {
+.scrollToTop {
   position: fixed;
-  bottom: 8rem;
+  bottom: 2rem;
   right: 2rem;
   width: 44px;
   height: 44px;
@@ -12,7 +12,7 @@
   border-radius: 50%;
   border: none;
   cursor: pointer;
-  background-color: #007bff;
+  background-color: var(--primary);
   color: white;
   opacity: 0;
   pointer-events: none;
@@ -20,17 +20,22 @@
 
   transition:
     opacity 0.3s ease,
-    transform 0.3s ease;
+    transform 0.3s ease,
+    bottom 0.5s ease;
 }
 
-.scroll-to-top.show {
+.show {
   opacity: 1;
   pointer-events: auto;
   transform: translateY(0) scale(1);
 }
 
+.footerVisible {
+  bottom: 8rem;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .scroll-to-top {
+  .scrollToTop {
     transition: none;
   }
 }

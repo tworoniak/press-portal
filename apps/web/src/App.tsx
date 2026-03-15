@@ -10,7 +10,6 @@ import { CommandPalette } from './components/ui/CommandPalette/CommandPalette';
 import FestivalsPage from './features/festivals/FestivalsPage';
 import BandsPage from './features/bands/BandsPage';
 import AppLayout from './components/layout/AppLayout/AppLayout';
-import ScrollToTopButton from './components/ui/ScrollToTop/ScrollToTopButton';
 
 export default function App() {
   return (
@@ -32,7 +31,7 @@ export default function App() {
             </Route>
           </Route>
         </Routes>
-        <ScrollToTopButton />
+
         {/* </div> */}
         <CommandPalette />
       </BrowserRouter>
