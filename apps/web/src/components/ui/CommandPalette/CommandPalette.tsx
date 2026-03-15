@@ -10,6 +10,8 @@ import {
   Users,
 } from 'lucide-react';
 
+// import Button from '../Button/Button';
+
 import { useContactSearch } from '../../../features/contacts/searchQueries';
 import { useBands, useCreateBand } from '../../../features/bands/queries';
 import {
@@ -409,6 +411,22 @@ export function CommandPalette() {
               </div>
               <div className={styles.list}>
                 {quickActions.map((r, idx) => (
+                  // <Button
+                  //   key={`action:${r.id}`}
+                  //   className={`${styles.row} ${idx === activeIndex ? styles.active : ''}`}
+                  //   onMouseEnter={() => setActiveIndex(idx)}
+                  //   onClick={() => void go(r)}
+                  // >
+                  //   <div className={styles.rowTop}>
+                  //     <span className={styles.kind}>
+                  //       {iconFor(r)} {labelForKind(r)}
+                  //     </span>
+                  //     <span className={styles.title}>{r.title}</span>
+                  //   </div>
+                  //   {r.subtitle ? (
+                  //     <div className={styles.subtitle}>{r.subtitle}</div>
+                  //   ) : null}
+                  // </Button>
                   <button
                     key={`action:${r.id}`}
                     type='button'
