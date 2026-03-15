@@ -1,42 +1,13 @@
-// import { Link } from 'react-router-dom';
-// import styles from './Header.module.scss';
-
-// const Header = () => {
-//   return (
-//     <header className={styles.header}>
-//       <div className={styles.headerInner}>
-//         <Link to='/' className={styles.logo}>
-//           <span className={styles.logoText}>PressPilot</span>
-//         </Link>
-
-//         <nav className={styles.nav}>
-//           <Link to='/'>Dashboard</Link>
-//           <Link to='/contacts'>Contacts</Link>
-//           <Link to='/bands'>Bands</Link>
-//           <Link to='/festivals'>Festivals</Link>
-//           <button
-//             onClick={() => {
-//               localStorage.removeItem('pp_token');
-//               window.location.href = '/login';
-//             }}
-//           >
-//             Logout
-//           </button>
-//         </nav>
-//       </div>
-//     </header>
-//   );
-// };
-
-// export default Header;
-
 import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
+
+import Button from '../../ui/Button/Button';
+
 import styles from './Header.module.scss';
 
 const navItems = [
-  { to: '/', label: 'Dashboard', end: true },
+  { to: '/dashboard', label: 'Dashboard', end: true },
   { to: '/contacts', label: 'Contacts' },
   { to: '/bands', label: 'Bands' },
   { to: '/festivals', label: 'Festivals' },
@@ -103,7 +74,18 @@ const Header = () => {
             </NavLink>
           ))}
 
-          <button
+          <Button
+            variant='outline'
+            color='primary'
+            size='lg'
+            onClick={() => {
+              localStorage.removeItem('pp_token');
+              window.location.href = '/login';
+            }}
+          >
+            Logout
+          </Button>
+          {/* <button
             type='button'
             className={styles.logoutButton}
             onClick={() => {
@@ -112,7 +94,7 @@ const Header = () => {
             }}
           >
             Logout
-          </button>
+          </button> */}
         </nav>
       </div>
     </header>

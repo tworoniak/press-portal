@@ -1,52 +1,3 @@
-// @use '../../../styles/abstracts/mixins' as *;
-
-// .header {
-//   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-//   background: linear-gradient(
-//     180deg,
-//     rgba(255, 255, 255, 0.06),
-//     rgba(255, 255, 255, 0.03)
-//   );
-// }
-
-// .headerInner {
-//   max-width: 1200px;
-//   margin: 0 auto;
-//   padding: 14px 20px;
-
-//   display: flex;
-//   align-items: center;
-//   justify-content: space-between;
-// }
-
-// .logo {
-//   font-weight: 700;
-//   text-decoration: none;
-//   color: white;
-// }
-
-// .logoText {
-//   //   @include gradient-text(var(--primary), #ef4444);
-//   @include animated-gradient-text(var(--primary), #ff4d6d, var(--primary));
-//   font-size: 2.4rem;
-// }
-
-// .nav {
-//   display: flex;
-//   align-items: center;
-//   gap: 20px;
-
-//   a {
-//     font-size: 1.2rem;
-//     text-decoration: none;
-//     color: rgba(255, 255, 255, 0.75);
-
-//     &:hover {
-//       color: white;
-//     }
-//   }
-// }
-
 @use '../../../styles/abstracts/mixins' as *;
 
 .header {
@@ -153,8 +104,8 @@
     90deg,
     var(--primary) 0%,
     #8b7bff 35%,
-    #ff4d6d 70%,
-    #ff7a59 100%
+    // #ff4d6d 70%,
+     // #ff7a59 100%
   );
   box-shadow:
     0 0 12px rgba(124, 92, 255, 0.45),

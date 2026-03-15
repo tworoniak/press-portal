@@ -9,6 +9,7 @@ import { SearchPicker } from '../../components/ui/SearchPicker/SearchPicker';
 
 import page from '../../components/ui/Page/Page.module.scss';
 import card from '../../components/ui/Card/Card.module.scss';
+import Button from '../../components/ui/Button/Button';
 
 import type { Interaction } from './detailApi';
 import {
@@ -24,6 +25,7 @@ import {
 
 import { useBands, useCreateBand } from '../bands/queries';
 import { useFestivals, useCreateFestival } from '../festivals/queries';
+import { X } from 'lucide-react';
 
 type InteractionType = 'EMAIL' | 'CALL' | 'DM' | 'NOTE';
 
@@ -222,17 +224,17 @@ export default function ContactDetailPage() {
                     {cb.band.name}
                   </Link>
 
-                  <button
-                    type='button'
+                  <Button
+                    variant='outline'
+                    color='danger'
+                    size='sm'
                     onClick={(e) => {
                       e.stopPropagation(); // defensive
                       removeBand.mutate(cb.band.id);
                     }}
-                    disabled={removeBand.isPending}
-                    style={{ opacity: 0.8 }}
                   >
-                    ✕
-                  </button>
+                    <X size={14} />
+                  </Button>
                 </div>
               ))
             ) : (
@@ -249,8 +251,10 @@ export default function ContactDetailPage() {
               <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
                 <div style={{ fontWeight: 600 }}>{repSelectedBand.name}</div>
 
-                <button
-                  type='button'
+                <Button
+                  variant='contained'
+                  color='neutral'
+                  size='lg'
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={(e) => {
                     e.preventDefault();
@@ -259,10 +263,12 @@ export default function ContactDetailPage() {
                   }}
                 >
                   Clear
-                </button>
+                </Button>
 
-                <button
-                  type='button'
+                <Button
+                  variant='contained'
+                  color='primary'
+                  size='lg'
                   disabled={addBand.isPending}
                   onClick={async () => {
                     await addBand.mutateAsync(repSelectedBand.id);
@@ -271,7 +277,7 @@ export default function ContactDetailPage() {
                   }}
                 >
                   {addBand.isPending ? 'Adding…' : 'Add'}
-                </button>
+                </Button>
               </div>
             ) : (
               <>
@@ -300,32 +306,35 @@ export default function ContactDetailPage() {
                     {!repBandsQ.isLoading && !repBandsQ.isError ? (
                       <>
                         {(repBandsQ.data ?? []).slice(0, 8).map((b) => (
-                          <button
+                          <Button
                             key={b.id}
-                            type='button'
+                            variant='contained'
+                            color='primary'
+                            size='lg'
+                            style={{
+                              // display: 'block',
+                              width: '100%',
+                              marginBottom: '8px',
+                            }}
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
                               setRepSelectedBand({ id: b.id, name: b.name });
                               setRepBandSearch('');
                             }}
-                            style={{
-                              display: 'block',
-                              width: '100%',
-                              textAlign: 'left',
-                              padding: '8px 10px',
-                              borderRadius: 8,
-                            }}
                           >
                             {b.name}
-                          </button>
+                          </Button>
                         ))}
 
                         {(repBandsQ.data?.length ?? 0) === 0 ? (
                           <div style={{ display: 'grid', gap: 8 }}>
                             <div style={{ opacity: 0.75 }}>No matches.</div>
-                            <button
-                              type='button'
+
+                            <Button
+                              variant='contained'
+                              color='primary'
+                              size='lg'
                               onMouseDown={(e) => e.preventDefault()}
                               onClick={async (e) => {
                                 e.preventDefault();
@@ -345,12 +354,11 @@ export default function ContactDetailPage() {
                                 setRepBandSearch('');
                               }}
                               disabled={createBand.isPending}
-                              style={{ padding: '8px 10px', borderRadius: 8 }}
                             >
                               {createBand.isPending
                                 ? 'Creating…'
                                 : `Create "${repBandSearch.trim()}"`}
-                            </button>
+                            </Button>
                           </div>
                         ) : null}
                       </>
@@ -393,14 +401,16 @@ export default function ContactDetailPage() {
                   >
                     {cf.festival.name}
                   </Link>
-                  <button
-                    type='button'
+
+                  <Button
+                    variant='outline'
+                    color='danger'
+                    size='sm'
                     onClick={() => removeFestival.mutate(cf.festival.id)}
                     disabled={removeFestival.isPending}
-                    style={{ opacity: 0.8 }}
                   >
-                    ✕
-                  </button>
+                    <X size={14} />
+                  </Button>
                 </div>
               ))
             ) : (
@@ -421,8 +431,10 @@ export default function ContactDetailPage() {
                   {repSelectedFestival.name}
                 </div>
 
-                <button
-                  type='button'
+                <Button
+                  variant='contained'
+                  color='neutral'
+                  size='lg'
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={(e) => {
                     e.preventDefault();
@@ -431,10 +443,12 @@ export default function ContactDetailPage() {
                   }}
                 >
                   Clear
-                </button>
+                </Button>
 
-                <button
-                  type='button'
+                <Button
+                  variant='contained'
+                  color='primary'
+                  size='lg'
                   disabled={addFestival.isPending}
                   onClick={async () => {
                     await addFestival.mutateAsync(repSelectedFestival.id);
@@ -443,7 +457,7 @@ export default function ContactDetailPage() {
                   }}
                 >
                   {addFestival.isPending ? 'Adding…' : 'Add'}
-                </button>
+                </Button>
               </div>
             ) : (
               <>
@@ -474,9 +488,11 @@ export default function ContactDetailPage() {
                     {!repFestivalsQ.isLoading && !repFestivalsQ.isError ? (
                       <>
                         {(repFestivalsQ.data ?? []).slice(0, 8).map((f) => (
-                          <button
+                          <Button
                             key={f.id}
-                            type='button'
+                            variant='contained'
+                            color='primary'
+                            size='lg'
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
@@ -487,11 +503,8 @@ export default function ContactDetailPage() {
                               setRepFestivalSearch('');
                             }}
                             style={{
-                              display: 'block',
                               width: '100%',
-                              textAlign: 'left',
-                              padding: '8px 10px',
-                              borderRadius: 8,
+                              marginBottom: '8px',
                             }}
                           >
                             {f.name}
@@ -501,14 +514,17 @@ export default function ContactDetailPage() {
                                 • {f.location}
                               </span>
                             ) : null}
-                          </button>
+                          </Button>
                         ))}
 
                         {(repFestivalsQ.data?.length ?? 0) === 0 ? (
                           <div style={{ display: 'grid', gap: 8 }}>
                             <div style={{ opacity: 0.75 }}>No matches.</div>
-                            <button
-                              type='button'
+
+                            <Button
+                              variant='contained'
+                              color='primary'
+                              size='lg'
                               onMouseDown={(e) => e.preventDefault()}
                               onClick={async (e) => {
                                 e.preventDefault();
@@ -527,12 +543,11 @@ export default function ContactDetailPage() {
                                 setRepFestivalSearch('');
                               }}
                               disabled={createFestival.isPending}
-                              style={{ padding: '8px 10px', borderRadius: 8 }}
                             >
                               {createFestival.isPending
                                 ? 'Creating…'
                                 : `Create "${repFestivalSearch.trim()}"`}
-                            </button>
+                            </Button>
                           </div>
                         ) : null}
                       </>
@@ -639,8 +654,10 @@ export default function ContactDetailPage() {
               />
             </label>
 
-            <button
-              type='button'
+            <Button
+              variant='contained'
+              color='primary'
+              size='lg'
               onClick={() => {
                 console.log('selectedBand', selectedBand);
                 console.log('selectedFestival', selectedFestival);
@@ -669,7 +686,7 @@ export default function ContactDetailPage() {
               disabled={create.isPending}
             >
               {create.isPending ? 'Saving…' : 'Save interaction'}
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -709,8 +726,10 @@ export default function ContactDetailPage() {
                   />
 
                   {editSelectedBand ? (
-                    <button
-                      type='button'
+                    <Button
+                      variant='contained'
+                      color='primary'
+                      size='lg'
                       onMouseDown={(e) => e.preventDefault()}
                       onClick={(e) => {
                         e.preventDefault();
@@ -720,7 +739,7 @@ export default function ContactDetailPage() {
                       }}
                     >
                       Clear
-                    </button>
+                    </Button>
                   ) : null}
                 </div>
 
@@ -742,9 +761,11 @@ export default function ContactDetailPage() {
                     {!editBandsQ.isLoading && !editBandsQ.isError && (
                       <>
                         {(editBandsQ.data ?? []).slice(0, 8).map((b) => (
-                          <button
+                          <Button
+                            variant='contained'
+                            color='primary'
+                            size='lg'
                             key={b.id}
-                            type='button'
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
@@ -752,22 +773,21 @@ export default function ContactDetailPage() {
                               setEditBandSearch('');
                             }}
                             style={{
-                              display: 'block',
                               width: '100%',
-                              textAlign: 'left',
-                              padding: '8px 10px',
-                              borderRadius: 8,
+                              marginBottom: '8px',
                             }}
                           >
                             {b.name}
-                          </button>
+                          </Button>
                         ))}
 
                         {(editBandsQ.data?.length ?? 0) === 0 ? (
                           <div style={{ display: 'grid', gap: 8 }}>
                             <div style={{ opacity: 0.75 }}>No matches.</div>
-                            <button
-                              type='button'
+                            <Button
+                              variant='contained'
+                              color='primary'
+                              size='lg'
                               onMouseDown={(e) => e.preventDefault()}
                               onClick={async (e) => {
                                 e.preventDefault();
@@ -787,12 +807,11 @@ export default function ContactDetailPage() {
                                 setEditBandSearch('');
                               }}
                               disabled={createBand.isPending}
-                              style={{ padding: '8px 10px', borderRadius: 8 }}
                             >
                               {createBand.isPending
                                 ? 'Creating…'
                                 : `Create "${editBandSearch.trim()}"`}
-                            </button>
+                            </Button>
                           </div>
                         ) : null}
                       </>
@@ -821,8 +840,10 @@ export default function ContactDetailPage() {
                   />
 
                   {editSelectedFestival ? (
-                    <button
-                      type='button'
+                    <Button
+                      variant='contained'
+                      color='primary'
+                      size='lg'
                       onMouseDown={(e) => e.preventDefault()}
                       onClick={(e) => {
                         e.preventDefault();
@@ -832,7 +853,7 @@ export default function ContactDetailPage() {
                       }}
                     >
                       Clear
-                    </button>
+                    </Button>
                   ) : null}
                 </div>
 
@@ -857,9 +878,11 @@ export default function ContactDetailPage() {
                     {!editFestivalsQ.isLoading && !editFestivalsQ.isError && (
                       <>
                         {(editFestivalsQ.data ?? []).slice(0, 8).map((f) => (
-                          <button
+                          <Button
                             key={f.id}
-                            type='button'
+                            variant='contained'
+                            color='primary'
+                            size='lg'
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
@@ -870,22 +893,22 @@ export default function ContactDetailPage() {
                               setEditFestivalSearch('');
                             }}
                             style={{
-                              display: 'block',
+                              marginBottom: '8px',
                               width: '100%',
-                              textAlign: 'left',
-                              padding: '8px 10px',
-                              borderRadius: 8,
                             }}
                           >
                             {f.name}
-                          </button>
+                          </Button>
                         ))}
 
                         {(editFestivalsQ.data?.length ?? 0) === 0 ? (
                           <div style={{ display: 'grid', gap: 8 }}>
                             <div style={{ opacity: 0.75 }}>No matches.</div>
-                            <button
-                              type='button'
+
+                            <Button
+                              variant='contained'
+                              color='primary'
+                              size='lg'
                               onMouseDown={(e) => e.preventDefault()}
                               onClick={async (e) => {
                                 e.preventDefault();
@@ -904,12 +927,11 @@ export default function ContactDetailPage() {
                                 setEditFestivalSearch('');
                               }}
                               disabled={createFestival.isPending}
-                              style={{ padding: '8px 10px', borderRadius: 8 }}
                             >
                               {createFestival.isPending
                                 ? 'Creating…'
                                 : `Create "${editFestivalSearch.trim()}"`}
-                            </button>
+                            </Button>
                           </div>
                         ) : null}
                       </>
@@ -955,8 +977,10 @@ export default function ContactDetailPage() {
               </label>
 
               <div style={{ display: 'flex', gap: 10 }}>
-                <button
-                  type='button'
+                <Button
+                  variant='contained'
+                  color='primary'
+                  size='lg'
                   disabled={updateIt.isPending}
                   onClick={async () => {
                     await updateIt.mutateAsync({
@@ -981,17 +1005,19 @@ export default function ContactDetailPage() {
                   }}
                 >
                   {updateIt.isPending ? 'Saving…' : 'Save'}
-                </button>
+                </Button>
 
-                <button
-                  type='button'
+                <Button
+                  variant='contained'
+                  color='neutral'
+                  size='lg'
                   onClick={() => {
                     setEditOpen(false);
                     setEditing(null);
                   }}
                 >
                   Cancel
-                </button>
+                </Button>
               </div>
             </div>
           ) : null}

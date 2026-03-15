@@ -1,4 +1,7 @@
 import { useMemo } from 'react';
+
+import Button from '../Button/Button';
+
 import styles from './SearchPicker.module.scss';
 
 type IdName = { id: string; name: string };
@@ -84,6 +87,18 @@ export function SearchPicker<TItem>({
       {selected ? (
         <div className={styles.selectedRow}>
           <div className={styles.selectedName}>{selected.name}</div>
+          <Button
+            className={styles.clearBtn}
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onSelectedChange(null);
+              onQueryChange('');
+            }}
+          >
+            Clear
+          </Button>
           <button
             type='button'
             className={styles.clearBtn}
@@ -126,10 +141,11 @@ export function SearchPicker<TItem>({
                     const id = getKey(it);
                     const name = getName(it);
                     return (
-                      <button
+                      <Button
+                        variant='contained'
+                        color='primary'
+                        size='lg'
                         key={id}
-                        type='button'
-                        className={styles.option}
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
@@ -143,7 +159,7 @@ export function SearchPicker<TItem>({
                             {renderMeta(it)}
                           </div>
                         ) : null}
-                      </button>
+                      </Button>
                     );
                   })}
 
@@ -152,9 +168,10 @@ export function SearchPicker<TItem>({
                   ) : null}
 
                   {showCreate ? (
-                    <button
-                      type='button'
-                      className={styles.createBtn}
+                    <Button
+                      variant='contained'
+                      color='primary'
+                      size='lg'
                       onClick={async (e) => {
                         e.preventDefault();
                         e.stopPropagation();
@@ -169,7 +186,7 @@ export function SearchPicker<TItem>({
                         : createLabel
                           ? createLabel(q)
                           : `Create "${q}"`}
-                    </button>
+                    </Button>
                   ) : null}
                 </>
               ) : null}
