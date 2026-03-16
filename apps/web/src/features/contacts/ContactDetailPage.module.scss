@@ -34,6 +34,83 @@
   gap: 8px;
 }
 
+/* Profile Card */
+.profileCard {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.02),
+      rgba(255, 255, 255, 0.01)
+    ),
+    rgba(0, 0, 0, 0.12);
+  padding: 16px;
+}
+
+.profileTop {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-full);
+  display: grid;
+  place-items: center;
+  font-weight: 600;
+  font-size: 2.4rem;
+  background: rgba(124, 92, 255, 0.16);
+  color: white;
+  flex-shrink: 0;
+}
+
+.profileText {
+  min-width: 0;
+}
+
+.profileName {
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.profileMeta {
+  margin-top: 4px;
+  font-size: 1.3rem;
+  opacity: 0.7;
+  line-height: 1.4;
+}
+
+.profileDetails {
+  margin-top: 16px;
+  display: grid;
+  gap: 10px;
+}
+
+.detailRow {
+  display: grid;
+  gap: 4px;
+}
+
+.detailLabel {
+  font-size: 12px;
+  opacity: 0.65;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.detailValue {
+  font-size: 14px;
+  line-height: 1.4;
+
+  a {
+    text-decoration: none;
+  }
+}
+
 /* Interaction Form */
 .interactionForm {
   display: grid;

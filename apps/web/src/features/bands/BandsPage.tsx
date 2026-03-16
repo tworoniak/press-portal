@@ -14,7 +14,7 @@ import table from '../../components/ui/Table/Table.module.scss';
 import { Modal } from '../../components/ui/Modal/Modal';
 import Button from '../../components/ui/Button/Button';
 
-import { Trash2, Pencil } from 'lucide-react';
+import { Trash2, Pencil, Music } from 'lucide-react';
 
 type BandRow = {
   id: string;
@@ -138,7 +138,7 @@ export default function BandsPage() {
   return (
     <div className={page.page}>
       <div className={page.container}>
-        {/* Create */}
+        {/* Create Modal */}
         <Modal
           title='Create band'
           open={isCreateOpen}
@@ -225,7 +225,7 @@ export default function BandsPage() {
           </div>
         </Modal>
 
-        {/* Edit */}
+        {/* Edit Modal */}
         <Modal
           title='Edit band'
           open={isEditOpen}
@@ -339,7 +339,7 @@ export default function BandsPage() {
           </div>
         </Modal>
 
-        {/* Delete */}
+        {/* Delete Modal */}
         <Modal
           title='Delete band'
           open={isDeleteOpen}
@@ -393,6 +393,7 @@ export default function BandsPage() {
               size='lg'
               onClick={() => setIsCreateOpen(true)}
             >
+              <Music size='14' />
               New Band
             </Button>
           </div>
@@ -460,8 +461,8 @@ export default function BandsPage() {
                             size='lg'
                             onClick={() => openEdit(b)}
                           >
-                            Edit
                             <Pencil size={14} />
+                            <span className='mobile-hidden'>Edit</span>
                           </Button>
 
                           <Button
@@ -470,8 +471,8 @@ export default function BandsPage() {
                             size='lg'
                             onClick={() => openDelete(b)}
                           >
-                            <span className='mobile-hidden'>Delete</span>
                             <Trash2 size={14} />
+                            <span className='mobile-hidden'>Delete</span>
                           </Button>
                         </div>
                       </td>

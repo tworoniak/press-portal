@@ -31,7 +31,7 @@ function followUpTone(nextFollowUpAt: string | null) {
 
   if (ms <= 0) return { tone: 'danger' as const, label: 'Due' };
   if (ms <= 3 * day) return { tone: 'warn' as const, label: 'Soon' };
-  return { tone: 'default' as const, label: 'Scheduled' };
+  return { tone: 'primary' as const, label: 'Scheduled' };
 }
 
 function fmt(dt: string) {

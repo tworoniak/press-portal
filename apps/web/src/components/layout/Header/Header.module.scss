@@ -55,6 +55,23 @@
   }
 }
 
+.rightSide {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.desktopAccount {
+  display: flex;
+  align-items: center;
+}
+
+@media (max-width: 900px) {
+  .desktopAccount {
+    display: none;
+  }
+}
+
 .nav {
   display: flex;
   align-items: center;
