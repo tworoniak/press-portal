@@ -59,28 +59,28 @@ textarea::placeholder {
   color: rgba(255, 255, 255, 0.45);
 }
 
-button {
-  font-size: 1.2rem;
-  padding: 8px 14px;
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  background: linear-gradient(
-    180deg,
-    rgba(124, 92, 255, 0.95),
-    rgba(124, 92, 255, 0.75)
-  );
-  color: white;
-  cursor: pointer;
-  box-shadow: 0 10px 22px rgba(124, 92, 255, 0.22);
+// button {
+//   font-size: 1.2rem;
+//   padding: 8px 14px;
+//   border-radius: var(--radius);
+//   border: 1px solid var(--border);
+//   // background: linear-gradient(
+//   //   180deg,
+//   //   rgba(124, 92, 255, 0.95),
+//   //   rgba(124, 92, 255, 0.75)
+//   // );
+//   color: white;
+//   cursor: pointer;
+//   // box-shadow: 0 10px 22px rgba(124, 92, 255, 0.22);
 
-  &:hover {
-    background: linear-gradient(
-      180deg,
-      rgba(124, 92, 255, 1),
-      rgba(124, 92, 255, 0.85)
-    );
-  }
-}
+//   &:hover {
+//     background: linear-gradient(
+//       180deg,
+//       rgba(124, 92, 255, 1),
+//       rgba(124, 92, 255, 0.85)
+//     );
+//   }
+// }
 
 button:disabled {
   opacity: 0.55;
