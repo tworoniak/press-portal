@@ -162,10 +162,10 @@ export default function ContactDetailPage() {
       <div className={page.container}>
         <div className={page.headerRow}>
           <h1 className={page.title}>{title}</h1>
-          <div className={page.nav}>
+          {/* <div className={page.nav}>
             <Link to='/contacts'>Contacts</Link>
             <Link to='/dashboard'>Dashboard</Link>
-          </div>
+          </div> */}
         </div>
 
         <div className={page.subtle}>

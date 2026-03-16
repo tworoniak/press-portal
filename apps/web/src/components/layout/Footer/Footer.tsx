@@ -1,4 +1,5 @@
 import { forwardRef } from 'react';
+// import { Music } from 'lucide-react';
 import styles from './Footer.module.scss';
 
 const Footer = forwardRef<HTMLElement>((_, ref) => {
@@ -6,7 +7,8 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
     <footer ref={ref} className={styles.footer}>
       <div className={styles.footerInner}>
         <p>
-          PressPilot{' '}
+          {/* <Music color='rgba(255, 255, 255, 0.65)' size={12} /> */}
+          PressPilot
           <span className={styles.mobileHidden}>
             — Organize your press contacts. Simplify your outreach.
           </span>
