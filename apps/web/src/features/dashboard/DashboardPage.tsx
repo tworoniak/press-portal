@@ -131,14 +131,20 @@ export default function DashboardPage() {
             <div className={styles.summaryHint}>Future reminders</div>
           </div>
 
+          {/* <div className={styles.summaryCard}>
+            <div className={styles.summaryLabel}>Contacts</div>
+            <div className={styles.summaryValue}>{summary.totalContacts}</div>
+            <div className={styles.summaryHint}>Total tracked contacts</div>
+          </div> */}
+        </div>
+
+        <div className={styles.summary}>
           <div className={styles.summaryCard}>
             <div className={styles.summaryLabel}>Contacts</div>
             <div className={styles.summaryValue}>{summary.totalContacts}</div>
             <div className={styles.summaryHint}>Total tracked contacts</div>
           </div>
-        </div>
 
-        <div className={styles.summary}>
           <div className={styles.summaryCard}>
             <div className={styles.summaryLabel}>Bands</div>
             <div className={styles.summaryValue}>{summary.totalBands}</div>
@@ -167,7 +173,7 @@ export default function DashboardPage() {
                     data={pipeline}
                     dataKey='value'
                     nameKey='name'
-                    innerRadius={65}
+                    innerRadius={60}
                     outerRadius={95}
                     paddingAngle={0}
                   >

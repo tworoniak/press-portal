@@ -14,7 +14,7 @@ import table from '../../components/ui/Table/Table.module.scss';
 import { Modal } from '../../components/ui/Modal/Modal';
 import Button from '../../components/ui/Button/Button';
 
-import { Trash2 } from 'lucide-react';
+import { Trash2, Pencil } from 'lucide-react';
 
 type BandRow = {
   id: string;
@@ -461,8 +461,7 @@ export default function BandsPage() {
                             onClick={() => openEdit(b)}
                           >
                             Edit
-                            {/* <span className='mobile-hidden'>Edit</span> */}
-                            {/* <Pencil size={14} /> */}
+                            <Pencil size={14} />
                           </Button>
 
                           <Button

@@ -7,7 +7,7 @@ import {
   useDeleteContact,
   useUpdateContact,
 } from './queries';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Pencil } from 'lucide-react';
 import page from '../../components/ui/Page/Page.module.scss';
 import card from '../../components/ui/Card/Card.module.scss';
 import table from '../../components/ui/Table/Table.module.scss';
@@ -529,113 +529,228 @@ export default function ContactsPage() {
             <div className={page.subtle}>{data?.length ?? 0} contact(s)</div>
             <div style={{ height: 10 }} />
 
-            <div className={table.tableWrap}>
-              <table className={table.table}>
-                <thead>
-                  <tr>
-                    <th>Name</th>
-                    <th>Company / Role</th>
-                    <th>Status</th>
-                    <th>Last contacted</th>
-                    <th>Follow-up</th>
-                    <th>Tags</th>
-                    <th style={{ width: 160 }}>Actions</th>
-                  </tr>
-                </thead>
+            {/* Desktop Data Table */}
+            <div className={styles.desktopTable}>
+              <div className={table.tableWrap}>
+                <table className={table.table}>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Company / Role</th>
+                      <th>Status</th>
+                      <th>Last contacted</th>
+                      <th>Follow-up</th>
+                      <th>Tags</th>
+                      <th style={{ width: 160 }}>Actions</th>
+                    </tr>
+                  </thead>
 
-                <tbody>
-                  {((data ?? []) as ContactRow[]).map((c) => {
-                    const label = c.status?.replaceAll('_', ' ') ?? '—';
-                    const tone = statusTone(c.status);
-                    const nextFollowUpAt =
-                      c.interactions?.[0]?.nextFollowUpAt ?? null;
-                    const fu = followUpBadge(nextFollowUpAt);
+                  <tbody>
+                    {((data ?? []) as ContactRow[]).map((c) => {
+                      const label = c.status?.replaceAll('_', ' ') ?? '—';
+                      const tone = statusTone(c.status);
+                      const nextFollowUpAt =
+                        c.interactions?.[0]?.nextFollowUpAt ?? null;
+                      const fu = followUpBadge(nextFollowUpAt);
 
-                    return (
-                      <tr key={c.id}>
-                        <td>
-                          <div className={table.rowTitle}>
+                      return (
+                        <tr key={c.id}>
+                          <td>
+                            <div className={table.rowTitle}>
+                              <Link to={`/contacts/${c.id}`}>
+                                {displayName(c)}
+                              </Link>
+                            </div>
+                            <div className={table.smallMuted}>
+                              {c.email ?? ''}
+                            </div>
+                          </td>
+
+                          <td>
+                            <div className={table.rowCompany}>
+                              {c.company ?? '—'}
+                            </div>
+                            <div className={table.smallMuted}>
+                              {c.role ?? '—'}
+                            </div>
+                          </td>
+
+                          <td>
+                            <Badge tone={tone}>{label}</Badge>
+                          </td>
+
+                          <td className={table.smallMuted}>
+                            {c.lastContactedAt
+                              ? fmtDate(c.lastContactedAt)
+                              : '—'}
+                          </td>
+
+                          <td>
+                            {fu ? (
+                              <>
+                                <Badge tone={fu.tone}>{fu.label}</Badge>
+                                <div
+                                  className={table.smallMuted}
+                                  style={{ marginTop: 6 }}
+                                >
+                                  {fmtDate(nextFollowUpAt!)}
+                                </div>
+                              </>
+                            ) : (
+                              <span style={{ opacity: 0.6 }}>—</span>
+                            )}
+                          </td>
+
+                          <td>
+                            <TagRow tags={c.tags ?? []} />
+                          </td>
+
+                          <td>
+                            <div style={{ display: 'flex', gap: 8 }}>
+                              <Button
+                                variant='contained'
+                                color='primary'
+                                size='lg'
+                                onClick={() => openEdit(c)}
+                              >
+                                Edit
+                                <Pencil size={14} />
+                              </Button>
+
+                              <Button
+                                variant='outline'
+                                color='danger'
+                                size='lg'
+                                onClick={() => openDelete(c)}
+                              >
+                                <span className='mobile-hidden'>Delete</span>
+                                <Trash2 size={14} />
+                              </Button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+
+                    {(data?.length ?? 0) === 0 && (
+                      <tr>
+                        <td colSpan={7} style={{ padding: 14, opacity: 0.75 }}>
+                          No contacts match these filters.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Mobile Data Cards */}
+            <div className={styles.mobileCards}>
+              {((data ?? []) as ContactRow[]).length ? (
+                ((data ?? []) as ContactRow[]).map((c) => {
+                  const label = c.status?.replaceAll('_', ' ') ?? '—';
+                  const tone = statusTone(c.status);
+                  const nextFollowUpAt =
+                    c.interactions?.[0]?.nextFollowUpAt ?? null;
+                  const fu = followUpBadge(nextFollowUpAt);
+
+                  return (
+                    <article key={c.id} className={styles.mobileCard}>
+                      <div className={styles.mobileCardTop}>
+                        <div>
+                          <div className={styles.mobileCardTitle}>
                             <Link to={`/contacts/${c.id}`}>
                               {displayName(c)}
                             </Link>
                           </div>
-                          <div className={table.smallMuted}>
-                            {c.email ?? ''}
-                          </div>
-                        </td>
-
-                        <td>
-                          <div className={table.rowCompany}>
+                          <div className={styles.mobileCardSubtle}>
                             {c.company ?? '—'}
+                            {c.role ? ` • ${c.role}` : ''}
                           </div>
-                          <div className={table.smallMuted}>
-                            {c.role ?? '—'}
-                          </div>
-                        </td>
+                        </div>
 
-                        <td>
-                          <Badge tone={tone}>{label}</Badge>
-                        </td>
+                        <Badge tone={tone}>{label}</Badge>
+                      </div>
 
-                        <td className={table.smallMuted}>
-                          {c.lastContactedAt ? fmtDate(c.lastContactedAt) : '—'}
-                        </td>
+                      {c.email ? (
+                        <div className={styles.mobileCardSubtle}>{c.email}</div>
+                      ) : null}
 
-                        <td>
-                          {fu ? (
-                            <>
-                              <Badge tone={fu.tone}>{fu.label}</Badge>
-                              <div
-                                className={table.smallMuted}
-                                style={{ marginTop: 6 }}
-                              >
-                                {fmtDate(nextFollowUpAt!)}
-                              </div>
-                            </>
-                          ) : (
-                            <span style={{ opacity: 0.6 }}>—</span>
-                          )}
-                        </td>
+                      <div className={styles.mobileMetaRow}>
+                        <div>
+                          <span className={styles.mobileMetaLabel}>
+                            Last contacted:
+                          </span>{' '}
+                          <span className={styles.mobileMetaValue}>
+                            {c.lastContactedAt
+                              ? fmtDate(c.lastContactedAt)
+                              : '—'}
+                          </span>
+                        </div>
+                      </div>
 
-                        <td>
+                      <div className={styles.mobileMetaRow}>
+                        <div>
+                          <span className={styles.mobileMetaLabel}>
+                            Follow-up:
+                          </span>{' '}
+                          <span className={styles.mobileMetaValue}>
+                            {fu ? fu.label : '—'}
+                          </span>
+                        </div>
+
+                        {fu && nextFollowUpAt ? (
+                          <Badge tone={fu.tone}>{fu.label}</Badge>
+                        ) : null}
+                      </div>
+
+                      {nextFollowUpAt ? (
+                        <div className={styles.mobileCardSubtle}>
+                          Due: {fmtDate(nextFollowUpAt)}
+                        </div>
+                      ) : null}
+
+                      {(c.tags?.length ?? 0) > 0 ? (
+                        <div className={styles.mobileTags}>
                           <TagRow tags={c.tags ?? []} />
-                        </td>
+                        </div>
+                      ) : null}
 
-                        <td>
-                          <div style={{ display: 'flex', gap: 8 }}>
-                            <Button
-                              variant='contained'
-                              color='primary'
-                              size='lg'
-                              onClick={() => openEdit(c)}
-                            >
-                              Edit
-                            </Button>
+                      <div className={styles.mobileActions}>
+                        <Link
+                          to={`/contacts/${c.id}`}
+                          className={styles.mobileActionLink}
+                        >
+                          View
+                        </Link>
+                        <Button
+                          variant='outline'
+                          color='primary'
+                          size='sm'
+                          onClick={() => openEdit(c)}
+                        >
+                          Edit
+                          <Pencil size={12} />
+                        </Button>
 
-                            <Button
-                              variant='outline'
-                              color='danger'
-                              size='lg'
-                              onClick={() => openDelete(c)}
-                            >
-                              <span className='mobile-hidden'>Delete</span>
-                              <Trash2 size={14} />
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-
-                  {(data?.length ?? 0) === 0 && (
-                    <tr>
-                      <td colSpan={7} style={{ padding: 14, opacity: 0.75 }}>
-                        No contacts match these filters.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+                        <Button
+                          variant='outline'
+                          color='danger'
+                          size='sm'
+                          onClick={() => openDelete(c)}
+                        >
+                          Delete
+                          <Trash2 size={12} />
+                        </Button>
+                      </div>
+                    </article>
+                  );
+                })
+              ) : (
+                <div className={page.subtle}>
+                  No contacts match these filters.
+                </div>
+              )}
             </div>
           </>
         )}

@@ -14,7 +14,7 @@ import table from '../../components/ui/Table/Table.module.scss';
 import { Modal } from '../../components/ui/Modal/Modal';
 import Button from '../../components/ui/Button/Button';
 
-import { Trash2 } from 'lucide-react';
+import { Trash2, Pencil } from 'lucide-react';
 
 type FestivalRow = {
   id: string;
@@ -516,6 +516,7 @@ export default function FestivalsPage() {
                             onClick={() => openEdit(f)}
                           >
                             Edit
+                            <Pencil size={14} />
                           </Button>
 
                           <Button
