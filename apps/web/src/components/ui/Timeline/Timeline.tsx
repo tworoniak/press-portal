@@ -3,7 +3,7 @@ import { Badge } from '../Badge/Badge';
 import { Chip } from '../Chip/Chip';
 import styles from './Timeline.module.scss';
 
-import { Trash2, Pencil } from 'lucide-react';
+import { Trash2, Pencil, CornerDownRight } from 'lucide-react';
 
 type LinkedRef = {
   id: string;
@@ -107,7 +107,10 @@ export function Timeline({ items, onEdit, onDelete }: TimelineProps) {
               {it.outcome ? (
                 <div className={styles.outcome}>
                   <span className={styles.label}>Outcome</span>
-                  <span>{it.outcome}</span>
+                  <span className={styles.outcomeContent}>
+                    <CornerDownRight size={12} />
+                    {it.outcome}
+                  </span>
                 </div>
               ) : null}
 

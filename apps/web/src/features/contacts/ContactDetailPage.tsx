@@ -28,7 +28,7 @@ import {
 
 import { useBands, useCreateBand } from '../bands/queries';
 import { useFestivals, useCreateFestival } from '../festivals/queries';
-import { X } from 'lucide-react';
+import { X, Mail } from 'lucide-react';
 
 type InteractionType = 'EMAIL' | 'CALL' | 'DM' | 'NOTE';
 
@@ -245,6 +245,7 @@ export default function ContactDetailPage() {
                 <div className={styles.detailRow}>
                   <span className={styles.detailLabel}>Email</span>
                   <span className={styles.detailValue}>
+                    <Mail size={14} />
                     {data.email ? (
                       <a href={`mailto:${data.email}`}>{data.email}</a>
                     ) : (

@@ -174,7 +174,7 @@ export default function DashboardPage() {
                     data={pipeline}
                     dataKey='value'
                     nameKey='name'
-                    innerRadius={60}
+                    innerRadius={55}
                     outerRadius={95}
                     paddingAngle={0}
                   >
@@ -182,6 +182,7 @@ export default function DashboardPage() {
                       <Cell
                         key={`${entry.name}-${index}`}
                         fill={pieColors[index % pieColors.length]}
+                        strokeWidth={0}
                       />
                     ))}
                   </Pie>
@@ -267,7 +268,7 @@ export default function DashboardPage() {
                   />
                   <Bar
                     dataKey='count'
-                    barSize='30'
+                    barSize='40'
                     // radius={[8, 8, 0, 0]}
                     fill='#7c5cff'
                   />

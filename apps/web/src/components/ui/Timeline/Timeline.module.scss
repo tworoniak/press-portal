@@ -181,6 +181,16 @@
   gap: 4px;
 }
 
+.outcomeContent {
+  font-size: 1.4rem;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: var(--radius);
+  border-color: rgba(255, 255, 255, 0.1);
+  border-width: 1px;
+  border-style: solid;
+}
+
 .label {
   font-size: 12px;
   text-transform: uppercase;
@@ -189,6 +199,7 @@
 }
 
 .notes {
+  font-size: 1.2rem;
   margin-top: 10px;
   line-height: 1.55;
   opacity: 0.9;
