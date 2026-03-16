@@ -61,6 +61,27 @@
   border: 1px solid;
 }
 
+/* shape */
+// .rect {
+
+// }
+
+.round {
+  border-radius: 50%;
+  &.sm {
+    padding: 0.5rem;
+  }
+  &.md {
+    padding: 0.6rem;
+  }
+  &.lg {
+    padding: 0.7rem;
+  }
+  &.xl {
+    padding: 1rem;
+  }
+}
+
 /* primary */
 
 .primary.contained {

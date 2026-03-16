@@ -6,12 +6,14 @@ type Variant = 'contained' | 'outline';
 type Color = 'primary' | 'danger' | 'neutral';
 type Size = 'sm' | 'md' | 'lg' | 'xl';
 type Type = 'button' | 'submit';
+type Shape = 'rect' | 'round';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant;
   color?: Color;
   size?: Size;
   type?: Type;
+  shape?: Shape;
   startIcon?: ReactNode;
   endIcon?: ReactNode;
   iconOnly?: boolean;
@@ -23,6 +25,7 @@ const Button = ({
   color = 'primary',
   size = 'md',
   type = 'button',
+  shape = 'rect',
   startIcon,
   endIcon,
   iconOnly = false,
@@ -34,6 +37,7 @@ const Button = ({
     styles[variant],
     styles[color],
     styles[size],
+    styles[shape],
     iconOnly && styles.iconOnly,
     className,
   );

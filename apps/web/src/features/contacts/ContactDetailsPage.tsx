@@ -228,6 +228,7 @@ export default function ContactDetailPage() {
                     variant='outline'
                     color='danger'
                     size='sm'
+                    shape='round'
                     onClick={(e) => {
                       e.stopPropagation(); // defensive
                       removeBand.mutate(cb.band.id);
@@ -406,6 +407,7 @@ export default function ContactDetailPage() {
                     variant='outline'
                     color='danger'
                     size='sm'
+                    shape='round'
                     onClick={() => removeFestival.mutate(cf.festival.id)}
                     disabled={removeFestival.isPending}
                   >
