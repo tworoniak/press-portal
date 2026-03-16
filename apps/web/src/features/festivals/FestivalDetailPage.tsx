@@ -122,6 +122,7 @@ export default function FestivalDetailPage() {
                     variant='outline'
                     color='danger'
                     size='sm'
+                    shape='round'
                     onClick={() => remove.mutate(link.contactId)}
                     disabled={remove.isPending}
                   >
