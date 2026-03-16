@@ -13,6 +13,7 @@ import card from '../../components/ui/Card/Card.module.scss';
 import table from '../../components/ui/Table/Table.module.scss';
 import { Modal } from '../../components/ui/Modal/Modal';
 import Button from '../../components/ui/Button/Button';
+import DateInput from '../../components/ui/DateInput/DateInput';
 
 import { Trash2, Pencil } from 'lucide-react';
 
@@ -207,23 +208,17 @@ export default function FestivalsPage() {
                 />
               </label>
 
-              <label style={{ display: 'grid', gap: 6 }}>
-                <span style={{ fontSize: 12, opacity: 0.75 }}>Start date</span>
-                <input
-                  type='date'
-                  value={newStartDate}
-                  onChange={(e) => setNewStartDate(e.target.value)}
-                />
-              </label>
+              <DateInput
+                label='Start date'
+                value={newStartDate}
+                onChange={(e) => setNewStartDate(e.target.value)}
+              />
 
-              <label style={{ display: 'grid', gap: 6 }}>
-                <span style={{ fontSize: 12, opacity: 0.75 }}>End date</span>
-                <input
-                  type='date'
-                  value={newEndDate}
-                  onChange={(e) => setNewEndDate(e.target.value)}
-                />
-              </label>
+              <DateInput
+                label='End date'
+                value={newEndDate}
+                onChange={(e) => setNewEndDate(e.target.value)}
+              />
 
               <label style={{ display: 'grid', gap: 6 }}>
                 <span style={{ fontSize: 12, opacity: 0.75 }}>
@@ -322,31 +317,25 @@ export default function FestivalsPage() {
                 />
               </label>
 
-              <label style={{ display: 'grid', gap: 6 }}>
-                <span style={{ fontSize: 12, opacity: 0.75 }}>Start date</span>
-                <input
-                  type='date'
-                  value={editDraft?.startDate ?? ''}
-                  onChange={(e) =>
-                    setEditDraft((prev) =>
-                      prev ? { ...prev, startDate: e.target.value } : prev,
-                    )
-                  }
-                />
-              </label>
+              <DateInput
+                label='Start date'
+                value={editDraft?.startDate ?? ''}
+                onChange={(e) =>
+                  setEditDraft((prev) =>
+                    prev ? { ...prev, startDate: e.target.value } : prev,
+                  )
+                }
+              />
 
-              <label style={{ display: 'grid', gap: 6 }}>
-                <span style={{ fontSize: 12, opacity: 0.75 }}>End date</span>
-                <input
-                  type='date'
-                  value={editDraft?.endDate ?? ''}
-                  onChange={(e) =>
-                    setEditDraft((prev) =>
-                      prev ? { ...prev, endDate: e.target.value } : prev,
-                    )
-                  }
-                />
-              </label>
+              <DateInput
+                label='End date'
+                value={editDraft?.endDate ?? ''}
+                onChange={(e) =>
+                  setEditDraft((prev) =>
+                    prev ? { ...prev, endDate: e.target.value } : prev,
+                  )
+                }
+              />
 
               <label style={{ display: 'grid', gap: 6 }}>
                 <span style={{ fontSize: 12, opacity: 0.75 }}>
