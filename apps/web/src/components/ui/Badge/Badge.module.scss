@@ -4,11 +4,25 @@
   gap: 8px;
   padding: 6px 10px;
   border-radius: 999px;
-  border: 1px solid var(--border);
+  border-width: 1px;
+  border-style: solid;
+  border-color: var(--border);
   background: rgba(255, 255, 255, 0.05);
   font-size: 10px;
   color: rgba(255, 255, 255, 0.88);
   white-space: nowrap;
+  &.primary {
+    border-color: var(--primary);
+  }
+  &.ok {
+    border-color: var(--ok);
+  }
+  &.warn {
+    border-color: var(--warn);
+  }
+  &.danger {
+    border-color: var(--danger);
+  }
 }
 
 .dot {
@@ -18,6 +32,9 @@
   background: rgba(255, 255, 255, 0.5);
 }
 
+.primary .dot {
+  background: var(--primary);
+}
 .ok .dot {
   background: var(--ok);
 }

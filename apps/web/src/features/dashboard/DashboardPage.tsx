@@ -160,6 +160,7 @@ export default function DashboardPage() {
 
         {/* Charts row */}
         <div className={styles.chartGrid}>
+          {/* Pie/Donut Chart */}
           <section className={card.card}>
             <div className={styles.chartHeader}>
               <h2 className={card.cardTitle}>Follow-up pipeline</h2>
@@ -221,6 +222,7 @@ export default function DashboardPage() {
             </div>
           </section>
 
+          {/* Bar Chart */}
           <section className={card.card}>
             <div className={styles.chartHeader}>
               <h2 className={card.cardTitle}>Interactions this week</h2>
@@ -263,7 +265,12 @@ export default function DashboardPage() {
                     }}
                     cursor={{ fill: 'transparent' }}
                   />
-                  <Bar dataKey='count' radius={[8, 8, 0, 0]} fill='#7c5cff' />
+                  <Bar
+                    dataKey='count'
+                    barSize='30'
+                    // radius={[8, 8, 0, 0]}
+                    fill='#7c5cff'
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -393,7 +400,7 @@ export default function DashboardPage() {
                           {nameOf(it.contact)}
                         </Link>
                       </div>
-                      <Badge tone='default'>{it.type}</Badge>
+                      <Badge tone='primary'>{it.type}</Badge>
                     </div>
 
                     <div className={page.subtle} style={{ marginTop: 4 }}>

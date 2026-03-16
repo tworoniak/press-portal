@@ -56,6 +56,11 @@
   border: none;
 }
 
+.no-outline {
+  background: transparent;
+  border: none;
+}
+
 .outline {
   background: transparent;
   border: 1px solid;
@@ -69,7 +74,7 @@
 .round {
   border-radius: 50%;
   &.sm {
-    padding: 0.5rem;
+    padding: 0.2rem;
   }
   &.md {
     padding: 0.6rem;
@@ -134,6 +139,14 @@
 }
 
 .neutral.outline {
+  border-color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.85);
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.06);
+  }
+}
+.neutral.no-outline {
   border-color: rgba(255, 255, 255, 0.2);
   color: rgba(255, 255, 255, 0.85);
 

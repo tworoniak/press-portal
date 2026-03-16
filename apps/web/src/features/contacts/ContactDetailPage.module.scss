@@ -1,0 +1,98 @@
+.pageGrid {
+  display: grid;
+  grid-template-columns: 360px minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.timelineCard {
+  padding: 0;
+}
+
+/* Chip Row */
+.chipRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Interaction Form */
+.interactionForm {
+  display: grid;
+  gap: 10px;
+  max-width: 620px;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.formGrid {
+  display: grid;
+  gap: 10px;
+  max-width: 620px;
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+}
+
+.fieldLabel {
+  font-size: 12px;
+  opacity: 0.75;
+}
+
+.modalActions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 640px) {
+  .sectionHeader {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .modalActions {
+    flex-direction: column;
+  }
+}
+
+/* mobile */
+
+@media (max-width: 960px) {
+  .pageGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    order: 1;
+  }
+
+  .main {
+    order: 2;
+  }
+}

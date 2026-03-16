@@ -99,19 +99,6 @@ export function SearchPicker<TItem>({
           >
             Clear
           </Button>
-          <button
-            type='button'
-            className={styles.clearBtn}
-            onMouseDown={(e) => e.preventDefault()}
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              onSelectedChange(null);
-              onQueryChange('');
-            }}
-          >
-            Clear
-          </button>
         </div>
       ) : (
         <>

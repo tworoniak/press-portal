@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import ContactsPage from './features/contacts/ContactsPage';
-import ContactDetailPage from './features/contacts/ContactDetailsPage';
+import ContactDetailPage from './features/contacts/ContactDetailPage';
 import DashboardPage from './features/dashboard/DashboardPage';
 import LoginPage from './pages/LoginPage';
 import { RequireAuth } from './components/RequireAuth';

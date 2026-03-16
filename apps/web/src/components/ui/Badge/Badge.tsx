@@ -1,6 +1,6 @@
 import styles from './Badge.module.scss';
 
-export type BadgeTone = 'default' | 'ok' | 'warn' | 'danger';
+export type BadgeTone = 'default' | 'primary' | 'ok' | 'warn' | 'danger';
 
 export function Badge({
   children,
@@ -10,13 +10,15 @@ export function Badge({
   tone?: BadgeTone;
 }) {
   const cls =
-    tone === 'ok'
-      ? `${styles.badge} ${styles.ok}`
-      : tone === 'warn'
-        ? `${styles.badge} ${styles.warn}`
-        : tone === 'danger'
-          ? `${styles.badge} ${styles.danger}`
-          : styles.badge;
+    tone === 'primary'
+      ? `${styles.badge} ${styles.primary}`
+      : tone === 'ok'
+        ? `${styles.badge} ${styles.ok}`
+        : tone === 'warn'
+          ? `${styles.badge} ${styles.warn}`
+          : tone === 'danger'
+            ? `${styles.badge} ${styles.danger}`
+            : styles.badge;
 
   return (
     <span className={cls}>
