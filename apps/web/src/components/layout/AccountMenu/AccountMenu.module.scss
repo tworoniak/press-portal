@@ -1,0 +1,84 @@
+.root {
+  position: relative;
+}
+
+.trigger {
+  display: inline-grid;
+  place-items: center;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+.menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  min-width: 240px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.02),
+      rgba(255, 255, 255, 0.01)
+    ),
+    rgba(10, 10, 14, 0.98);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.32);
+  padding: 10px;
+  z-index: 60;
+}
+
+.menuHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 6px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.menuIdentity {
+  min-width: 0;
+}
+
+.menuName {
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.menuEmail {
+  margin-top: 4px;
+  font-size: 12px;
+  opacity: 0.68;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.menuSection {
+  display: grid;
+  gap: 4px;
+  padding: 10px 0;
+}
+
+.menuItem {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  color: inherit;
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.menuItem:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.menuFooter {
+  padding: 8px 6px 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  justify-content: flex-end;
+}

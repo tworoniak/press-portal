@@ -5,13 +5,14 @@ import styles from './ContactDetailPage.module.scss';
 import page from '../../components/ui/Page/Page.module.scss';
 import card from '../../components/ui/Card/Card.module.scss';
 
-import { SelectField } from '../../components/SelectField/SelectField';
+import { SelectField } from '../../components/ui/SelectField/SelectField';
 import { Timeline } from '../../components/ui/Timeline/Timeline';
 import { TagRow } from '../../components/ui/Tag/TagRow';
 import { Modal } from '../../components/ui/Modal/Modal';
 import { SearchPicker } from '../../components/ui/SearchPicker/SearchPicker';
 import { Chip } from '../../components/ui/Chip/Chip';
 import Button from '../../components/ui/Button/Button';
+import Avatar from '../../components/ui/Avatar/Avatar';
 
 import type { Interaction } from './detailApi';
 import {
@@ -27,7 +28,7 @@ import {
 
 import { useBands, useCreateBand } from '../bands/queries';
 import { useFestivals, useCreateFestival } from '../festivals/queries';
-import { X } from 'lucide-react';
+import { X, Mail } from 'lucide-react';
 
 type InteractionType = 'EMAIL' | 'CALL' | 'DM' | 'NOTE';
 
@@ -146,6 +147,29 @@ export default function ContactDetailPage() {
     setEditOpen(true);
   }
 
+  function fullName() {
+    return (
+      data?.displayName ||
+      [data?.firstName, data?.lastName].filter(Boolean).join(' ') ||
+      data?.email ||
+      '(no name)'
+    );
+  }
+
+  // function initialsOf(name: string) {
+  //   return name
+  //     .split(' ')
+  //     .filter(Boolean)
+  //     .slice(0, 2)
+  //     .map((part) => part[0]?.toUpperCase() ?? '')
+  //     .join('');
+  // }
+
+  function fmtDate(dt?: string | null) {
+    if (!dt) return '—';
+    return new Date(dt).toLocaleString();
+  }
+
   function resetCreateInteractionForm() {
     setType('EMAIL');
     setSubject('');
@@ -197,31 +221,58 @@ export default function ContactDetailPage() {
           <h1 className={page.title}>{title}</h1>
         </div>
 
-        <div className={page.subtle}>
-          {data.company ? data.company : '—'}
-          {data.role ? ` • ${data.role}` : ''}
-          {data.email ? (
-            <>
-              {' '}
-              •{' '}
-              <a
-                href={`mailto:${data.email}`}
-                className='contact-email-link'
-                onClick={(e) => e.stopPropagation()}
-              >
-                {data.email}
-              </a>
-            </>
-          ) : null}
-        </div>
-
-        {/* <div style={{ height: 10 }} /> */}
-
         {/* START Page Grid */}
         <div className={styles.pageGrid}>
           {/* START Sidebar */}
           <div className={styles.sidebar}>
-            {/* Tags */}
+            {/* Profile Card */}
+            <div className={styles.profileCard}>
+              <div className={styles.profileTop}>
+                {/* Avatar */}
+                <Avatar name={fullName()} size='xl' />
+
+                <div className={styles.profileText}>
+                  <div className={styles.profileName}>{fullName()}</div>
+
+                  <div className={styles.profileMeta}>
+                    {data.role ? data.role : '—'}
+                    {data.company ? ` • ${data.company}` : ''}
+                  </div>
+                </div>
+              </div>
+
+              <div className={styles.profileDetails}>
+                <div className={styles.detailRow}>
+                  <span className={styles.detailLabel}>Email</span>
+                  <span className={styles.detailValue}>
+                    <Mail size={14} />
+                    {data.email ? (
+                      <a href={`mailto:${data.email}`}>{data.email}</a>
+                    ) : (
+                      '—'
+                    )}
+                  </span>
+                </div>
+
+                <div className={styles.detailRow}>
+                  <span className={styles.detailLabel}>Status</span>
+                  <span className={styles.detailValue}>
+                    {data.status ?? '—'}
+                  </span>
+                </div>
+
+                <div className={styles.detailRow}>
+                  <span className={styles.detailLabel}>Last contacted</span>
+                  <span className={styles.detailValue}>
+                    {data.lastContactedAt ? fmtDate(data.lastContactedAt) : '—'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Status Card */}
+
+            {/* Tags Card */}
             <div className={card.card}>
               <div className={card.cardTitle}>Tags</div>
               <TagRow tags={data.tags ?? []} />

@@ -1,13 +1,13 @@
 import { useMemo, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { SelectField } from '../../components/SelectField/SelectField';
+import { SelectField } from '../../components/ui/SelectField/SelectField';
 import {
   useContacts,
   useCreateContact,
   useDeleteContact,
   useUpdateContact,
 } from './queries';
-import { Trash2, Pencil } from 'lucide-react';
+import { Trash2, Pencil, UserPlus } from 'lucide-react';
 import page from '../../components/ui/Page/Page.module.scss';
 import card from '../../components/ui/Card/Card.module.scss';
 import table from '../../components/ui/Table/Table.module.scss';
@@ -461,6 +461,7 @@ export default function ContactsPage() {
               size='lg'
               onClick={() => setIsCreateOpen(true)}
             >
+              <UserPlus size={14} />
               New Contact
             </Button>
           </div>
@@ -615,8 +616,8 @@ export default function ContactsPage() {
                                 size='lg'
                                 onClick={() => openEdit(c)}
                               >
-                                Edit
                                 <Pencil size={14} />
+                                <span className='mobile-hidden'>Edit</span>
                               </Button>
 
                               <Button
@@ -625,8 +626,8 @@ export default function ContactsPage() {
                                 size='lg'
                                 onClick={() => openDelete(c)}
                               >
-                                <span className='mobile-hidden'>Delete</span>
                                 <Trash2 size={14} />
+                                <span className='mobile-hidden'>Delete</span>
                               </Button>
                             </div>
                           </td>
@@ -731,8 +732,8 @@ export default function ContactsPage() {
                           size='sm'
                           onClick={() => openEdit(c)}
                         >
-                          Edit
                           <Pencil size={12} />
+                          Edit
                         </Button>
 
                         <Button
@@ -741,8 +742,8 @@ export default function ContactsPage() {
                           size='sm'
                           onClick={() => openDelete(c)}
                         >
-                          Delete
                           <Trash2 size={12} />
+                          Delete
                         </Button>
                       </div>
                     </article>

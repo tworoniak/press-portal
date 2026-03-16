@@ -15,7 +15,7 @@ import { Modal } from '../../components/ui/Modal/Modal';
 import Button from '../../components/ui/Button/Button';
 import DateInput from '../../components/ui/DateInput/DateInput';
 
-import { Trash2, Pencil } from 'lucide-react';
+import { Trash2, Pencil, CalendarPlus } from 'lucide-react';
 
 type FestivalRow = {
   id: string;
@@ -434,6 +434,7 @@ export default function FestivalsPage() {
               size='lg'
               onClick={() => setIsCreateOpen(true)}
             >
+              <CalendarPlus size={14} />
               New Festival
             </Button>
           </div>
@@ -504,8 +505,8 @@ export default function FestivalsPage() {
                             size='lg'
                             onClick={() => openEdit(f)}
                           >
-                            Edit
                             <Pencil size={14} />
+                            <span className='mobile-hidden'>Edit</span>
                           </Button>
 
                           <Button
@@ -514,8 +515,8 @@ export default function FestivalsPage() {
                             size='lg'
                             onClick={() => openDelete(f)}
                           >
-                            <span className='mobile-hidden'>Delete</span>
                             <Trash2 size={14} />
+                            <span className='mobile-hidden'>Delete</span>
                           </Button>
                         </div>
                       </td>

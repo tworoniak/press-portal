@@ -18,6 +18,7 @@ Live Demo is unavailable at the moment. Vercel deployment is planned.
 ![Press Contact Portal screen 6.](/apps/web/src/assets/screen-06.png 'Press Contact Portal screen 6.')
 ![Press Contact Portal screen 7.](/apps/web/src/assets/screen-07.png 'Press Contact Portal screen 7.')
 ![Press Contact Portal screen 8.](/apps/web/src/assets/screen-08.png 'Press Contact Portal screen 8.')
+![Press Contact Portal screen 9.](/apps/web/src/assets/screen-09.png 'Press Contact Portal screen 9.')
 
 ---
 

@@ -31,7 +31,7 @@ function followUpTone(nextFollowUpAt: string | null) {
 
   if (ms <= 0) return { tone: 'danger' as const, label: 'Due' };
   if (ms <= 3 * day) return { tone: 'warn' as const, label: 'Soon' };
-  return { tone: 'default' as const, label: 'Scheduled' };
+  return { tone: 'primary' as const, label: 'Scheduled' };
 }
 
 function fmt(dt: string) {
@@ -174,7 +174,7 @@ export default function DashboardPage() {
                     data={pipeline}
                     dataKey='value'
                     nameKey='name'
-                    innerRadius={60}
+                    innerRadius={55}
                     outerRadius={95}
                     paddingAngle={0}
                   >
@@ -182,6 +182,7 @@ export default function DashboardPage() {
                       <Cell
                         key={`${entry.name}-${index}`}
                         fill={pieColors[index % pieColors.length]}
+                        strokeWidth={0}
                       />
                     ))}
                   </Pie>
@@ -267,7 +268,7 @@ export default function DashboardPage() {
                   />
                   <Bar
                     dataKey='count'
-                    barSize='30'
+                    barSize='40'
                     // radius={[8, 8, 0, 0]}
                     fill='#7c5cff'
                   />
