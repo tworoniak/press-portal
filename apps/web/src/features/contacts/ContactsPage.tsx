@@ -78,7 +78,9 @@ function statusTone(status: string | null | undefined): BadgeTone {
     case 'ARCHIVED':
       return 'default';
     case 'NOT_CONTACTED':
+      return 'default';
     case 'CONTACTED':
+      return 'primary';
     default:
       return 'default';
   }

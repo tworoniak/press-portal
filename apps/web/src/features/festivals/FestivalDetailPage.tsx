@@ -4,6 +4,7 @@ import { Link, useParams } from 'react-router-dom';
 import page from '../../components/ui/Page/Page.module.scss';
 import card from '../../components/ui/Card/Card.module.scss';
 import Button from '../../components/ui/Button/Button';
+import { Chip } from '../../components/ui/Chip/Chip';
 
 import { X } from 'lucide-react';
 
@@ -96,17 +97,7 @@ export default function FestivalDetailPage() {
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
             {fest.contacts?.length ? (
               fest.contacts.map((link) => (
-                <div
-                  key={link.contactId}
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 8,
-                    padding: '6px 10px',
-                    border: '1px solid rgba(0,0,0,0.12)',
-                    borderRadius: 999,
-                  }}
-                >
+                <Chip key={link.contactId} tone='default'>
                   <Link
                     to={`/contacts/${link.contactId}`}
                     style={{
@@ -119,8 +110,8 @@ export default function FestivalDetailPage() {
                   </Link>
 
                   <Button
-                    variant='outline'
-                    color='danger'
+                    variant='no-outline'
+                    color='neutral'
                     size='sm'
                     shape='round'
                     onClick={() => remove.mutate(link.contactId)}
@@ -128,7 +119,7 @@ export default function FestivalDetailPage() {
                   >
                     <X size={14} />
                   </Button>
-                </div>
+                </Chip>
               ))
             ) : (
               <div style={{ opacity: 0.75 }}>No contacts linked yet.</div>

@@ -2,7 +2,7 @@ import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import styles from './Button.module.scss';
 import clsx from 'clsx';
 
-type Variant = 'contained' | 'outline';
+type Variant = 'contained' | 'outline' | 'no-outline';
 type Color = 'primary' | 'danger' | 'neutral';
 type Size = 'sm' | 'md' | 'lg' | 'xl';
 type Type = 'button' | 'submit';
