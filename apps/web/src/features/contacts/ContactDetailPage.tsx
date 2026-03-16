@@ -25,11 +25,11 @@ import {
   useAddContactFestival,
   useRemoveContactFestival,
 } from './detailQueries';
-
+import { useUpdateContact } from './queries';
 import { useBands, useCreateBand } from '../bands/queries';
 import { useFestivals, useCreateFestival } from '../festivals/queries';
-import { X, Mail } from 'lucide-react';
-
+import { X, Mail, Building2, Phone, Globe, Plus, Pencil } from 'lucide-react';
+// MapPin
 type InteractionType = 'EMAIL' | 'CALL' | 'DM' | 'NOTE';
 
 const INTERACTION_OPTIONS = [
@@ -81,6 +81,19 @@ export default function ContactDetailPage() {
   const bandsQ = useBands(bandSearch, !selectedBand);
   const festivalsQ = useFestivals(festivalSearch, !selectedFestival);
 
+  // ---- edit contact modal state
+  const updateContact = useUpdateContact();
+
+  const [editContactOpen, setEditContactOpen] = useState(false);
+  const [editContactDraft, setEditContactDraft] = useState<{
+    displayName: string;
+    email: string;
+    company: string;
+    role: string;
+    status: string;
+    tagsText: string;
+  } | null>(null);
+
   // ---- edit modal state
   const [editOpen, setEditOpen] = useState(false);
   const [editing, setEditing] = useState<Interaction | null>(null);
@@ -123,6 +136,49 @@ export default function ContactDetailPage() {
     );
   }, [data]);
 
+  // ---- Edit Contact
+  function openEditContact() {
+    setEditContactDraft({
+      displayName:
+        data?.displayName ||
+        [data?.firstName, data?.lastName].filter(Boolean).join(' '),
+      email: data?.email ?? '',
+      company: data?.company ?? '',
+      role: data?.role ?? '',
+      status: data?.status ?? '',
+      tagsText: (data?.tags ?? []).join(', '),
+    });
+
+    setEditContactOpen(true);
+  }
+
+  function splitTags(value: string) {
+    return value
+      .split(',')
+      .map((t) => t.trim())
+      .filter(Boolean);
+  }
+
+  async function handleSaveContact() {
+    if (!editContactDraft || !data) return;
+
+    await updateContact.mutateAsync({
+      id: data.id,
+      data: {
+        displayName: editContactDraft.displayName.trim() || null,
+        email: editContactDraft.email.trim() || null,
+        company: editContactDraft.company.trim() || null,
+        role: editContactDraft.role.trim() || null,
+        status: editContactDraft.status || undefined,
+        tags: splitTags(editContactDraft.tagsText),
+      },
+    });
+
+    setEditContactOpen(false);
+    setEditContactDraft(null);
+  }
+
+  // ---- Edit Interaction
   function openEdit(it: Interaction) {
     setEditing(it);
 
@@ -214,6 +270,8 @@ export default function ContactDetailPage() {
       </div>
     );
 
+  console.log(data);
+
   return (
     <div className={page.page}>
       <div className={page.container}>
@@ -236,32 +294,81 @@ export default function ContactDetailPage() {
 
                   <div className={styles.profileMeta}>
                     {data.role ? data.role : '—'}
-                    {data.company ? ` • ${data.company}` : ''}
+                    {/* {data.company ? ` • ${data.company}` : ''} */}
                   </div>
                 </div>
               </div>
 
               <div className={styles.profileDetails}>
                 <div className={styles.detailRow}>
-                  <span className={styles.detailLabel}>Email</span>
+                  {/* <span className={styles.detailLabel}>Email</span> */}
+                  <span className={styles.detailValue}>
+                    <Building2 size={14} />
+                    {data.company ? <p>{data.company}</p> : ' '}
+                  </span>
+                </div>
+                <div className={styles.detailRow}>
+                  {/* <span className={styles.detailLabel}>Email</span> */}
                   <span className={styles.detailValue}>
                     <Mail size={14} />
                     {data.email ? (
                       <a href={`mailto:${data.email}`}>{data.email}</a>
                     ) : (
-                      '—'
+                      ' '
                     )}
                   </span>
                 </div>
-
                 <div className={styles.detailRow}>
+                  <span className={styles.detailValue}>
+                    {data.phone ? (
+                      <>
+                        <Phone size={14} />
+                        <p>{data.phone}</p>
+                      </>
+                    ) : (
+                      ' '
+                    )}
+                  </span>
+                </div>
+                <div className={styles.detailRow}>
+                  <span className={styles.detailValue}>
+                    {data.website ? (
+                      <>
+                        <Globe size={14} />
+                        <p>{data.website}</p>
+                      </>
+                    ) : (
+                      ' '
+                    )}
+                  </span>
+                </div>
+              </div>
+
+              {/* Profile Actions */}
+              <div className={styles.profileActions}>
+                <Button
+                  variant='outline'
+                  color='neutral'
+                  size='sm'
+                  onClick={openEditContact}
+                >
+                  <Pencil size={12} />
+                  Edit Contact
+                </Button>
+              </div>
+            </div>
+
+            {/* Status Card */}
+            <div className={styles.profileCard}>
+              <div className={styles.statusDetails}>
+                <div className={styles.detailRowFlex}>
                   <span className={styles.detailLabel}>Status</span>
                   <span className={styles.detailValue}>
                     {data.status ?? '—'}
                   </span>
                 </div>
 
-                <div className={styles.detailRow}>
+                <div className={styles.detailRowFlex}>
                   <span className={styles.detailLabel}>Last contacted</span>
                   <span className={styles.detailValue}>
                     {data.lastContactedAt ? fmtDate(data.lastContactedAt) : '—'}
@@ -269,8 +376,6 @@ export default function ContactDetailPage() {
                 </div>
               </div>
             </div>
-
-            {/* Status Card */}
 
             {/* Tags Card */}
             <div className={card.card}>
@@ -316,7 +421,7 @@ export default function ContactDetailPage() {
                 )}
               </div>
 
-              <label style={{ display: 'grid', gap: 6, maxWidth: 520 }}>
+              <label style={{ display: 'grid', gap: 6 }}>
                 <span style={{ fontSize: 12, opacity: 0.75 }}>Add band</span>
 
                 {repSelectedBand ? (
@@ -490,7 +595,7 @@ export default function ContactDetailPage() {
               </div>
 
               {/* add association */}
-              <label style={{ display: 'grid', gap: 6, maxWidth: 520 }}>
+              <label style={{ display: 'grid', gap: 6 }}>
                 <span style={{ fontSize: 12, opacity: 0.75 }}>
                   Add festival
                 </span>
@@ -653,6 +758,7 @@ export default function ContactDetailPage() {
                   size='lg'
                   onClick={() => setCreateOpen(true)}
                 >
+                  <Plus size={12} />
                   Log Interaction
                 </Button>
               </div>
@@ -776,8 +882,132 @@ export default function ContactDetailPage() {
                 </div>
               </div>
             </Modal>
+            {/* START Edit Contact Modal */}
+            <Modal
+              title='Edit Contact'
+              open={editContactOpen}
+              onClose={() => {
+                setEditContactOpen(false);
+                setEditContactDraft(null);
+              }}
+            >
+              {editContactDraft ? (
+                <div className={styles.formGrid}>
+                  <label className={styles.field}>
+                    <span className={styles.fieldLabel}>Display name</span>
+                    <input
+                      value={editContactDraft.displayName}
+                      onChange={(e) =>
+                        setEditContactDraft((prev) =>
+                          prev
+                            ? { ...prev, displayName: e.target.value }
+                            : prev,
+                        )
+                      }
+                    />
+                  </label>
 
-            {/* Edit Modal */}
+                  <label className={styles.field}>
+                    <span className={styles.fieldLabel}>Email</span>
+                    <input
+                      value={editContactDraft.email}
+                      onChange={(e) =>
+                        setEditContactDraft((prev) =>
+                          prev ? { ...prev, email: e.target.value } : prev,
+                        )
+                      }
+                    />
+                  </label>
+
+                  <label className={styles.field}>
+                    <span className={styles.fieldLabel}>Company</span>
+                    <input
+                      value={editContactDraft.company}
+                      onChange={(e) =>
+                        setEditContactDraft((prev) =>
+                          prev ? { ...prev, company: e.target.value } : prev,
+                        )
+                      }
+                    />
+                  </label>
+
+                  <label className={styles.field}>
+                    <span className={styles.fieldLabel}>Role</span>
+                    <input
+                      value={editContactDraft.role}
+                      onChange={(e) =>
+                        setEditContactDraft((prev) =>
+                          prev ? { ...prev, role: e.target.value } : prev,
+                        )
+                      }
+                    />
+                  </label>
+
+                  <label className={styles.field}>
+                    <span className={styles.fieldLabel}>Status</span>
+                    <input
+                      value={editContactDraft.status}
+                      onChange={(e) =>
+                        setEditContactDraft((prev) =>
+                          prev ? { ...prev, status: e.target.value } : prev,
+                        )
+                      }
+                      placeholder='NOT_CONTACTED / CONTACTED / RESPONDED...'
+                    />
+                    {/* <SelectField
+                      label='Status'
+                      value={editContactDraft.status}
+                      options={STATUS_OPTIONS}
+                      onChange={(value) =>
+                        setEditContactDraft((prev) =>
+                          prev ? { ...prev, status: value } : prev,
+                        )
+                      }
+                    /> */}
+                  </label>
+
+                  <label className={styles.field}>
+                    <span className={styles.fieldLabel}>Tags</span>
+                    <input
+                      value={editContactDraft.tagsText}
+                      onChange={(e) =>
+                        setEditContactDraft((prev) =>
+                          prev ? { ...prev, tagsText: e.target.value } : prev,
+                        )
+                      }
+                      placeholder='Press, Metal, US'
+                    />
+                  </label>
+
+                  <div className={styles.modalActions}>
+                    <Button
+                      variant='contained'
+                      color='primary'
+                      size='lg'
+                      onClick={() => void handleSaveContact()}
+                      disabled={updateContact.isPending}
+                    >
+                      {updateContact.isPending ? 'Saving…' : 'Save Contact'}
+                    </Button>
+
+                    <Button
+                      variant='contained'
+                      color='neutral'
+                      size='lg'
+                      onClick={() => {
+                        setEditContactOpen(false);
+                        setEditContactDraft(null);
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              ) : null}
+            </Modal>
+            {/* END Edit Contact Modal */}
+
+            {/* START Edit Interaction Modal */}
             <Modal
               title='Edit interaction'
               open={editOpen}
@@ -787,7 +1017,7 @@ export default function ContactDetailPage() {
               }}
             >
               {editing ? (
-                <div style={{ display: 'grid', gap: 10, maxWidth: 560 }}>
+                <div style={{ display: 'grid', gap: 10 }}>
                   <SelectField<InteractionType>
                     label='Type'
                     value={editType}
@@ -1136,7 +1366,9 @@ export default function ContactDetailPage() {
                 </div>
               ) : null}
             </Modal>
+            {/* END Edit Interaction Modal */}
 
+            {/* START Interaction Timeline */}
             <Timeline
               items={data.interactions ?? []}
               onEdit={(it) => openEdit(it as Interaction)}

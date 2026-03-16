@@ -37,16 +37,16 @@
 
 /* Profile Card */
 .profileCard {
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border);
   border-radius: var(--radius);
-  background:
-    linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.02),
-      rgba(255, 255, 255, 0.01)
-    ),
-    rgba(0, 0, 0, 0.12);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.06),
+    rgba(255, 255, 255, 0.03)
+  );
+  // rgba(0, 0, 0, 0.12);
   padding: 16px;
+  box-shadow: var(--shadow);
 }
 
 .profileTop {
@@ -75,12 +75,24 @@
 .profileDetails {
   margin-top: 16px;
   display: grid;
-  gap: 10px;
+  gap: 0.5rem;
+}
+.statusDetails {
+  margin-top: 16px;
+  display: grid;
+  gap: 1rem;
 }
 
 .detailRow {
   display: grid;
-  gap: 4px;
+  gap: 0.5rem;
+}
+
+.detailRowFlex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
 }
 
 .detailLabel {
@@ -102,6 +114,17 @@
     font-size: 1.4rem;
     text-decoration: none;
   }
+
+  p {
+    margin: 0;
+  }
+}
+
+.profileActions {
+  margin-top: 14px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 /* Interaction Form */
@@ -121,7 +144,7 @@
 .formGrid {
   display: grid;
   gap: 10px;
-  max-width: 620px;
+  // max-width: 620px;
 }
 
 .field {
