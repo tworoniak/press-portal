@@ -76,7 +76,7 @@ export function Timeline({ items, onEdit, onDelete }: TimelineProps) {
                     {onEdit ? (
                       <Button
                         variant='outline'
-                        color='neutral'
+                        color='primary'
                         size='sm'
                         onClick={() => onEdit(it)}
                       >
