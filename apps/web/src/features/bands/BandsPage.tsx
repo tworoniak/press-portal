@@ -456,7 +456,7 @@ export default function BandsPage() {
                       <td>
                         <div style={{ display: 'flex', gap: 8 }}>
                           <Button
-                            variant='contained'
+                            variant='outline'
                             color='primary'
                             size='lg'
                             onClick={() => openEdit(b)}
