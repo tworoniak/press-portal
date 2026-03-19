@@ -119,7 +119,7 @@ export default function DashboardPage() {
             <div className={styles.summaryHint}>Overdue follow-ups</div>
           </div>
 
-          <div className={`${styles.summaryCard} ${styles.kpiWarn}`}>
+          <div className={`${styles.summaryCard}  ${styles.kpiWarn}`}>
             <div className={styles.summaryLabel}>Due soon</div>
             <div className={styles.summaryValue}>{summary.soon}</div>
             <div className={styles.summaryHint}>Next 3 days</div>
@@ -130,32 +130,34 @@ export default function DashboardPage() {
             <div className={styles.summaryValue}>{summary.scheduled}</div>
             <div className={styles.summaryHint}>Future reminders</div>
           </div>
-
-          {/* <div className={styles.summaryCard}>
-            <div className={styles.summaryLabel}>Contacts</div>
-            <div className={styles.summaryValue}>{summary.totalContacts}</div>
-            <div className={styles.summaryHint}>Total tracked contacts</div>
-          </div> */}
         </div>
 
         <div className={styles.summary}>
-          <div className={styles.summaryCard}>
-            <div className={styles.summaryLabel}>Contacts</div>
-            <div className={styles.summaryValue}>{summary.totalContacts}</div>
-            <div className={styles.summaryHint}>Total tracked contacts</div>
-          </div>
+          <Link to='/contacts' className={styles.summaryCardLink}>
+            <div className={`${styles.summaryCard} ${styles.withLink}`}>
+              <div className={styles.summaryLabel}>Contacts</div>
+              <div className={styles.summaryValue}>{summary.totalContacts}</div>
+              <div className={styles.summaryHint}>Total tracked contacts</div>
+            </div>
+          </Link>
 
-          <div className={styles.summaryCard}>
-            <div className={styles.summaryLabel}>Bands</div>
-            <div className={styles.summaryValue}>{summary.totalBands}</div>
-            <div className={styles.summaryHint}>Total tracked bands</div>
-          </div>
+          <Link to='/bands' className={styles.summaryCardLink}>
+            <div className={`${styles.summaryCard} ${styles.withLink}`}>
+              <div className={styles.summaryLabel}>Bands</div>
+              <div className={styles.summaryValue}>{summary.totalBands}</div>
+              <div className={styles.summaryHint}>Total tracked bands</div>
+            </div>
+          </Link>
 
-          <div className={styles.summaryCard}>
-            <div className={styles.summaryLabel}>Festivals</div>
-            <div className={styles.summaryValue}>{summary.totalFestivals}</div>
-            <div className={styles.summaryHint}>Upcoming and archived</div>
-          </div>
+          <Link to='/festivals' className={styles.summaryCardLink}>
+            <div className={`${styles.summaryCard} ${styles.withLink}`}>
+              <div className={styles.summaryLabel}>Festivals</div>
+              <div className={styles.summaryValue}>
+                {summary.totalFestivals}
+              </div>
+              <div className={styles.summaryHint}>Upcoming and archived</div>
+            </div>
+          </Link>
         </div>
 
         {/* Charts row */}

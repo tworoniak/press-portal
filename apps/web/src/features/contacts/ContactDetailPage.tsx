@@ -89,6 +89,8 @@ export default function ContactDetailPage() {
     displayName: string;
     email: string;
     company: string;
+    website: string;
+    phone: string;
     role: string;
     status: string;
     tagsText: string;
@@ -144,6 +146,8 @@ export default function ContactDetailPage() {
         [data?.firstName, data?.lastName].filter(Boolean).join(' '),
       email: data?.email ?? '',
       company: data?.company ?? '',
+      website: data?.website ?? '',
+      phone: data?.phone ?? '',
       role: data?.role ?? '',
       status: data?.status ?? '',
       tagsText: (data?.tags ?? []).join(', '),
@@ -168,6 +172,8 @@ export default function ContactDetailPage() {
         displayName: editContactDraft.displayName.trim() || null,
         email: editContactDraft.email.trim() || null,
         company: editContactDraft.company.trim() || null,
+        website: editContactDraft.website.trim() || null,
+        phone: editContactDraft.phone.trim() || null,
         role: editContactDraft.role.trim() || null,
         status: editContactDraft.status || undefined,
         tags: splitTags(editContactDraft.tagsText),
@@ -330,6 +336,7 @@ export default function ContactDetailPage() {
                     )}
                   </span>
                 </div>
+
                 <div className={styles.detailRow}>
                   <span className={styles.detailValue}>
                     {data.website ? (
@@ -348,7 +355,7 @@ export default function ContactDetailPage() {
               <div className={styles.profileActions}>
                 <Button
                   variant='outline'
-                  color='neutral'
+                  color='primary'
                   size='sm'
                   onClick={openEditContact}
                 >
@@ -764,7 +771,7 @@ export default function ContactDetailPage() {
               </div>
             </div>
 
-            {/* Interaction Modal */}
+            {/* START Interaction Modal */}
             <Modal
               title='Log Interaction'
               open={createOpen}
@@ -882,6 +889,8 @@ export default function ContactDetailPage() {
                 </div>
               </div>
             </Modal>
+            {/* END Interaction Modal */}
+
             {/* START Edit Contact Modal */}
             <Modal
               title='Edit Contact'
@@ -926,6 +935,30 @@ export default function ContactDetailPage() {
                       onChange={(e) =>
                         setEditContactDraft((prev) =>
                           prev ? { ...prev, company: e.target.value } : prev,
+                        )
+                      }
+                    />
+                  </label>
+
+                  <label className={styles.field}>
+                    <span className={styles.fieldLabel}>Phone</span>
+                    <input
+                      value={editContactDraft.phone}
+                      onChange={(e) =>
+                        setEditContactDraft((prev) =>
+                          prev ? { ...prev, phone: e.target.value } : prev,
+                        )
+                      }
+                    />
+                  </label>
+
+                  <label className={styles.field}>
+                    <span className={styles.fieldLabel}>Website</span>
+                    <input
+                      value={editContactDraft.website}
+                      onChange={(e) =>
+                        setEditContactDraft((prev) =>
+                          prev ? { ...prev, website: e.target.value } : prev,
                         )
                       }
                     />
