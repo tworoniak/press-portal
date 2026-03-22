@@ -34,10 +34,10 @@ model Contact {
   displayName  String?  // optional override if you prefer "Jane @ Label"
   role         String?  // publicist / manager / label / etc.
   company      String?
-
   email        String?  @unique
   phone        String?
   website      String?
+  location     String?
   timezone     String?  // e.g. "America/Chicago"
 
   notes        String?

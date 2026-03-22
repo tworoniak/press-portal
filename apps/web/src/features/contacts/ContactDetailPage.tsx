@@ -28,7 +28,16 @@ import {
 import { useUpdateContact } from './queries';
 import { useBands, useCreateBand } from '../bands/queries';
 import { useFestivals, useCreateFestival } from '../festivals/queries';
-import { X, Mail, Building2, Phone, Globe, Plus, Pencil } from 'lucide-react';
+import {
+  X,
+  Mail,
+  Building2,
+  Phone,
+  Globe,
+  Plus,
+  Pencil,
+  MapPin,
+} from 'lucide-react';
 // MapPin
 type InteractionType = 'EMAIL' | 'CALL' | 'DM' | 'NOTE';
 
@@ -40,6 +49,23 @@ const INTERACTION_OPTIONS = [
 ] as const satisfies readonly { value: InteractionType; label: string }[];
 
 type NamedRef = { id: string; name: string };
+
+function DetailRow({
+  icon,
+  children,
+}: {
+  icon?: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className={styles.detailRow}>
+      <span className={styles.detailValue}>
+        {icon}
+        <span>{children}</span>
+      </span>
+    </div>
+  );
+}
 
 export default function ContactDetailPage() {
   const { id = '' } = useParams();
@@ -89,6 +115,7 @@ export default function ContactDetailPage() {
     displayName: string;
     email: string;
     company: string;
+    location: string;
     website: string;
     phone: string;
     role: string;
@@ -147,6 +174,7 @@ export default function ContactDetailPage() {
       email: data?.email ?? '',
       company: data?.company ?? '',
       website: data?.website ?? '',
+      location: data?.location ?? '',
       phone: data?.phone ?? '',
       role: data?.role ?? '',
       status: data?.status ?? '',
@@ -173,6 +201,7 @@ export default function ContactDetailPage() {
         email: editContactDraft.email.trim() || null,
         company: editContactDraft.company.trim() || null,
         website: editContactDraft.website.trim() || null,
+        location: editContactDraft.location.trim() || null,
         phone: editContactDraft.phone.trim() || null,
         role: editContactDraft.role.trim() || null,
         status: editContactDraft.status || undefined,
@@ -300,55 +329,40 @@ export default function ContactDetailPage() {
 
                   <div className={styles.profileMeta}>
                     {data.role ? data.role : '—'}
-                    {/* {data.company ? ` • ${data.company}` : ''} */}
                   </div>
                 </div>
               </div>
 
               <div className={styles.profileDetails}>
-                <div className={styles.detailRow}>
-                  {/* <span className={styles.detailLabel}>Email</span> */}
-                  <span className={styles.detailValue}>
-                    <Building2 size={14} />
-                    {data.company ? <p>{data.company}</p> : ' '}
-                  </span>
-                </div>
-                <div className={styles.detailRow}>
-                  {/* <span className={styles.detailLabel}>Email</span> */}
-                  <span className={styles.detailValue}>
-                    <Mail size={14} />
-                    {data.email ? (
-                      <a href={`mailto:${data.email}`}>{data.email}</a>
-                    ) : (
-                      ' '
-                    )}
-                  </span>
-                </div>
-                <div className={styles.detailRow}>
-                  <span className={styles.detailValue}>
-                    {data.phone ? (
-                      <>
-                        <Phone size={14} />
-                        <p>{data.phone}</p>
-                      </>
-                    ) : (
-                      ' '
-                    )}
-                  </span>
-                </div>
+                {data.company && (
+                  <DetailRow icon={<Building2 size={14} />}>
+                    <p>{data.company}</p>
+                  </DetailRow>
+                )}
 
-                <div className={styles.detailRow}>
-                  <span className={styles.detailValue}>
-                    {data.website ? (
-                      <>
-                        <Globe size={14} />
-                        <p>{data.website}</p>
-                      </>
-                    ) : (
-                      ' '
-                    )}
-                  </span>
-                </div>
+                {data.email && (
+                  <DetailRow icon={<Mail size={14} />}>
+                    <a href={`mailto:${data.email}`}>{data.email}</a>
+                  </DetailRow>
+                )}
+
+                {data.phone && (
+                  <DetailRow icon={<Phone size={14} />}>{data.phone}</DetailRow>
+                )}
+
+                {data.website && (
+                  <DetailRow icon={<Globe size={14} />}>
+                    <a href={`${data.website}`} target='_blank'>
+                      {data.website}
+                    </a>
+                  </DetailRow>
+                )}
+
+                {data.location && (
+                  <DetailRow icon={<MapPin size={14} />}>
+                    <p>{data.location}</p>
+                  </DetailRow>
+                )}
               </div>
 
               {/* Profile Actions */}
@@ -935,6 +949,18 @@ export default function ContactDetailPage() {
                       onChange={(e) =>
                         setEditContactDraft((prev) =>
                           prev ? { ...prev, company: e.target.value } : prev,
+                        )
+                      }
+                    />
+                  </label>
+
+                  <label className={styles.field}>
+                    <span className={styles.fieldLabel}>Location</span>
+                    <input
+                      value={editContactDraft.location}
+                      onChange={(e) =>
+                        setEditContactDraft((prev) =>
+                          prev ? { ...prev, location: e.target.value } : prev,
                         )
                       }
                     />
