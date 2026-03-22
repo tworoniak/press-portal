@@ -53,7 +53,7 @@ export default function AccountMenu({
         aria-haspopup='menu'
         aria-label='Open account menu'
       >
-        <Avatar name={name} size='lg' />
+        <Avatar name={name} size='md' />
       </button>
 
       {open ? (
