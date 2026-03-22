@@ -63,30 +63,6 @@ export class ContactsService {
     });
   }
 
-  // async findOne(id: string) {
-  //   return this.prisma.contact.findUnique({
-  //     where: { id },
-  //     include: {
-  //       interactions: {
-  //         orderBy: { occurredAt: 'desc' },
-  //         include: {
-  //           band: { select: { id: true, name: true } },
-  //           festival: { select: { id: true, name: true } },
-  //         },
-  //       },
-  //       bands: {
-  //         include: {
-  //           band: { select: { id: true, name: true } },
-  //         },
-  //         orderBy: { createdAt: 'desc' },
-  //       },
-  //       festivals: {
-  //         include: { festival: { select: { id: true, name: true } } },
-  //       },
-  //     },
-  //   });
-  // }
-
   async findOne(id: string) {
     return this.prisma.contact.findUnique({
       where: { id },

@@ -7,6 +7,7 @@ export class UpdateContactDto {
 
   @IsOptional() @IsEmail() email?: string;
   @IsOptional() @IsString() company?: string;
+  @IsOptional() @IsString() location?: string;
   @IsOptional() @IsString() role?: string;
 
   @IsOptional()

@@ -15,6 +15,7 @@ export type Contact = {
   email: string | null;
   phone: string | null;
   website: string | null;
+  location: string | null;
   timezone: string | null;
   notes: string | null;
   doNotContact: boolean;
@@ -37,6 +38,7 @@ export type CreateContactInput = Partial<
     | 'email'
     | 'phone'
     | 'website'
+    | 'location'
     | 'timezone'
     | 'notes'
     | 'doNotContact'
@@ -56,6 +58,7 @@ export type UpdateContactInput = Partial<
     | 'email'
     | 'phone'
     | 'website'
+    | 'location'
     | 'timezone'
     | 'notes'
     | 'doNotContact'
