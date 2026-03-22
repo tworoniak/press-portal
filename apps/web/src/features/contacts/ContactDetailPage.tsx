@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
-import styles from './ContactDetailPage.module.scss';
+import styles from '../../components/ui/EntityDetailLayout/EntityDetailPage.module.scss';
 import page from '../../components/ui/Page/Page.module.scss';
 import card from '../../components/ui/Card/Card.module.scss';
 
@@ -304,8 +304,6 @@ export default function ContactDetailPage() {
         <div className={page.container}>Not found.</div>
       </div>
     );
-
-  console.log(data);
 
   return (
     <div className={page.page}>

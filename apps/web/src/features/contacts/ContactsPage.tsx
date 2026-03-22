@@ -10,7 +10,7 @@ import {
 import { Trash2, Pencil, UserPlus } from 'lucide-react';
 import page from '../../components/ui/Page/Page.module.scss';
 import card from '../../components/ui/Card/Card.module.scss';
-import table from '../../components/ui/Table/Table.module.scss';
+import list from '../../components/ui/ResourceList/ResourceList.module.scss';
 import styles from './ContactsPage.module.scss';
 import { Badge, type BadgeTone } from '../../components/ui/Badge/Badge';
 import { TagRow } from '../../components/ui/Tag/TagRow';
@@ -114,15 +114,44 @@ type EditDraft = {
   tagsText: string;
 };
 
+function setContactFilter(
+  setSearchParams: ReturnType<typeof useSearchParams>[1],
+  key: 'q' | 'status' | 'tag' | 'followup',
+  value: string | boolean,
+) {
+  setSearchParams(
+    (prev) => {
+      const p = new URLSearchParams(prev);
+      if (key === 'followup') {
+        if (value) p.set('followup', '1');
+        else p.delete('followup');
+      } else if (key === 'q') {
+        const s = String(value).trim();
+        if (s) p.set('q', s);
+        else p.delete('q');
+      } else if (key === 'status') {
+        const s = String(value).trim();
+        if (s) p.set('status', s);
+        else p.delete('status');
+      } else if (key === 'tag') {
+        const s = String(value).trim();
+        if (s) p.set('tag', s);
+        else p.delete('tag');
+      }
+      return p;
+    },
+    { replace: true },
+  );
+}
+
 export default function ContactsPage() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  // Filters
-  const [search, setSearch] = useState('');
-  const [status, setStatus] = useState<ContactStatus>('');
-  const [tag, setTag] = useState('');
-  const [needsFollowUp, setNeedsFollowUp] = useState(false);
+  const search = searchParams.get('q') ?? '';
+  const status = (searchParams.get('status') as ContactStatus) || '';
+  const tag = searchParams.get('tag') ?? '';
+  const needsFollowUp = searchParams.get('followup') === '1';
 
   const filters = useMemo(
     () => ({
@@ -184,7 +213,10 @@ export default function ContactsPage() {
     setNewTags('Press');
 
     if (shouldOpenFromRoute) {
-      navigate('/contacts', { replace: true });
+      const p = new URLSearchParams(searchParams);
+      p.delete('create');
+      const qs = p.toString();
+      navigate({ pathname: '/contacts', search: qs ? `?${qs}` : '' }, { replace: true });
     }
   }
 
@@ -245,7 +277,13 @@ export default function ContactsPage() {
             setIsCreateOpen(false);
 
             if (shouldOpenFromRoute) {
-              navigate('/contacts', { replace: true });
+              const p = new URLSearchParams(searchParams);
+              p.delete('create');
+              const qs = p.toString();
+              navigate(
+                { pathname: '/contacts', search: qs ? `?${qs}` : '' },
+                { replace: true },
+              );
             }
           }}
         >
@@ -476,7 +514,9 @@ export default function ContactsPage() {
               <span style={{ fontSize: 12, opacity: 0.75 }}>Search</span>
               <input
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) =>
+                  setContactFilter(setSearchParams, 'q', e.target.value)
+                }
                 placeholder='Name, email, company...'
               />
             </label>
@@ -485,14 +525,18 @@ export default function ContactsPage() {
               label='Status'
               value={status}
               options={STATUS_OPTIONS}
-              onChange={setStatus}
+              onChange={(v) =>
+                setContactFilter(setSearchParams, 'status', v ?? '')
+              }
             />
 
             <label style={{ display: 'grid', gap: 6 }}>
               <span style={{ fontSize: 12, opacity: 0.75 }}>Tag</span>
               <input
                 value={tag}
-                onChange={(e) => setTag(e.target.value)}
+                onChange={(e) =>
+                  setContactFilter(setSearchParams, 'tag', e.target.value)
+                }
                 placeholder='Metal, Festival...'
               />
             </label>
@@ -508,7 +552,13 @@ export default function ContactsPage() {
               <input
                 type='checkbox'
                 checked={needsFollowUp}
-                onChange={(e) => setNeedsFollowUp(e.target.checked)}
+                onChange={(e) =>
+                  setContactFilter(
+                    setSearchParams,
+                    'followup',
+                    e.target.checked,
+                  )
+                }
               />
               <span style={{ fontSize: 14 }}>Needs follow-up</span>
             </label>
@@ -532,228 +582,116 @@ export default function ContactsPage() {
             <div className={page.subtle}>{data?.length ?? 0} contact(s)</div>
             <div style={{ height: 10 }} />
 
-            {/* Desktop Data Table */}
-            <div className={styles.desktopTable}>
-              <div className={table.tableWrap}>
-                <table className={table.table}>
-                  <thead>
-                    <tr>
-                      <th>Name</th>
-                      <th>Company / Role</th>
-                      <th>Status</th>
-                      <th>Last contacted</th>
-                      <th>Follow-up</th>
-                      <th>Tags</th>
-                      <th style={{ width: 160 }}>Actions</th>
-                    </tr>
-                  </thead>
+            <div className={list.list}>
+              {((data ?? []) as ContactRow[]).map((c) => {
+                const label = c.status?.replaceAll('_', ' ') ?? '—';
+                const tone = statusTone(c.status);
+                const nextFollowUpAt =
+                  c.interactions?.[0]?.nextFollowUpAt ?? null;
+                const fu = followUpBadge(nextFollowUpAt);
 
-                  <tbody>
-                    {((data ?? []) as ContactRow[]).map((c) => {
-                      const label = c.status?.replaceAll('_', ' ') ?? '—';
-                      const tone = statusTone(c.status);
-                      const nextFollowUpAt =
-                        c.interactions?.[0]?.nextFollowUpAt ?? null;
-                      const fu = followUpBadge(nextFollowUpAt);
-
-                      return (
-                        <tr key={c.id}>
-                          <td>
-                            <div className={table.rowTitle}>
-                              <Link to={`/contacts/${c.id}`}>
-                                {displayName(c)}
-                              </Link>
-                            </div>
-                            <div className={table.smallMuted}>
-                              {c.email ?? ''}
-                            </div>
-                          </td>
-
-                          <td>
-                            <div className={table.rowCompany}>
-                              {c.company ?? '—'}
-                            </div>
-                            <div className={table.smallMuted}>
-                              {c.role ?? '—'}
-                            </div>
-                          </td>
-
-                          <td>
-                            <Badge tone={tone}>{label}</Badge>
-                          </td>
-
-                          <td className={table.smallMuted}>
-                            {c.lastContactedAt
-                              ? fmtDate(c.lastContactedAt)
-                              : '—'}
-                          </td>
-
-                          <td>
-                            {fu ? (
-                              <>
-                                <Badge tone={fu.tone}>{fu.label}</Badge>
-                                <div
-                                  className={table.smallMuted}
-                                  style={{ marginTop: 6 }}
-                                >
-                                  {fmtDate(nextFollowUpAt!)}
-                                </div>
-                              </>
-                            ) : (
-                              <span style={{ opacity: 0.6 }}>—</span>
-                            )}
-                          </td>
-
-                          <td>
-                            <TagRow tags={c.tags ?? []} />
-                          </td>
-
-                          <td>
-                            <div style={{ display: 'flex', gap: 8 }}>
-                              <Button
-                                variant='outline'
-                                color='primary'
-                                size='lg'
-                                onClick={() => openEdit(c)}
-                              >
-                                <Pencil size={14} />
-                                <span className='mobile-hidden'>Edit</span>
-                              </Button>
-
-                              <Button
-                                variant='outline'
-                                color='danger'
-                                size='lg'
-                                onClick={() => openDelete(c)}
-                              >
-                                <Trash2 size={14} />
-                                <span className='mobile-hidden'>Delete</span>
-                              </Button>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-
-                    {(data?.length ?? 0) === 0 && (
-                      <tr>
-                        <td colSpan={7} style={{ padding: 14, opacity: 0.75 }}>
-                          No contacts match these filters.
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            {/* Mobile Data Cards */}
-            <div className={styles.mobileCards}>
-              {((data ?? []) as ContactRow[]).length ? (
-                ((data ?? []) as ContactRow[]).map((c) => {
-                  const label = c.status?.replaceAll('_', ' ') ?? '—';
-                  const tone = statusTone(c.status);
-                  const nextFollowUpAt =
-                    c.interactions?.[0]?.nextFollowUpAt ?? null;
-                  const fu = followUpBadge(nextFollowUpAt);
-
-                  return (
-                    <article key={c.id} className={styles.mobileCard}>
-                      <div className={styles.mobileCardTop}>
-                        <div>
-                          <div className={styles.mobileCardTitle}>
-                            <Link to={`/contacts/${c.id}`}>
-                              {displayName(c)}
-                            </Link>
-                          </div>
-                          <div className={styles.mobileCardSubtle}>
-                            {c.company ?? '—'}
-                            {c.role ? ` • ${c.role}` : ''}
-                          </div>
+                return (
+                  <article key={c.id} className={list.item}>
+                    <div className={list.itemHeader}>
+                      <div className={list.titleBlock}>
+                        <div className={list.title}>
+                          <Link to={`/contacts/${c.id}`}>
+                            {displayName(c)}
+                          </Link>
                         </div>
-
+                        {c.email ? (
+                          <div className={list.sub}>{c.email}</div>
+                        ) : null}
+                      </div>
+                      <div className={list.badges}>
                         <Badge tone={tone}>{label}</Badge>
-                      </div>
-
-                      {c.email ? (
-                        <div className={styles.mobileCardSubtle}>{c.email}</div>
-                      ) : null}
-
-                      <div className={styles.mobileMetaRow}>
-                        <div>
-                          <span className={styles.mobileMetaLabel}>
-                            Last contacted:
-                          </span>{' '}
-                          <span className={styles.mobileMetaValue}>
-                            {c.lastContactedAt
-                              ? fmtDate(c.lastContactedAt)
-                              : '—'}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className={styles.mobileMetaRow}>
-                        <div>
-                          <span className={styles.mobileMetaLabel}>
-                            Follow-up:
-                          </span>{' '}
-                          <span className={styles.mobileMetaValue}>
-                            {fu ? fu.label : '—'}
-                          </span>
-                        </div>
-
-                        {fu && nextFollowUpAt ? (
+                        {fu ? (
                           <Badge tone={fu.tone}>{fu.label}</Badge>
                         ) : null}
                       </div>
+                    </div>
 
-                      {nextFollowUpAt ? (
-                        <div className={styles.mobileCardSubtle}>
-                          Due: {fmtDate(nextFollowUpAt)}
+                    <div className={list.meta}>
+                      <div className={list.metaCell}>
+                        <div className={list.metaLabel}>Company</div>
+                        <div className={list.metaValue}>
+                          {c.company ?? <span className={list.muted}>—</span>}
                         </div>
-                      ) : null}
-
-                      {(c.tags?.length ?? 0) > 0 ? (
-                        <div className={styles.mobileTags}>
-                          <TagRow tags={c.tags ?? []} />
-                        </div>
-                      ) : null}
-
-                      <div className={styles.mobileActions}>
-                        <Link
-                          to={`/contacts/${c.id}`}
-                          className={styles.mobileActionLink}
-                        >
-                          View
-                        </Link>
-                        <Button
-                          variant='outline'
-                          color='primary'
-                          size='sm'
-                          onClick={() => openEdit(c)}
-                        >
-                          <Pencil size={12} />
-                          Edit
-                        </Button>
-
-                        <Button
-                          variant='outline'
-                          color='danger'
-                          size='sm'
-                          onClick={() => openDelete(c)}
-                        >
-                          <Trash2 size={12} />
-                          Delete
-                        </Button>
                       </div>
-                    </article>
-                  );
-                })
-              ) : (
-                <div className={page.subtle}>
+                      <div className={list.metaCell}>
+                        <div className={list.metaLabel}>Role</div>
+                        <div className={list.metaValue}>
+                          {c.role ?? <span className={list.muted}>—</span>}
+                        </div>
+                      </div>
+                      <div className={list.metaCell}>
+                        <div className={list.metaLabel}>Last contacted</div>
+                        <div className={list.metaValue}>
+                          {c.lastContactedAt ? (
+                            fmtDate(c.lastContactedAt)
+                          ) : (
+                            <span className={list.muted}>—</span>
+                          )}
+                        </div>
+                      </div>
+                      <div className={list.metaCell}>
+                        <div className={list.metaLabel}>Follow-up due</div>
+                        <div className={list.metaValue}>
+                          {nextFollowUpAt ? (
+                            fmtDate(nextFollowUpAt)
+                          ) : (
+                            <span className={list.muted}>—</span>
+                          )}
+                        </div>
+                      </div>
+                      <div className={list.metaCell}>
+                        <div className={list.metaLabel}>Tags</div>
+                        <div className={list.metaValue}>
+                          {(c.tags?.length ?? 0) > 0 ? (
+                            <TagRow tags={c.tags ?? []} />
+                          ) : (
+                            <span className={list.muted}>—</span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className={list.actions}>
+                      <Link
+                        to={`/contacts/${c.id}`}
+                        className={list.actionLink}
+                      >
+                        View
+                      </Link>
+                      <Button
+                        variant='outline'
+                        color='primary'
+                        size='lg'
+                        onClick={() => openEdit(c)}
+                      >
+                        <Pencil size={14} />
+                        Edit
+                      </Button>
+
+                      <Button
+                        variant='outline'
+                        color='danger'
+                        size='lg'
+                        onClick={() => openDelete(c)}
+                      >
+                        <Trash2 size={14} />
+                        Delete
+                      </Button>
+                    </div>
+                  </article>
+                );
+              })}
+
+              {(data?.length ?? 0) === 0 ? (
+                <div className={list.empty}>
                   No contacts match these filters.
                 </div>
-              )}
+              ) : null}
             </div>
           </>
         )}

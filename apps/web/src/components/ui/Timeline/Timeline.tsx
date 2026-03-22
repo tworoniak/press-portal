@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 import Button from '../Button/Button';
 import { Badge } from '../Badge/Badge';
 import { Chip } from '../Chip/Chip';
@@ -18,6 +20,8 @@ export type TimelineItem = {
   notes: string | null;
   outcome: string | null;
   nextFollowUpAt: string | null;
+  /** Shown on band/festival detail views */
+  contact?: LinkedRef | null;
   band?: LinkedRef | null;
   festival?: LinkedRef | null;
 };
@@ -116,9 +120,24 @@ export function Timeline({ items, onEdit, onDelete }: TimelineProps) {
 
               {it.notes ? <div className={styles.notes}>{it.notes}</div> : null}
 
-              {it.band || it.festival || it.nextFollowUpAt ? (
+              {it.contact || it.band || it.festival || it.nextFollowUpAt ? (
                 <div className={styles.bottomRow}>
                   <div className={styles.chips}>
+                    {it.contact ? (
+                      <Chip tone='default'>
+                        <Link
+                          to={`/contacts/${it.contact.id}`}
+                          style={{
+                            fontWeight: 600,
+                            textDecoration: 'none',
+                            color: 'inherit',
+                          }}
+                        >
+                          {it.contact.name}
+                        </Link>
+                      </Chip>
+                    ) : null}
+
                     {it.band ? (
                       <Chip tone='default'>{it.band.name}</Chip>
                     ) : null}

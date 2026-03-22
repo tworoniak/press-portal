@@ -37,6 +37,7 @@ type ActionResult = {
   subtitle?: string;
   actionType:
     | 'go-dashboard'
+    | 'go-follow-ups'
     | 'go-contacts'
     | 'go-bands'
     | 'go-festivals'
@@ -122,6 +123,8 @@ function iconFor(r: Result) {
           return <Music size={14} />;
         case 'go-festivals':
           return <CalendarDays size={14} />;
+        case 'go-follow-ups':
+          return <Clock size={14} />;
         default:
           return <Plus size={14} />;
       }
@@ -185,6 +188,13 @@ export function CommandPalette() {
         title: 'Go to Dashboard',
         subtitle: 'Jump to your overview',
         actionType: 'go-dashboard',
+      },
+      {
+        kind: 'action',
+        id: 'go-follow-ups',
+        title: 'Go to Follow-ups',
+        subtitle: 'All scheduled follow-ups by date',
+        actionType: 'go-follow-ups',
       },
       {
         kind: 'action',
@@ -302,6 +312,9 @@ export function CommandPalette() {
       switch (r.actionType) {
         case 'go-dashboard':
           navigate('/dashboard');
+          break;
+        case 'go-follow-ups':
+          navigate('/follow-ups');
           break;
         case 'go-contacts':
           navigate('/contacts');

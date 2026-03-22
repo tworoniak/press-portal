@@ -10,7 +10,7 @@ import {
 
 import page from '../../components/ui/Page/Page.module.scss';
 import card from '../../components/ui/Card/Card.module.scss';
-import table from '../../components/ui/Table/Table.module.scss';
+import list from '../../components/ui/ResourceList/ResourceList.module.scss';
 import { Modal } from '../../components/ui/Modal/Modal';
 import Button from '../../components/ui/Button/Button';
 
@@ -393,7 +393,7 @@ export default function BandsPage() {
               size='lg'
               onClick={() => setIsCreateOpen(true)}
             >
-              <Music size='14' />
+              <Music size={14} />
               New Band
             </Button>
           </div>
@@ -423,71 +423,82 @@ export default function BandsPage() {
             <div className={page.subtle}>{rows.length} band(s)</div>
             <div style={{ height: 10 }} />
 
-            <div className={table.tableWrap}>
-              <table className={table.table}>
-                <thead>
-                  <tr>
-                    <th>Name</th>
-                    <th>Genre</th>
-                    <th>Country</th>
-                    <th>Website</th>
-                    <th style={{ width: 160 }}>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {rows.map((b) => (
-                    <tr key={b.id}>
-                      <td>
-                        <div className={table.rowTitle}>
-                          <Link to={`/bands/${b.id}`}>{b.name}</Link>
-                        </div>
-                      </td>
-                      <td>{b.genre ?? '—'}</td>
-                      <td>{b.country ?? '—'}</td>
-                      <td>
+            <div className={list.list}>
+              {rows.map((b) => (
+                <article key={b.id} className={list.item}>
+                  <div className={list.itemHeader}>
+                    <div className={list.titleBlock}>
+                      <div className={list.title}>
+                        <Link to={`/bands/${b.id}`}>{b.name}</Link>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className={list.meta}>
+                    <div className={list.metaCell}>
+                      <div className={list.metaLabel}>Genre</div>
+                      <div className={list.metaValue}>
+                        {b.genre ?? <span className={list.muted}>—</span>}
+                      </div>
+                    </div>
+                    <div className={list.metaCell}>
+                      <div className={list.metaLabel}>Country</div>
+                      <div className={list.metaValue}>
+                        {b.country ?? <span className={list.muted}>—</span>}
+                      </div>
+                    </div>
+                    <div className={list.metaCell}>
+                      <div className={list.metaLabel}>Website</div>
+                      <div className={list.metaValue}>
                         {b.website ? (
-                          <a href={b.website} target='_blank' rel='noreferrer'>
+                          <a
+                            className={list.link}
+                            href={b.website}
+                            target='_blank'
+                            rel='noreferrer'
+                          >
                             {b.website}
                           </a>
                         ) : (
-                          '—'
+                          <span className={list.muted}>—</span>
                         )}
-                      </td>
-                      <td>
-                        <div style={{ display: 'flex', gap: 8 }}>
-                          <Button
-                            variant='outline'
-                            color='primary'
-                            size='lg'
-                            onClick={() => openEdit(b)}
-                          >
-                            <Pencil size={14} />
-                            <span className='mobile-hidden'>Edit</span>
-                          </Button>
+                      </div>
+                    </div>
+                  </div>
 
-                          <Button
-                            variant='outline'
-                            color='danger'
-                            size='lg'
-                            onClick={() => openDelete(b)}
-                          >
-                            <Trash2 size={14} />
-                            <span className='mobile-hidden'>Delete</span>
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                  <div className={list.actions}>
+                    <Link
+                      to={`/bands/${b.id}`}
+                      className={list.actionLink}
+                    >
+                      View
+                    </Link>
+                    <Button
+                      variant='outline'
+                      color='primary'
+                      size='lg'
+                      onClick={() => openEdit(b)}
+                    >
+                      <Pencil size={14} />
+                      Edit
+                    </Button>
 
-                  {rows.length === 0 && (
-                    <tr>
-                      <td colSpan={5} style={{ padding: 14, opacity: 0.75 }}>
-                        No bands found.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+                    <Button
+                      variant='outline'
+                      color='danger'
+                      size='lg'
+                      onClick={() => openDelete(b)}
+                    >
+                      <Trash2 size={14} />
+                      Delete
+                    </Button>
+                  </div>
+                </article>
+              ))}
+
+              {rows.length === 0 ? (
+                <div className={list.empty}>No bands found.</div>
+              ) : null}
             </div>
           </>
         )}
