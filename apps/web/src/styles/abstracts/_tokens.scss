@@ -25,7 +25,11 @@
   --space-4: 1.8rem;
   --space-5: 2.4rem;
 
-  --gradient-primary: linear-gradient(180deg, var(--primary-dark) 0%, #000 40%);
+  --gradient-primary: linear-gradient(
+    180deg,
+    var(--primary-dark) 0%,
+    transparent 40%
+  );
 
   --font:
     ui-sans-serif, system-ui, -apple-system, Segoe UI, Rubik, Helvetica, Arial,
