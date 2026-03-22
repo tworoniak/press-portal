@@ -113,23 +113,44 @@ export default function DashboardPage() {
 
         {/* KPI row */}
         <div className={styles.summary}>
-          <div className={`${styles.summaryCard} ${styles.kpiDanger}`}>
-            <div className={styles.summaryLabel}>Due</div>
-            <div className={styles.summaryValue}>{summary.due}</div>
-            <div className={styles.summaryHint}>Overdue follow-ups</div>
-          </div>
+          <Link
+            to='/follow-ups?filter=due'
+            className={styles.summaryCardLink}
+          >
+            <div
+              className={`${styles.summaryCard} ${styles.kpiDanger} ${styles.withLink}`}
+            >
+              <div className={styles.summaryLabel}>Due</div>
+              <div className={styles.summaryValue}>{summary.due}</div>
+              <div className={styles.summaryHint}>Overdue follow-ups</div>
+            </div>
+          </Link>
 
-          <div className={`${styles.summaryCard}  ${styles.kpiWarn}`}>
-            <div className={styles.summaryLabel}>Due soon</div>
-            <div className={styles.summaryValue}>{summary.soon}</div>
-            <div className={styles.summaryHint}>Next 3 days</div>
-          </div>
+          <Link
+            to='/follow-ups?filter=soon'
+            className={styles.summaryCardLink}
+          >
+            <div
+              className={`${styles.summaryCard} ${styles.kpiWarn} ${styles.withLink}`}
+            >
+              <div className={styles.summaryLabel}>Due soon</div>
+              <div className={styles.summaryValue}>{summary.soon}</div>
+              <div className={styles.summaryHint}>Next 3 days</div>
+            </div>
+          </Link>
 
-          <div className={`${styles.summaryCard} ${styles.kpiDefault}`}>
-            <div className={styles.summaryLabel}>Scheduled</div>
-            <div className={styles.summaryValue}>{summary.scheduled}</div>
-            <div className={styles.summaryHint}>Future reminders</div>
-          </div>
+          <Link
+            to='/follow-ups?filter=scheduled'
+            className={styles.summaryCardLink}
+          >
+            <div
+              className={`${styles.summaryCard} ${styles.kpiDefault} ${styles.withLink}`}
+            >
+              <div className={styles.summaryLabel}>Scheduled</div>
+              <div className={styles.summaryValue}>{summary.scheduled}</div>
+              <div className={styles.summaryHint}>Future reminders</div>
+            </div>
+          </Link>
         </div>
 
         <div className={styles.summary}>
@@ -283,7 +304,12 @@ export default function DashboardPage() {
         {/* Lists */}
         <div className={styles.grid}>
           <section className={card.card}>
-            <h2 className={card.cardTitle}>Follow-ups</h2>
+            <div className={styles.cardTitleRow}>
+              <h2 className={card.cardTitle}>Follow-ups</h2>
+              <Link to='/follow-ups' className={styles.cardTitleLink}>
+                View all
+              </Link>
+            </div>
 
             {followups.length ? (
               <ul className={styles.list}>

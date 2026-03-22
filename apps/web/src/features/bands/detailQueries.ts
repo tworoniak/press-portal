@@ -47,6 +47,9 @@ export type BandDetail = {
   genre: string | null;
   country: string | null;
   website: string | null;
+  spotifyUrl: string | null;
+  instagram: string | null;
+  notes: string | null;
   contacts: BandContactLink[];
   interactions: BandInteraction[];
 };

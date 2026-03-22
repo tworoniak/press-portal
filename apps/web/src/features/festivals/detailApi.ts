@@ -28,14 +28,40 @@ type FestivalContactLink = {
   };
 };
 
+export type FestivalInteractionContact = {
+  id: string;
+  displayName: string | null;
+  firstName: string | null;
+  lastName: string | null;
+  email: string | null;
+  company: string | null;
+  role: string | null;
+};
+
+export type FestivalInteraction = {
+  id: string;
+  type: string;
+  occurredAt: string;
+  subject: string | null;
+  notes: string | null;
+  outcome: string | null;
+  nextFollowUpAt: string | null;
+  contact: FestivalInteractionContact;
+  band: { id: string; name: string } | null;
+};
+
 export type FestivalDetail = {
   id: string;
   name: string;
   location: string | null;
   website: string | null;
+  instagram: string | null;
   startDate: string | null;
   endDate: string | null;
+  credentialInfo: string | null;
+  notes: string | null;
   contacts: FestivalContactLink[];
+  interactions: FestivalInteraction[];
 };
 
 export async function fetchFestival(id: string) {

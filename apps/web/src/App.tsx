@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import ContactsPage from './features/contacts/ContactsPage';
 import ContactDetailPage from './features/contacts/ContactDetailPage';
 import DashboardPage from './features/dashboard/DashboardPage';
+import FollowUpsPage from './features/dashboard/FollowUpsPage';
 import LoginPage from './pages/LoginPage';
 import { RequireAuth } from './components/RequireAuth';
 import BandDetailPage from './features/bands/BandDetailPage';
@@ -22,6 +23,7 @@ export default function App() {
           <Route element={<RequireAuth />}>
             <Route element={<AppLayout />}>
               <Route path='/dashboard' element={<DashboardPage />} />
+              <Route path='/follow-ups' element={<FollowUpsPage />} />
               <Route path='/contacts' element={<ContactsPage />} />
               <Route path='/contacts/:id' element={<ContactDetailPage />} />
               <Route path='/bands' element={<BandsPage />} />

@@ -37,6 +37,24 @@ export class FestivalsService {
           },
           orderBy: { createdAt: 'desc' },
         },
+        interactions: {
+          orderBy: { occurredAt: 'desc' },
+          take: 15,
+          include: {
+            contact: {
+              select: {
+                id: true,
+                displayName: true,
+                firstName: true,
+                lastName: true,
+                email: true,
+                company: true,
+                role: true,
+              },
+            },
+            band: { select: { id: true, name: true } },
+          },
+        },
       },
     });
   }

@@ -166,6 +166,7 @@ import styles from './Header.module.scss';
 
 const navItems = [
   { to: '/dashboard', label: 'Dashboard', end: true },
+  { to: '/follow-ups', label: 'Follow-ups' },
   { to: '/contacts', label: 'Contacts' },
   { to: '/bands', label: 'Bands' },
   { to: '/festivals', label: 'Festivals' },

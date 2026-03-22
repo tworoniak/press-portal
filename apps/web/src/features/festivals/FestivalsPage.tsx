@@ -10,7 +10,7 @@ import {
 
 import page from '../../components/ui/Page/Page.module.scss';
 import card from '../../components/ui/Card/Card.module.scss';
-import table from '../../components/ui/Table/Table.module.scss';
+import list from '../../components/ui/ResourceList/ResourceList.module.scss';
 import { Modal } from '../../components/ui/Modal/Modal';
 import Button from '../../components/ui/Button/Button';
 import DateInput from '../../components/ui/DateInput/DateInput';
@@ -464,74 +464,95 @@ export default function FestivalsPage() {
             <div className={page.subtle}>{rows.length} festival(s)</div>
             <div style={{ height: 10 }} />
 
-            <div className={table.tableWrap}>
-              <table className={table.table}>
-                <thead>
-                  <tr>
-                    <th>Name</th>
-                    <th>Location</th>
-                    <th>Dates</th>
-                    <th>Website</th>
-                    <th style={{ width: 160 }}>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {rows.map((f) => (
-                    <tr key={f.id}>
-                      <td>
-                        <div className={table.rowTitle}>
+            <div className={list.list}>
+              {rows.map((f) => {
+                const dateRange =
+                  f.startDate || f.endDate
+                    ? `${fmtDate(f.startDate)}${
+                        f.endDate ? ` – ${fmtDate(f.endDate)}` : ''
+                      }`
+                    : null;
+
+                return (
+                  <article key={f.id} className={list.item}>
+                    <div className={list.itemHeader}>
+                      <div className={list.titleBlock}>
+                        <div className={list.title}>
                           <Link to={`/festivals/${f.id}`}>{f.name}</Link>
                         </div>
-                      </td>
-                      <td>{f.location ?? '—'}</td>
-                      <td>
-                        {fmtDate(f.startDate)}
-                        {f.endDate ? ` – ${fmtDate(f.endDate)}` : ''}
-                      </td>
-                      <td>
-                        {f.website ? (
-                          <a href={f.website} target='_blank' rel='noreferrer'>
-                            {f.website}
-                          </a>
-                        ) : (
-                          '—'
-                        )}
-                      </td>
-                      <td>
-                        <div style={{ display: 'flex', gap: 8 }}>
-                          <Button
-                            variant='outline'
-                            color='primary'
-                            size='lg'
-                            onClick={() => openEdit(f)}
-                          >
-                            <Pencil size={14} />
-                            <span className='mobile-hidden'>Edit</span>
-                          </Button>
+                      </div>
+                    </div>
 
-                          <Button
-                            variant='outline'
-                            color='danger'
-                            size='lg'
-                            onClick={() => openDelete(f)}
-                          >
-                            <Trash2 size={14} />
-                            <span className='mobile-hidden'>Delete</span>
-                          </Button>
+                    <div className={list.meta}>
+                      <div className={list.metaCell}>
+                        <div className={list.metaLabel}>Dates</div>
+                        <div className={list.metaValue}>
+                          {dateRange ?? (
+                            <span className={list.muted}>—</span>
+                          )}
                         </div>
-                      </td>
-                    </tr>
-                  ))}
+                      </div>
+                      <div className={list.metaCell}>
+                        <div className={list.metaLabel}>Location</div>
+                        <div className={list.metaValue}>
+                          {f.location ?? (
+                            <span className={list.muted}>—</span>
+                          )}
+                        </div>
+                      </div>
+                      <div className={list.metaCell}>
+                        <div className={list.metaLabel}>Website</div>
+                        <div className={list.metaValue}>
+                          {f.website ? (
+                            <a
+                              className={list.link}
+                              href={f.website}
+                              target='_blank'
+                              rel='noreferrer'
+                            >
+                              {f.website}
+                            </a>
+                          ) : (
+                            <span className={list.muted}>—</span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
 
-                  {rows.length === 0 && (
-                    <tr>
-                      <td colSpan={5} style={{ padding: 14, opacity: 0.75 }}>
-                        No festivals found.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+                    <div className={list.actions}>
+                      <Link
+                        to={`/festivals/${f.id}`}
+                        className={list.actionLink}
+                      >
+                        View
+                      </Link>
+                      <Button
+                        variant='outline'
+                        color='primary'
+                        size='lg'
+                        onClick={() => openEdit(f)}
+                      >
+                        <Pencil size={14} />
+                        Edit
+                      </Button>
+
+                      <Button
+                        variant='outline'
+                        color='danger'
+                        size='lg'
+                        onClick={() => openDelete(f)}
+                      >
+                        <Trash2 size={14} />
+                        Delete
+                      </Button>
+                    </div>
+                  </article>
+                );
+              })}
+
+              {rows.length === 0 ? (
+                <div className={list.empty}>No festivals found.</div>
+              ) : null}
             </div>
           </>
         )}

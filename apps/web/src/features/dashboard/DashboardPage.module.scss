@@ -73,6 +73,28 @@
   margin-bottom: 16px;
 }
 
+.cardTitleRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+}
+
+.cardTitleLink {
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  opacity: 0.85;
+
+  &:hover {
+    opacity: 1;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+}
+
 .chartHeader {
   margin-bottom: 12px;
 }

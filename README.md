@@ -1,4 +1,4 @@
-# 🎤 PressPilot v1.1 🤘
+# 🎤 PressPilot v1.2 🤘
 
 A full-stack Press Contact Management Portal for tracking publicists, managers, labels, and media contacts for bands and festivals.
 
@@ -31,6 +31,8 @@ Live Demo is unavailable at the moment. Vercel deployment is planned.
 - React Router
 - TanStack Query
 - Axios
+- SCSS modules (shared layout and list patterns)
+- Recharts (dashboard charts)
 
 ### Backend
 
@@ -97,22 +99,54 @@ press-portal/
 
 ## ✨ Current Features
 
-- ✅ Contacts CRUD
-- ✅ Contact detail view
-- ✅ Interaction logging (email, call, DM, note, etc.)
-- ✅ Timeline per contact
-- ✅ Auto-update lastContactedAt when interaction is created
-- ✅ Prisma relational schema (Contacts, Bands, Festivals, Interactions)
-- ✅ Dockerized PostgreSQL
+**Data & API**
 
-- 🔐 JWT authentication
-- 🧠 Prisma + Postgres
-- 🧾 Contacts CRUD
-- 🕒 Interactions + follow-up logic
-- 📊 Dashboard queries
-- ⚛️ React + TanStack Query
-- 🎨 Modular SCSS architecture
-- 🧹 Strict TypeScript + ESLint
+- Contacts, bands, and festivals CRUD
+- JWT authentication
+- Prisma relational schema (Contacts, Bands, Festivals, Interactions)
+- Interaction logging with auto-update of `lastContactedAt` (transactional)
+- Dockerized PostgreSQL; Prisma migrations committed
+
+**App behavior**
+
+- Dashboard: KPIs (Due / Due soon / Scheduled link to the follow-up queue), follow-up pipeline charts, recent activity, upcoming festivals
+- **Follow-ups** page (`/follow-ups`): full queue of interactions with a next follow-up date, filterable (All / Due / Due soon / Scheduled); API: `GET /dashboard/follow-up-queue`
+- Contact detail: profile, tags, linked bands/festivals, interaction timeline
+- Band & festival detail: profile and linked press contacts; recent interactions for that entity (band/festival APIs include interaction history)
+- Contacts list: search and filters (status, tag, needs follow-up), with **filters reflected in the URL** (`q`, `status`, `tag`, `followup`) for bookmarking and sharing
+- Command palette for quick navigation and creates
+- Responsive list views: **card-based lists** (`ResourceList`) for Contacts, Bands, and Festivals—one pattern for all breakpoints (no separate desktop table vs mobile cards)
+- Detail pages: **two-column layout** (details left, interactions right) for Contact, Band, and Festival, using shared layout styles (`EntityDetailLayout`)
+
+---
+
+## 🏃 Running locally
+
+1. **Database** — from the repo root:
+
+   ```bash
+   docker compose up -d
+   ```
+
+2. **Environment** — set `DATABASE_URL` in `apps/api/.env` (PostgreSQL URL matching `docker-compose.yml`, e.g. user `postgres`, database `press_portal`).
+
+3. **Install & migrate**:
+
+   ```bash
+   pnpm install
+   pnpm --filter @press/api exec prisma generate
+   pnpm --filter @press/api exec prisma migrate deploy
+   ```
+
+4. **Dev servers** (API + Vite):
+
+   ```bash
+   pnpm dev
+   ```
+
+   Or run separately: `pnpm dev:web` / `pnpm dev:api`.
+
+The API listens on **http://localhost:3000** by default. Vite defaults to **http://localhost:5173** (CORS allows common localhost ports). The web client uses `VITE_API_URL` if set; otherwise it defaults to `http://localhost:3000`.
 
 ---
 
@@ -137,12 +171,10 @@ press-portal/
 
 ## 🗺 Roadmap
 
-- 🔍 Search & filtering (status, tags, follow-ups)
-- 📅 Follow-up dashboard (nextFollowUpAt)
-- 🎟 Festival credential tracking
-- 📊 “Needs follow-up” smart sorting
-- 🧾 CSV import/export
-- 🔐 Auth + multi-workspace support
-- 📄 Swagger API documentation
+- CSV import/export
+- Calendar or richer sorting for follow-ups (beyond the current queue + filters)
+- Reminders or notifications for due follow-ups
+- Auth hardening + multi-workspace / multi-user
+- Swagger API documentation
 
 ---

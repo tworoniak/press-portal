@@ -24,6 +24,12 @@ export class DashboardController {
     return this.dashboard.followUpsDue(limit ? Number(limit) : 20);
   }
 
+  @Get('follow-up-queue')
+  followUpQueue(@Query('limit') limit?: string) {
+    const n = limit ? Number(limit) : 100;
+    return this.dashboard.followUpQueue(Number.isFinite(n) ? n : 100);
+  }
+
   @Get('recent')
   recentlyContacted(@Query('limit') limit?: string) {
     return this.dashboard.recentlyContacted(limit ? Number(limit) : 12);

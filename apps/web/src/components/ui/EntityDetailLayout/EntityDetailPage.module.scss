@@ -44,7 +44,6 @@
     rgba(255, 255, 255, 0.06),
     rgba(255, 255, 255, 0.03)
   );
-  // rgba(0, 0, 0, 0.12);
   padding: 16px;
   box-shadow: var(--shadow);
 }
@@ -144,7 +143,6 @@
 .formGrid {
   display: grid;
   gap: 10px;
-  // max-width: 620px;
 }
 
 .field {
@@ -173,8 +171,6 @@
     flex-direction: column;
   }
 }
-
-/* mobile */
 
 @media (max-width: 960px) {
   .pageGrid {

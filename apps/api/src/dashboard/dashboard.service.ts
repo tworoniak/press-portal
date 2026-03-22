@@ -20,6 +20,34 @@ export class DashboardService {
     });
   }
 
+  /** All interactions with a follow-up date, soonest first (overdue first). */
+  async followUpQueue(limit = 100) {
+    const take = Math.min(Math.max(limit, 1), 200);
+
+    return this.prisma.interaction.findMany({
+      where: {
+        nextFollowUpAt: { not: null },
+      },
+      include: {
+        contact: {
+          select: {
+            id: true,
+            displayName: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+            company: true,
+            role: true,
+          },
+        },
+        band: { select: { id: true, name: true } },
+        festival: { select: { id: true, name: true } },
+      },
+      orderBy: { nextFollowUpAt: 'asc' },
+      take,
+    });
+  }
+
   async recentlyContacted(limit = 12) {
     return this.prisma.contact.findMany({
       where: { lastContactedAt: { not: null } },
