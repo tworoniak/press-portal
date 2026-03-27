@@ -86,7 +86,6 @@ export class DashboardService {
       freshContacts,
       recentInteractions,
       upcomingFestivals,
-      interactionsLast7DaysRaw,
     ] = await Promise.all([
       this.prisma.contact.count(),
       this.prisma.band.count(),
@@ -189,15 +188,12 @@ export class DashboardService {
         },
       }),
 
-      this.prisma.interaction.findMany({
-        where: {
-          occurredAt: { gte: sevenDaysAgo },
-        },
-        select: {
-          occurredAt: true,
-        },
-      }),
     ]);
+
+    const interactionsLast7DaysRaw = await this.prisma.interaction.findMany({
+      where: { occurredAt: { gte: sevenDaysAgo } },
+      select: { occurredAt: true },
+    });
 
     const interactionsLast7Days = Array.from({ length: 7 }, (_, i) => {
       const day = new Date(sevenDaysAgo);

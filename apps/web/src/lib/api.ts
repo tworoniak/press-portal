@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL ?? 'http://localhost:3000',
+  baseURL: import.meta.env.VITE_API_URL ?? 'http://127.0.0.1:3000',
 });
 
 api.interceptors.request.use((config) => {
@@ -12,3 +12,14 @@ api.interceptors.request.use((config) => {
   }
   return config;
 });
+
+api.interceptors.response.use(
+  (res) => res,
+  (err) => {
+    if (err.response?.status === 401) {
+      localStorage.removeItem('pp_token');
+      window.location.href = '/login';
+    }
+    return Promise.reject(err);
+  },
+);

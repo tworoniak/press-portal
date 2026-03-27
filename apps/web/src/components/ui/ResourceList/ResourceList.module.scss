@@ -1,8 +1,8 @@
 // Shared list pattern: stacked cards at all breakpoints (no table / mobile split).
 
 .list {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 12px;
 }
 

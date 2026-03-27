@@ -30,6 +30,10 @@
     var(--primary-dark) 0%,
     transparent 40%
   );
+  --gradient-primary-reverse: linear-gradient(
+    180deg,
+    transparent 0% var(--primary-dark) 100%
+  );
 
   --font:
     ui-sans-serif, system-ui, -apple-system, Segoe UI, Rubik, Helvetica, Arial,
