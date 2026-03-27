@@ -6,6 +6,11 @@ datasource db {
   provider = "postgresql"
 }
 
+enum UserRole {
+  ADMIN
+  USER
+}
+
 enum InteractionType {
   EMAIL
   CALL
@@ -163,7 +168,7 @@ model User {
   id        String   @id @default(cuid())
   email     String   @unique
   password  String
-  role      String   @default("ADMIN")
+  role      UserRole @default(ADMIN)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
